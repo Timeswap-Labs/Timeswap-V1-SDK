@@ -5,6 +5,7 @@ export class Uint128 {
   constructor(value: string | number | bigint | boolean | Uint128) {
     if (value instanceof Uint128) this.value = value.value;
     else this.value = BigInt(value);
+
     this.isValid = isUint128(this.value);
   }
 
@@ -16,6 +17,7 @@ export class Uint128 {
     // if (this.isValid) {
     if (value instanceof Uint128) this.value = value.value;
     else this.value = BigInt(value);
+
     this.isValid = isUint128(this.value);
     // }
   }

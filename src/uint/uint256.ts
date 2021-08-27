@@ -2,8 +2,10 @@ export class Uint256 {
   value: bigint;
   isValid: boolean;
 
-  constructor(value: string | number | bigint | boolean) {
-    this.value = BigInt(value);
+  constructor(value: string | number | bigint | boolean | Uint256) {
+    if (value instanceof Uint256) this.value = value.value;
+    else this.value = BigInt(value);
+
     this.isValid = isUint256(this.value);
   }
 
@@ -11,9 +13,11 @@ export class Uint256 {
     return this.isValid ? this.value : null;
   }
 
-  set(value: string | number | bigint | boolean) {
+  set(value: string | number | bigint | boolean | Uint256) {
     // if (this.isValid) {
-    this.value = BigInt(value);
+    if (value instanceof Uint256) this.value = value.value;
+    else this.value = BigInt(value);
+
     this.isValid = isUint256(this.value);
     // }
   }

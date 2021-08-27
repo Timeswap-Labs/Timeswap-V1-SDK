@@ -2,8 +2,10 @@ export class Uint40 {
   value: bigint;
   isValid: boolean;
 
-  constructor(value: string | number | bigint | boolean) {
-    this.value = BigInt(value);
+  constructor(value: string | number | bigint | boolean | Uint40) {
+    if (value instanceof Uint40) this.value = value.value;
+    else this.value = BigInt(value);
+
     this.isValid = isUint40(this.value);
   }
 
@@ -11,95 +13,125 @@ export class Uint40 {
     return this.isValid ? this.value : null;
   }
 
-  set(value: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value = BigInt(value);
-      this.isValid = isUint40(this.value);
-    }
+  set(value: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (value instanceof Uint40) this.value = value.value;
+    else this.value = BigInt(value);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  add(other: string | number | bigint | boolean): Uint40 {
+  add(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.addAssign(other);
 
     return result;
   }
 
-  addAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value += BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  addAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value += other.value;
+    else this.value += BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  sub(other: string | number | bigint | boolean): Uint40 {
+  sub(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.subAssign(other);
 
     return result;
   }
 
-  subAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value -= BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  subAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value -= other.value;
+    else this.value -= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  mul(other: string | number | bigint | boolean): Uint40 {
+  mul(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.mulAssign(other);
 
     return result;
   }
 
-  mulAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value *= BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  mulAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value *= other.value;
+    else this.value *= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  div(other: string | number | bigint | boolean): Uint40 {
+  div(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.divAssign(other);
 
     return result;
   }
 
-  divAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value /= BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  divAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value /= other.value;
+    else this.value /= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  shiftLeft(other: string | number | bigint | boolean): Uint40 {
+  mod(other: string | number | bigint | boolean | Uint40): Uint40 {
+    const result = new Uint40(this.value);
+    result.modAssign(other);
+
+    return result;
+  }
+
+  modAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value %= other.value;
+    else this.value %= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
+  }
+
+  shiftLeft(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.shiftLeftAssign(other);
 
     return result;
   }
 
-  shiftLeftAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value <<= BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  shiftLeftAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value <<= other.value;
+    else this.value <<= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 
-  shiftRight(other: string | number | bigint | boolean): Uint40 {
+  shiftRight(other: string | number | bigint | boolean | Uint40): Uint40 {
     const result = new Uint40(this.value);
     result.shiftRightAssign(other);
 
     return result;
   }
 
-  shiftRightAssign(other: string | number | bigint | boolean) {
-    if (this.isValid) {
-      this.value >>= BigInt(other);
-      this.isValid = isUint40(this.value);
-    }
+  shiftRightAssign(other: string | number | bigint | boolean | Uint40) {
+    // if (this.isValid) {
+    if (other instanceof Uint40) this.value >>= other.value;
+    else this.value >>= BigInt(other);
+
+    this.isValid = isUint40(this.value);
+    // }
   }
 }
 

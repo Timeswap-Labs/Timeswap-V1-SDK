@@ -2,8 +2,10 @@ export class Uint112 {
   value: bigint;
   isValid: boolean;
 
-  constructor(value: string | number | bigint | boolean) {
-    this.value = BigInt(value);
+  constructor(value: string | number | bigint | boolean | Uint112) {
+    if (value instanceof Uint112) this.value = value.value;
+    else this.value = BigInt(value);
+
     this.isValid = isUint112(this.value);
   }
 
@@ -11,9 +13,11 @@ export class Uint112 {
     return this.isValid ? this.value : null;
   }
 
-  set(value: string | number | bigint | boolean) {
+  set(value: string | number | bigint | boolean | Uint112) {
     // if (this.isValid) {
-    this.value = BigInt(value);
+    if (value instanceof Uint112) this.value = value.value;
+    else this.value = BigInt(value);
+
     this.isValid = isUint112(this.value);
     // }
   }
