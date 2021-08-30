@@ -1,7 +1,7 @@
 import { Uint256 } from '..';
 
 export function mulDiv(a: Uint256, b: Uint256, denominator: Uint256): Uint256 {
-  return a.mul(b).div(denominator);
+  return new Uint256((a.value * b.value) / denominator.value);
 }
 
 export function mulDivUp(
@@ -10,8 +10,7 @@ export function mulDivUp(
   denominator: Uint256
 ): Uint256 {
   const z = mulDiv(a, b, denominator);
-  const mulMod = a.mul(b).mod(denominator);
-  if (mulMod.get()! > 0) return z.add(1);
-  // FIXME `!` mark
+  const mulMod = (a.value * b.value) % denominator.value;
+  if (mulMod > 0n) return z.add(1);
   else return z;
 }

@@ -7,8 +7,8 @@ export function calculate(
   denominator2: Uint256
 ): Uint256 {
   return mulDivUp(
-    state.interest.mul(state.cdp),
-    state.asset,
+    new Uint256(state.interest.mul(state.cdp)),
+    new Uint256(state.asset),
     denominator1.mul(denominator2)
   );
 }
@@ -19,8 +19,8 @@ export function getConstantProduct(
   denominator2: Uint256
 ): Uint256 {
   return mulDivUp(
-    state.interest.mul(state.cdp).shiftLeft(32),
-    state.asset,
+    new Uint256(state.interest.mul(state.cdp).shiftLeft(32)),
+    new Uint256(state.asset),
     denominator1.mul(denominator2)
   );
 }

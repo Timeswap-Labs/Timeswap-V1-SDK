@@ -27,13 +27,13 @@ export function givenDebt(
 
   const cdpAdjust = getConstantProduct(
     state,
-    state.asset.sub(assetOut),
+    new Uint256(state.asset.sub(assetOut)),
     interestAdjust
   );
 
   const _cdpIncrease = new Uint256(cdpAdjust);
   _cdpIncrease.subAssign(new Uint256(state.cdp).shiftLeft(16));
-  _cdpIncrease.set(divUp(_cdpIncrease, feeBase));
+  _cdpIncrease.set(divUp(_cdpIncrease, new Uint256(feeBase)));
   const cdpIncrease = new Uint112(_cdpIncrease);
 
   return { interestIncrease, cdpIncrease };
@@ -58,7 +58,9 @@ export function givenCollateral(
   const denominator = new Uint256(state.asset);
   denominator.subAssign(assetOut);
   denominator.mulAssign(new Uint256(state.asset).shiftLeft(32));
-  subtrahend.set(mulDivUp(subtrahend, assetOut.mul(state.cdp), denominator));
+  subtrahend.set(
+    mulDivUp(subtrahend, new Uint256(assetOut.mul(state.cdp)), denominator)
+  );
 
   const _cdpIncrease = new Uint256(collateralIn);
   _cdpIncrease.subAssign(subtrahend);
@@ -70,13 +72,13 @@ export function givenCollateral(
 
   const interestAdjust = getConstantProduct(
     state,
-    state.asset.sub(assetOut),
+    new Uint256(state.asset.sub(assetOut)),
     cdpAdjust
   );
 
   const _interestIncrease = new Uint256(interestAdjust);
   _interestIncrease.subAssign(new Uint256(state.interest).shiftLeft(16));
-  _interestIncrease.set(divUp(_interestIncrease, feeBase));
+  _interestIncrease.set(divUp(_interestIncrease, new Uint256(feeBase)));
   const interestIncrease = new Uint112(_interestIncrease);
 
   return { interestIncrease, cdpIncrease };
@@ -102,7 +104,7 @@ export function givenPercent(
 
   const maximum = new Uint256(interestAdjust);
   maximum.subAssign(new Uint256(state.interest).shiftLeft(16));
-  maximum.set(divUp(maximum, feeBase));
+  maximum.set(divUp(maximum, new Uint256(feeBase)));
 
   const _interestIncrease = new Uint256(maximum);
   _interestIncrease.subAssign(minimum);
@@ -117,13 +119,13 @@ export function givenPercent(
 
   const cdpAdjust = getConstantProduct(
     state,
-    state.asset.sub(assetOut),
+    new Uint256(state.asset.sub(assetOut)),
     interestAdjust
   );
 
   const _cdpIncrease = new Uint256(cdpAdjust);
   _cdpIncrease.subAssign(new Uint256(state.cdp).shiftLeft(16));
-  _cdpIncrease.set(divUp(_cdpIncrease, feeBase));
+  _cdpIncrease.set(divUp(_cdpIncrease, new Uint256(feeBase)));
   const cdpIncrease = new Uint112(_cdpIncrease);
 
   return { interestIncrease, cdpIncrease };

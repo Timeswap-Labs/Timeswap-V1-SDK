@@ -25,7 +25,7 @@ export function givenBond(
 
   const cdpAdjust = getConstantProduct(
     state,
-    state.asset.add(assetIn),
+    new Uint256(state.asset.add(assetIn)),
     interestAdjust
   );
 
@@ -55,7 +55,9 @@ export function givenInsurance(
   const denominator = new Uint256(state.asset);
   denominator.addAssign(assetIn);
   denominator.mulAssign(state.asset.shiftLeft(32));
-  subtrahend.set(mulDiv(subtrahend, assetIn.mul(state.cdp), denominator));
+  subtrahend.set(
+    mulDiv(subtrahend, new Uint256(assetIn.mul(state.cdp)), denominator)
+  );
 
   const _cdpDecrease = new Uint256(insuranceOut);
   _cdpDecrease.subAssign(subtrahend);
@@ -67,7 +69,7 @@ export function givenInsurance(
 
   const interestAdjust = getConstantProduct(
     state,
-    state.asset.add(assetIn),
+    new Uint256(state.asset.add(assetIn)),
     cdpAdjust
   );
 
@@ -115,7 +117,7 @@ export function givenPercent(
 
   const cdpAdjust = getConstantProduct(
     state,
-    state.asset.add(assetIn),
+    new Uint256(state.asset.add(assetIn)),
     interestAdjust
   );
 
