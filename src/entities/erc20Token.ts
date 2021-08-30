@@ -1,6 +1,6 @@
 import { AbstractToken } from './abstractToken';
 
-export abstract class ERC20Token extends AbstractToken {
+export class ERC20Token extends AbstractToken {
   public readonly isNative: boolean = false;
   public readonly isERC20: boolean = true;
 
