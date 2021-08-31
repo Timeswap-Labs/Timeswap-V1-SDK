@@ -1,58 +1,453 @@
-import { Uint112, Uint256 } from '../../uint';
-import { ERC20Token } from '../../';
-import { Uint128 } from '../../uint';
-import { Uint40 } from '../../uint/uint40';
+import { ERC20Token, Uint112, Uint128, Uint256, Uint40 } from '../../';
+
+import { Provider } from '@ethersproject/providers';
+import { Signer } from '@ethersproject/abstract-signer';
+import { TimeswapConvenience__factory } from '../../typechain';
+import { TimeswapConvenience } from '../../typechain';
 
 export class Conv {
-  coninterfaceor(provider) {}
+  protected providerOrSigner: Provider | Signer;
+  protected contract: TimeswapConvenience;
 
-  // View
-  getNative(asset: ERC20Token, collateral: ERC20Token, maturity: Uint256) {}
+  constructor(providerOrSigner: Provider | Signer) {
+    this.providerOrSigner = providerOrSigner;
+    this.contract = TimeswapConvenience__factory.connect(
+      CONVENIENCE,
+      this.providerOrSigner
+    );
+  }
 
-  // Update
-  newLiquidity(params: NewLiquidity) {}
-  newLiquidityETHAsset(params: NewLiquidityETHAsset) {}
+  upgrade(signer: Signer): ConvSigner {
+    return new ConvSigner(signer);
+  }
 
-  newLiquidityETHCollateral(params: NewLiquidityETHCollateral) {}
-  addLiquidity(params: AddLiquidity) {}
-  addLiquidityETHAsset(params: AddLiquidityETHAsset) {}
-  addLiquidityETHCollateral(params: AddLiquidityETHCollateral) {}
-  removeLiquidity(params: RemoveLiquidity) {}
-  removeLiquidityETHAsset(params: RemoveLiquidityETHAsset) {}
-  removeLiquidityETHCollateral(param: RemoveLiquidityETHCollateral) {}
-  lendGivenBond(params: LendGivenBond) {}
+  async getNative(
+    asset: ERC20Token,
+    collateral: ERC20Token,
+    maturity: Uint256
+  ): Promise<Native> {
+    return await this.contract.getNative(
+      asset.address,
+      collateral.address,
+      maturity.get()
+    );
+  }
+}
 
-  lendGivenBondETHAsset(params: LendGivenBondETHAsset) {}
+export class ConvSigner extends Conv {
+  constructor(signer: Signer) {
+    super(signer);
+  }
 
-  lendGivenBondETHCollateral(params: LendGivenBondETHCollateral) {}
+  async newLiquidity(params: NewLiquidity) {
+    await this.contract.newLiquidity({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      debtOut: params.debtOut.value,
+      collateralIn: params.collateralIn.value,
+      deadline: params.deadline.value,
+    });
+  }
 
-  lendGivenInsurance(params: LendGivenInsurance) {}
+  async newLiquidityETHAsset(params: NewLiquidityETHAsset) {
+    await this.contract.newLiquidityETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      debtOut: params.debtOut.value,
+      collateralIn: params.collateralIn.value,
+      deadline: params.deadline.value,
+    });
+  }
 
-  lendGivenInsuranceETHAsset(params: LendGivenInsuranceETHAsset) {}
-  lendGivenInsuranceETHCollateral(params: LendGivenInsuranceETHCollateral) {}
-  lendGivenPercent(params: LendGivenPercent) {}
-  lendGivenPercentETHAsset(params: LendGivenPercentETHAsset) {}
-  lendGivenPercentETHCollateral(params: LendGivenPercentETHCollateral) {}
-  collect(params: Collect) {}
-  collectETHAsset(params: CollectETHAsset) {}
-  collectETHCollateral(params: CollectETHCollateral) {}
-  borrowGivenDebt(params: BorrowGivenDebt) {}
-  borrowGivenDebtETHAsset(params: BorrowGivenDebtETHAsset) {}
-  borrowGivenDebtETHCollateral(params: BorrowGivenDebtETHCollateral) {}
-  borrowGivenCollateral(params: BorrowGivenCollateral) {}
-  borrowGivenCollateralETHAsset(params: BorrowGivenCollateralETHAsset) {}
-  borrowGivenCollateralETHCollateral(
+  async newLiquidityETHCollateral(params: NewLiquidityETHCollateral) {
+    await this.contract.newLiquidityETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      debtOut: params.debtOut.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async addLiquidity(params: AddLiquidity) {
+    await this.contract.addLiquidity({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      minLiquidity: params.minLiquidity.value,
+      maxDebt: params.maxDebt.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async addLiquidityETHAsset(params: AddLiquidityETHAsset) {
+    await this.contract.addLiquidityETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      minLiquidity: params.minLiquidity.value,
+      maxDebt: params.maxDebt.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async addLiquidityETHCollateral(params: AddLiquidityETHCollateral) {
+    await this.contract.addLiquidityETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      minLiquidity: params.minLiquidity.value,
+      maxDebt: params.maxDebt.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async removeLiquidity(params: RemoveLiquidity) {
+    await this.contract.removeLiquidity({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      liquidityIn: params.liquidityIn.value,
+    });
+  }
+
+  async removeLiquidityETHAsset(params: RemoveLiquidityETHAsset) {
+    await this.contract.removeLiquidityETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      liquidityIn: params.liquidityIn.value,
+    });
+  }
+
+  async removeLiquidityETHCollateral(params: RemoveLiquidityETHCollateral) {
+    await this.contract.removeLiquidityETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      liquidityIn: params.liquidityIn.value,
+    });
+  }
+
+  async lendGivenBond(params: LendGivenBond) {
+    await this.contract.lendGivenBond({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      bondOut: params.bondOut.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenBondETHAsset(params: LendGivenBondETHAsset) {
+    await this.contract.lendGivenBondETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      bondOut: params.bondOut.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenBondETHCollateral(params: LendGivenBondETHCollateral) {
+    await this.contract.lendGivenBondETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      bondOut: params.bondOut.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenInsurance(params: LendGivenInsurance) {
+    this.contract.lendGivenInsurance({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      insuranceOut: params.insuranceOut.value,
+      minBond: params.minBond.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenInsuranceETHAsset(params: LendGivenInsuranceETHAsset) {
+    this.contract.lendGivenInsuranceETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      insuranceOut: params.insuranceOut.value,
+      minBond: params.minBond.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenInsuranceETHCollateral(
+    params: LendGivenInsuranceETHCollateral
+  ) {
+    this.contract.lendGivenInsuranceETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      insuranceOut: params.insuranceOut.value,
+      minBond: params.minBond.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenPercent(params: LendGivenPercent) {
+    await this.contract.lendGivenPercent({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      percent: params.percent.value,
+      minBond: params.minBond.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenPercentETHAsset(params: LendGivenPercentETHAsset) {
+    await this.contract.lendGivenPercentETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      percent: params.percent.value,
+      minBond: params.minBond.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async lendGivenPercentETHCollateral(params: LendGivenPercentETHCollateral) {
+    await this.contract.lendGivenPercentETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetIn: params.assetIn.value,
+      percent: params.percent.value,
+      minBond: params.minBond.value,
+      minInsurance: params.minInsurance.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async collect(params: Collect) {
+    this.contract.collect({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      claimsIn: {
+        bond: params.claimsIn.bond.value,
+        insurance: params.claimsIn.bond.value,
+      },
+    });
+  }
+
+  async collectETHAsset(params: CollectETHAsset) {
+    this.contract.collectETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      claimsIn: {
+        bond: params.claimsIn.bond.value,
+        insurance: params.claimsIn.bond.value,
+      },
+    });
+  }
+
+  async collectETHCollateral(params: CollectETHCollateral) {
+    this.contract.collectETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      claimsIn: {
+        bond: params.claimsIn.bond.value,
+        insurance: params.claimsIn.bond.value,
+      },
+    });
+  }
+
+  async borrowGivenDebt(params: BorrowGivenDebt) {
+    this.contract.borrowGivenDebt({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      debtIn: params.debtIn.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenDebtETHAsset(params: BorrowGivenDebtETHAsset) {
+    this.contract.borrowGivenDebtETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      debtIn: params.debtIn.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenDebtETHCollateral(params: BorrowGivenDebtETHCollateral) {
+    this.contract.borrowGivenDebtETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      debtIn: params.debtIn.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenCollateral(params: BorrowGivenCollateral) {
+    this.contract.borrowGivenCollateral({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      collateralIn: params.collateralIn.value,
+      maxDebt: params.maxDebt.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenCollateralETHAsset(params: BorrowGivenCollateralETHAsset) {
+    this.contract.borrowGivenCollateralETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      collateralIn: params.collateralIn.value,
+      maxDebt: params.maxDebt.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenCollateralETHCollateral(
     params: BorrowGivenCollateralETHCollateral
-  ) {}
-  borrowGivenPercent(params: BorrowGivenPercent) {}
-  borrowGivenPercentETHAsset(params: BorrowGivenPercentETHAsset) {}
-  borrowGivenPercentETHCollateral(params: BorrowGivenPercentETHCollateral) {}
-  repay(params: Repay) {}
-  repayETHAsset(params: RepayETHAsset) {}
-  repayETHCollateral(params: RepayETHCollateral) {}
+  ) {
+    this.contract.borrowGivenCollateralETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      maxDebt: params.maxDebt.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenPercent(params: BorrowGivenPercent) {
+    this.contract.borrowGivenPercent({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      percent: params.percent.value,
+      maxDebt: params.maxDebt.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenPercentETHAsset(params: BorrowGivenPercentETHAsset) {
+    this.contract.borrowGivenPercentETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      percent: params.percent.value,
+      maxDebt: params.maxDebt.value,
+      maxCollateral: params.maxCollateral.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async borrowGivenPercentETHCollateral(
+    params: BorrowGivenPercentETHCollateral
+  ) {
+    this.contract.borrowGivenPercentETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      assetOut: params.assetOut.value,
+      percent: params.percent.value,
+      maxDebt: params.maxDebt.value,
+      deadline: params.deadline.value,
+    });
+  }
+
+  async repay(params: Repay) {
+    this.contract.repay({
+      ...params,
+      asset: params.asset.address,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      ids: params.ids.map(value => value.value),
+      maxAssetsIn: params.maxAssetsIn.map(value => value.value),
+      deadline: params.deadline.value,
+    });
+  }
+
+  async repayETHAsset(params: RepayETHAsset) {
+    this.contract.repayETHAsset({
+      ...params,
+      collateral: params.collateral.address,
+      maturity: params.maturity.value,
+      ids: params.ids.map(value => value.value),
+      maxAssetsIn: params.maxAssetsIn.map(value => value.value),
+      deadline: params.deadline.value,
+    });
+  }
+
+  async repayETHCollateral(params: RepayETHCollateral) {
+    this.contract.repayETHCollateral({
+      ...params,
+      asset: params.asset.address,
+      maturity: params.maturity.value,
+      ids: params.ids.map(value => value.value),
+      maxAssetsIn: params.maxAssetsIn.map(value => value.value),
+      deadline: params.deadline.value,
+    });
+  }
 }
 
 // Interface
+
+interface Native {
+  liquidity: string;
+  bond: string;
+  insurance: string;
+  collateralizedDebt: string;
+}
 interface NewLiquidity {
   asset: ERC20Token;
   collateral: ERC20Token;
