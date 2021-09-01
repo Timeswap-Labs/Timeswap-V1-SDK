@@ -74,8 +74,7 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const assetIn = params.assetIn;
-      const collateralIn = params.collateralIn;
+      const { assetIn, collateralIn } = params;
       invariant(assetIn, 'assetIn is undefined');
       invariant(collateralIn, 'collateralIn is undefined');
 
@@ -87,7 +86,7 @@ export class PairSigner extends Pair {
         collateralIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const collateralIn = params.collateralIn;
+      const { collateralIn } = params;
       invariant(collateralIn, 'collateralIn is undefined');
 
       await this.convSigner.newLiquidityETHAsset({
@@ -96,7 +95,7 @@ export class PairSigner extends Pair {
         collateralIn,
       });
     } else if (this.asset instanceof ERC20Token) {
-      const assetIn = params.assetIn;
+      const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
       await this.convSigner.newLiquidityETHCollateral({
@@ -112,8 +111,7 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const assetIn = params.assetIn;
-      const maxCollateral = params.maxCollateral;
+      const { assetIn, maxCollateral } = params;
       invariant(assetIn, 'assetIn is undefined');
       invariant(maxCollateral, 'maxCollateral is undefined');
 
@@ -125,7 +123,7 @@ export class PairSigner extends Pair {
         maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const maxCollateral = params.maxCollateral;
+      const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
       await this.convSigner.addLiquidityETHAsset({
@@ -134,13 +132,268 @@ export class PairSigner extends Pair {
         maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      const assetIn = params.assetIn;
+      const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
       await this.convSigner.addLiquidityETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
+      });
+    }
+  }
+
+  async removeLiquidity(params: RemoveLiquidity) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      await this.convSigner.removeLiquidity({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.removeLiquidityETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.removeLiquidityETHCollateral({
+        ...params,
+        asset: this.asset,
+      });
+    }
+  }
+
+  async lendGivenBond(params: LendGivenBond) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenBond({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        assetIn,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.lendGivenBondETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenBondETHCollateral({
+        ...params,
+        asset: this.asset,
+        assetIn,
+      });
+    }
+  }
+
+  async lendGivenInsurance(params: LendGivenInsurance) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenInsurance({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        assetIn,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.lendGivenInsuranceETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenInsuranceETHCollateral({
+        ...params,
+        asset: this.asset,
+        assetIn,
+      });
+    }
+  }
+
+  async lendGivenPercent(params: LendGivenPercent) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenPercent({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        assetIn,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.lendGivenPercentETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      const { assetIn } = params;
+      invariant(assetIn, 'assetIn is undefined');
+
+      await this.convSigner.lendGivenPercentETHCollateral({
+        ...params,
+        asset: this.asset,
+        assetIn,
+      });
+    }
+  }
+
+  async collect(params: Collect) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      await this.convSigner.collect({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.collectETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.collectETHCollateral({
+        ...params,
+        asset: this.asset,
+      });
+    }
+  }
+
+  async borrowGivenDebt(params: BorrowGivenDebt) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { maxCollateral } = params;
+      invariant(maxCollateral, 'maxCollateral is undefined');
+
+      await this.convSigner.borrowGivenDebt({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        maxCollateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      const { maxCollateral } = params;
+      invariant(maxCollateral, 'maxCollateral is undefined');
+
+      await this.convSigner.borrowGivenDebtETHAsset({
+        ...params,
+        collateral: this.collateral,
+        maxCollateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.borrowGivenDebtETHCollateral({
+        ...params,
+        asset: this.asset,
+      });
+    }
+  }
+
+  async borrowGivenCollateral(params: BorrowGivenCollateral) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { collateralIn } = params;
+      invariant(collateralIn, 'collateralIn is undefined');
+
+      await this.convSigner.borrowGivenCollateral({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        collateralIn,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      const { collateralIn } = params;
+      invariant(collateralIn, 'collateralIn is undefined');
+
+      await this.convSigner.borrowGivenCollateralETHAsset({
+        ...params,
+        collateral: this.collateral,
+        collateralIn,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.borrowGivenCollateralETHCollateral({
+        ...params,
+        asset: this.asset,
+      });
+    }
+  }
+
+  async borrowGivenPercent(params: BorrowGivenPercent) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      const { maxCollateral } = params;
+      invariant(maxCollateral, 'maxCollateral is undefined');
+
+      await this.convSigner.borrowGivenPercent({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+        maxCollateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      const { maxCollateral } = params;
+      invariant(maxCollateral, 'maxCollateral is undefined');
+
+      await this.convSigner.borrowGivenPercentETHAsset({
+        ...params,
+        collateral: this.collateral,
+        maxCollateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.borrowGivenPercentETHCollateral({
+        ...params,
+        asset: this.asset,
+      });
+    }
+  }
+
+  async repay(params: Repay) {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      await this.convSigner.repay({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      await this.convSigner.repayETHAsset({
+        ...params,
+        collateral: this.collateral,
+      });
+    } else if (this.asset instanceof ERC20Token) {
+      await this.convSigner.repayETHCollateral({
+        ...params,
+        asset: this.asset,
       });
     }
   }
@@ -202,57 +455,19 @@ interface _AddLiquidity {
   deadline: Uint256;
 }
 interface RemoveLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   assetTo: string;
   collateralTo: string;
   liquidityIn: Uint256;
 }
 
-interface RemoveLiquidityETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  collateralTo: string;
-  liquidityIn: Uint256;
-}
-
-interface RemoveLiquidityETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  collateralTo: string;
-  liquidityIn: Uint256;
-}
 interface LendGivenBond {
   asset: ERC20Token;
   collateral: ERC20Token;
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenBondETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenBondETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
+  assetIn?: Uint112;
   bondOut: Uint128;
   minInsurance: Uint128;
   deadline: Uint256;
@@ -277,28 +492,7 @@ interface LendGivenInsurance {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenInsuranceETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenInsuranceETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
+  assetIn?: Uint112;
   insuranceOut: Uint128;
   minBond: Uint128;
   deadline: Uint256;
@@ -323,30 +517,7 @@ interface LendGivenPercent {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenPercentETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
-interface LendGivenPercentETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
+  assetIn?: Uint112;
   percent: Uint40;
   minBond: Uint128;
   minInsurance: Uint128;
@@ -375,22 +546,6 @@ interface Collect {
   claimsIn: Claims;
 }
 
-interface CollectETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  collateralTo: string;
-  claimsIn: Claims;
-}
-
-interface CollectETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  collateralTo: string;
-  claimsIn: Claims;
-}
-
 interface Claims {
   bond: Uint128;
   insurance: Uint128;
@@ -404,28 +559,7 @@ interface BorrowGivenDebt {
   dueTo: string;
   assetOut: Uint112;
   debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenDebtETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenDebtETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
+  maxCollateral?: Uint112;
   deadline: Uint256;
 }
 
@@ -448,28 +582,7 @@ interface BorrowGivenCollateral {
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
-  collateralIn: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenCollateralETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenCollateralETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
+  collateralIn?: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -496,30 +609,7 @@ interface BorrowGivenPercent {
   assetOut: Uint112;
   percent: Uint40;
   maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenPercentETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
-
-interface BorrowGivenPercentETHCollateral {
-  asset: ERC20Token;
-  maturity: Uint256;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
+  maxCollateral?: Uint112;
   deadline: Uint256;
 }
 
@@ -539,24 +629,6 @@ interface _BorrowGivenPercent {
 interface Repay {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
-  collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
-}
-
-interface RepayETHAsset {
-  collateral: ERC20Token;
-  maturity: Uint256;
-  collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
-}
-
-interface RepayETHCollateral {
-  asset: ERC20Token;
   maturity: Uint256;
   collateralTo: string;
   ids: Uint256[];
