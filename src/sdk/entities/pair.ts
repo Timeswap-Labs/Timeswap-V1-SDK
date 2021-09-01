@@ -7,9 +7,15 @@ import {
   Uint112,
   Uint128,
   Uint256,
+  Uint32,
   Uint40,
 } from '../..'; //from sdk-core
 import { NativeToken } from '../../entities';
+import {
+  TimeswapFactory__factory,
+  TimeswapPair,
+  TimeswapPair__factory,
+} from '../../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
 
 export class Pair {
@@ -17,7 +23,7 @@ export class Pair {
   protected asset: NativeToken | ERC20Token;
   protected collateral: NativeToken | ERC20Token;
 
-  // protected cache? : State
+  protected pair?: TimeswapPair;
 
   public constructor(
     providerOrSigner: Provider | Signer,
@@ -36,29 +42,108 @@ export class Pair {
     return new PairSigner(signer, this.asset, this.collateral);
   }
 
-  cacheState() {}
+  async initPair() {
+    if (!this.pair) {
+      const factory = await this.conv.factory();
+      const factoryContract = TimeswapFactory__factory.connect(
+        factory,
+        this.conv.getProviderOrSigner()
+      );
 
-  getState(maturity: Uint256) {}
+      const getTokenAddress = async (
+        token: NativeToken | ERC20Token
+      ): Promise<string> => {
+        if (token instanceof ERC20Token) return token.address;
+        else return await this.conv.weth();
+      };
 
-  getTotalLocked(maturity: Uint256) {}
+      const asset = await getTokenAddress(this.asset);
+      const collateral = await getTokenAddress(this.collateral);
 
-  getTotalLiquidity(maturity: Uint256) {}
+      const pair = await factoryContract.getPair(asset, collateral);
+      this.pair = TimeswapPair__factory.connect(
+        pair,
+        this.conv.getProviderOrSigner()
+      );
+    }
+  }
 
-  getLiquidityOf(maturity: Uint256, address: String) {}
+  async getState(maturity: Uint256): Promise<State> {
+    await this.initPair();
+    const state = await this.pair!.state(maturity.value);
 
-  getTotalClaims(maturity: Uint256) {}
+    const asset = new Uint112(state.asset.toString());
+    const interest = new Uint112(state.interest.toString());
+    const cdp = new Uint112(state.cdp.toString());
 
-  getClaimsOf(maturity: Uint256, address: String) {}
+    return { asset, interest, cdp };
+  }
 
-  getDuesOf(maturity: Uint256, address: String) {}
+  async getTotalLocked(maturity: Uint256): Promise<Tokens> {
+    await this.initPair();
+    const tokens = await this.pair!.totalLocked(maturity.value);
 
-  // async getNative(maturity: Uint256): Promise<Native> {
-  //   return await this.conv.getNative(
-  //     this.asset.address,
-  //     this.collateral.address,
-  //     maturity.get()
-  //   );
-  // }
+    const asset = new Uint128(tokens.asset.toString());
+    const collateral = new Uint128(tokens.collateral.toString());
+
+    return { asset, collateral };
+  }
+
+  async getTotalLiquidity(maturity: Uint256): Promise<Uint256> {
+    await this.initPair();
+    const totalLiquidity = await this.pair!.totalLiquidity(maturity.value);
+
+    return new Uint256(totalLiquidity.toString());
+  }
+
+  async getLiquidityOf(maturity: Uint256, address: string): Promise<Uint256> {
+    await this.initPair();
+    const liquidityOf = await this.pair!.liquidityOf(maturity.value, address);
+
+    return new Uint256(liquidityOf.toString());
+  }
+
+  async getTotalClaims(maturity: Uint256): Promise<Claims> {
+    await this.initPair();
+    const claims = await this.pair!.totalClaims(maturity.value);
+
+    const bond = new Uint128(claims.bond.toString());
+    const insurance = new Uint128(claims.insurance.toString());
+
+    return { bond, insurance };
+  }
+
+  async getClaimsOf(maturity: Uint256, address: string): Promise<Claims> {
+    await this.initPair();
+    const claims = await this.pair!.claimsOf(maturity.value, address);
+
+    const bond = new Uint128(claims.bond.toString());
+    const insurance = new Uint128(claims.insurance.toString());
+
+    return { bond, insurance };
+  }
+
+  async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
+    await this.initPair();
+    const dues = await this.pair!.duesOf(maturity.value, address);
+
+    return dues.map(due => {
+      const debt = new Uint112(due.debt.toString());
+      const collateral = new Uint112(due.collateral.toString());
+      const startBlock = new Uint32(due.startBlock);
+
+      return { debt, collateral, startBlock };
+    });
+  }
+
+  async getNative(maturity: Uint256): Promise<Native> {
+    const asset = this.asset;
+    const collateral = this.collateral;
+    invariant(asset instanceof ERC20Token, 'asset is not ERC20');
+    invariant(collateral instanceof ERC20Token, 'collateral is not ERC20');
+
+    return await this.conv.getNative(asset, collateral, maturity);
+  }
 }
 
 export class PairSigner extends Pair {
@@ -397,6 +482,23 @@ export class PairSigner extends Pair {
       });
     }
   }
+}
+
+interface Tokens {
+  asset: Uint128;
+  collateral: Uint128;
+}
+
+interface State {
+  asset: Uint112;
+  interest: Uint112;
+  cdp: Uint112;
+}
+
+interface Due {
+  debt: Uint112;
+  collateral: Uint112;
+  startBlock: Uint32;
 }
 
 interface Native {

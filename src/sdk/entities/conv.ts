@@ -2,8 +2,8 @@ import { ERC20Token, Uint112, Uint128, Uint256, Uint40 } from '../../';
 
 import { Provider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { TimeswapConvenience__factory } from '../../typechain';
-import { TimeswapConvenience } from '../../typechain';
+import { TimeswapConvenience__factory } from '../../typechain/timeswap';
+import { TimeswapConvenience } from '../../typechain/timeswap';
 
 export class Conv {
   protected providerOrSigner: Provider | Signer;
@@ -19,6 +19,10 @@ export class Conv {
 
   upgrade(signer: Signer): ConvSigner {
     return new ConvSigner(signer);
+  }
+
+  getProviderOrSigner(): Provider | Signer {
+    return this.providerOrSigner;
   }
 
   async factory(): Promise<string> {
