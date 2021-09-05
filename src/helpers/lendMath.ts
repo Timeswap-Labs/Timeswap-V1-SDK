@@ -1,5 +1,6 @@
-import { State, Uint112, Uint128, Uint16, Uint256, Uint40 } from '..';
-import { getConstantProduct } from './constantProduct';
+import invariant from 'tiny-invariant';
+import { Claims, State, Uint112, Uint128, Uint16, Uint256, Uint40 } from '..';
+import { checkConstantProduct, getConstantProduct } from './constantProduct';
 import { mulDiv } from './fullMath';
 import { divUp } from './math';
 
@@ -128,6 +129,94 @@ export function givenPercent(
   const cdpDecrease = new Uint112(_cdpDecrease);
 
   return { interestDecrease, cdpDecrease };
+}
+
+export function lend(
+  fee: Uint16,
+  state: State,
+  maturity: Uint256,
+  assetIn: Uint112,
+  interestDecrease: Uint112,
+  cdpDecrease: Uint112,
+  now: Uint256
+): Claims {
+  invariant(now < maturity, 'Expired');
+
+  check(state, assetIn, interestDecrease, cdpDecrease, fee);
+
+  const bond = getBond(maturity, assetIn, interestDecrease, now);
+  const insurance = getInsurance(maturity, state, assetIn, cdpDecrease, now);
+
+  return { bond, insurance };
+}
+
+function check(
+  state: State,
+  assetIn: Uint112,
+  interestDecrease: Uint112,
+  cdpDecrease: Uint112,
+  fee: Uint16
+) {
+  const feeBase = new Uint128(fee.add(0x10000));
+  const assetReserve = state.asset.add(assetIn);
+  const interestAdjusted = adjust(interestDecrease, state.interest, feeBase);
+  const cdpAdjusted = adjust(cdpDecrease, state.cdp, feeBase);
+  checkConstantProduct(state, assetReserve, interestAdjusted, cdpAdjusted);
+
+  const minimum = new Uint256(assetIn);
+  minimum.mulAssign(state.interest);
+  minimum.divAssign(new Uint256(assetReserve).shiftLeft(4));
+  invariant(interestDecrease.value >= minimum.value, 'Invalid');
+}
+
+function adjust(
+  decrease: Uint112,
+  reserve: Uint112,
+  feeBase: Uint128
+): Uint128 {
+  const adjusted = new Uint128(reserve);
+  adjusted.shiftLeftAssign(16);
+  adjusted.subAssign(feeBase.mul(decrease));
+  return adjusted;
+}
+
+function getBond(
+  maturity: Uint256,
+  assetIn: Uint112,
+  interestDecrease: Uint112,
+  now: Uint256
+): Uint128 {
+  const _bondOut = new Uint256(maturity);
+  _bondOut.subAssign(now);
+  _bondOut.mulAssign(interestDecrease);
+  _bondOut.shiftRightAssign(32);
+  _bondOut.addAssign(assetIn);
+  const bondOut = new Uint128(_bondOut);
+
+  return bondOut;
+}
+
+function getInsurance(
+  maturity: Uint256,
+  state: State,
+  assetIn: Uint112,
+  cdpDecrease: Uint112,
+  now: Uint256
+): Uint128 {
+  const _insuranceOut = new Uint256(maturity);
+  _insuranceOut.subAssign(now);
+  _insuranceOut.mulAssign(state.interest);
+  _insuranceOut.addAssign(new Uint256(state.asset).shiftLeft(32));
+  const denominator = new Uint256(state.asset);
+  denominator.addAssign(assetIn);
+  denominator.mulAssign(new Uint256(state.asset).shiftLeft(32));
+  _insuranceOut.set(
+    mulDiv(_insuranceOut, new Uint256(assetIn).mul(state.cdp), denominator)
+  );
+  _insuranceOut.addAssign(cdpDecrease);
+  const insuranceOut = new Uint128(_insuranceOut);
+
+  return insuranceOut;
 }
 
 export interface LendResult {

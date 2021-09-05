@@ -6,6 +6,7 @@ import {
   ERC20Token,
   Uint112,
   Uint128,
+  Uint16,
   Uint256,
   Uint32,
   Uint40,
@@ -68,6 +69,20 @@ export class Pair {
     }
   }
 
+  async getFee(): Promise<Uint16> {
+    await this.initPair();
+    const fee = await this.pair!.fee();
+
+    return new Uint16(fee);
+  }
+
+  async getProtocolFee(): Promise<Uint16> {
+    await this.initPair();
+    const protocolFee = await this.pair!.protocolFee();
+
+    return new Uint16(protocolFee);
+  }
+
   async getState(maturity: Uint256): Promise<State> {
     await this.initPair();
     const state = await this.pair!.state(maturity.value);
@@ -127,7 +142,7 @@ export class Pair {
     await this.initPair();
     const dues = await this.pair!.duesOf(maturity.value, address);
 
-    return dues.map(due => {
+    return dues.map((due) => {
       const debt = new Uint112(due.debt.toString());
       const collateral = new Uint112(due.collateral.toString());
       const startBlock = new Uint32(due.startBlock);
@@ -564,8 +579,6 @@ interface RemoveLiquidity {
 }
 
 interface LendGivenBond {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
@@ -589,8 +602,6 @@ interface _LendGivenBond {
 }
 
 interface LendGivenInsurance {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
@@ -614,8 +625,6 @@ interface _LendGivenInsurance {
 }
 
 interface LendGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
@@ -640,8 +649,6 @@ interface _LendGivenPercent {
   deadline: Uint256;
 }
 interface Collect {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   assetTo: string;
   collateralTo: string;
@@ -654,8 +661,6 @@ interface Claims {
 }
 
 interface BorrowGivenDebt {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   assetTo: string;
   dueTo: string;
@@ -678,8 +683,6 @@ interface _BorrowGivenDebt {
   deadline: Uint256;
 }
 interface BorrowGivenCollateral {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   assetTo: string;
   dueTo: string;
@@ -703,8 +706,6 @@ interface _BorrowGivenCollateral {
 }
 
 interface BorrowGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   assetTo: string;
   dueTo: string;
@@ -729,8 +730,6 @@ interface _BorrowGivenPercent {
   deadline: Uint256;
 }
 interface Repay {
-  asset: ERC20Token;
-  collateral: ERC20Token;
   maturity: Uint256;
   collateralTo: string;
   ids: Uint256[];

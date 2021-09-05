@@ -18,8 +18,9 @@
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "gentype": "yarn gentype:contracts",
-    "gentype:contracts": "typechain --target=ethers-v5 --always-generate-overloads --out-dir src/typechain/timeswap './node_modules/@timeswap-labs/timeswap-v1-?(core|convenience)/artifacts/contracts/**/*.json'"
+    "gentype": "yarn gentype:contracts && yarn gentype:abi",
+    "gentype:contracts": "typechain --target=ethers-v5 --always-generate-overloads --out-dir src/typechain/timeswap './node_modules/@timeswap-labs/timeswap-v1-?(core|convenience)/artifacts/contracts/**/*.json'",
+    "gentype:abi": "typechain --target=ethers-v5 --always-generate-overloads --out-dir src/typechain/abi './src/sdk/abi/*.json'"
   },
   "peerDependencies": {},
   "husky": {

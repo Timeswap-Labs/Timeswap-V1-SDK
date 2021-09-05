@@ -1,4 +1,5 @@
-import { State, Uint256 } from '..';
+import invariant from 'tiny-invariant';
+import { State, Uint112, Uint128, Uint256 } from '..';
 import { mulDivUp } from './fullMath';
 
 export function calculate(
@@ -23,4 +24,17 @@ export function getConstantProduct(
     new Uint256(state.asset),
     denominator1.mul(denominator2)
   );
+}
+
+export function checkConstantProduct(
+  state: State,
+  assetReserve: Uint112,
+  interestAdjusted: Uint128,
+  cdpAdjusted: Uint128
+) {
+  const newProd =
+    interestAdjusted.value * cdpAdjusted.value * assetReserve.value;
+  const oldProd =
+    state.interest.value * state.cdp.shiftLeft(32).value * state.asset.value;
+  invariant(newProd >= oldProd, 'Invariance');
 }

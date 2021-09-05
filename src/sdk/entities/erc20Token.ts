@@ -1,58 +1,99 @@
 import { Provider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { Uint256 } from '../../';
-import { IERC20 } from '../../typechain/timeswap';
-import { IERC20Metadata__factory } from '../../typechain/timeswap';
+import { Uint256, ERC20Token as ERC20Core } from '../../';
+import { Erc20, Erc20__factory } from '../../typechain/abi';
+import { ContractTransaction } from 'ethers';
 
-export class ERC20Token {
+export class ERC20Token extends ERC20Core {
   protected providerOrSigner: Provider | Signer;
-  protected erc20Contract: IERC20;
+  protected erc20Contract: Erc20;
 
-  constructor(providerOrSigner: Provider | Signer) {
+  constructor(
+    providerOrSigner: Provider | Signer,
+    chainID: number,
+    decimals: number,
+    address: string,
+    symbol?: string,
+    name?: string
+  ) {
+    super(chainID, decimals, address, symbol, name);
+
     this.providerOrSigner = providerOrSigner;
-    this.erc20Contract = IERC20Metadata__factory.connect(
-      CONVENIENCE,
-      this.providerOrSigner
-    );
+    this.erc20Contract = Erc20__factory.connect(address, this.providerOrSigner);
   }
 
   upgrade(signer: Signer): ERC20TokenSigner {
-    return new ERC20TokenSigner(signer);
+    return new ERC20TokenSigner(
+      signer,
+      this.chainID,
+      this.decimals,
+      this.address,
+      this.symbol,
+      this.name
+    );
   }
 
   //view
+  async getName(): Promise<string> {
+    return await this.erc20Contract.name();
+  }
+
+  async getSymbol(): Promise<string> {
+    return await this.erc20Contract.symbol();
+  }
+
+  async getDecimals(): Promise<number> {
+    return await this.erc20Contract.decimals();
+  }
+
   async totalSupply(): Promise<Uint256> {
-    return new Uint256((await this.erc20Contract.totalSupply()).toString());
+    const totalSupply = await this.erc20Contract.totalSupply();
+    return new Uint256(totalSupply.toString());
   }
 
   async allowance(owner: string, spender: string): Promise<Uint256> {
-    return new Uint256(
-      (await this.erc20Contract.allowance(owner, spender)).toString()
-    );
+    const allowance = await this.erc20Contract.allowance(owner, spender);
+    return new Uint256(allowance.toString());
   }
 
   async balanceOf(account: string): Promise<Uint256> {
-    return new Uint256(
-      (await this.erc20Contract.balanceOf(account)).toString()
-    );
+    const balanceOf = await this.erc20Contract.balanceOf(account);
+    return new Uint256(balanceOf.toString());
   }
 }
 
 export class ERC20TokenSigner extends ERC20Token {
-  constructor(signer: Signer) {
-    super(signer);
+  constructor(
+    signer: Signer,
+    chainID: number,
+    decimals: number,
+    address: string,
+    symbol?: string,
+    name?: string
+  ) {
+    super(signer, chainID, decimals, address, symbol, name);
   }
 
   //update
-  async approve(spender: string, amount: Uint256) {
+  async approve(
+    spender: string,
+    amount: Uint256
+  ): Promise<ContractTransaction> {
     return await this.erc20Contract.approve(spender, amount.value);
   }
 
-  async transfer(recipient: string, amount: Uint256) {
+  async transfer(
+    recipient: string,
+    amount: Uint256
+  ): Promise<ContractTransaction> {
     return await this.erc20Contract.transfer(recipient, amount.value);
   }
 
-  async transferFrom(sender: string, recipient: string, amount: Uint256) {
+  async transferFrom(
+    sender: string,
+    recipient: string,
+    amount: Uint256
+  ): Promise<ContractTransaction> {
     return await this.erc20Contract.transferFrom(
       sender,
       recipient,

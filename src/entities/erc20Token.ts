@@ -6,8 +6,14 @@ export class ERC20Token extends AbstractToken {
 
   public readonly address: string;
 
-  constructor(chainID: number, decimals: number, address: string) {
-    super(chainID, decimals);
+  constructor(
+    chainID: number,
+    decimals: number,
+    address: string,
+    symbol?: string,
+    name?: string
+  ) {
+    super(chainID, decimals, symbol, name);
     this.address = address;
   }
 }
