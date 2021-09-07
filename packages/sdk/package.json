@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -22,6 +22,10 @@
   "name": "@timeswap-labs/timeswap-v1-sdk",
   "author": "Emmanuel Antony",
   "module": "./dist/timeswap-v1-sdk.esm.js",
+  "repository": "git://github.com/Timeswap-Labs/Timeswap-V1-SDK.git",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "size-limit": [
     {
       "path": "./dist/timeswap-v1-sdk.cjs.production.min.js",
@@ -36,6 +40,8 @@
     "@ethersproject/abi": "^5.4.1",
     "@ethersproject/bytes": "^5.4.0",
     "@size-limit/preset-small-lib": "^5.0.3",
+    "@timeswap-labs/timeswap-v1-convenience": "^1.0.0",
+    "@timeswap-labs/timeswap-v1-core": "^1.0.0",
     "@typechain/ethers-v5": "^7.0.1",
     "ethers": "^5.4.6",
     "husky": "^7.0.1",
@@ -47,14 +53,9 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.3",
     "@ethersproject/abstract-signer": "^5.4.1",
-    "@ethersproject/address": "^5.4.0",
-    "@ethersproject/constants": "^5.4.0",
-    "@ethersproject/contracts": "^5.4.1",
     "@ethersproject/providers": "^5.4.5",
-    "@timeswap-labs/timeswap-v1-convenience": "^1.0.0",
-    "@timeswap-labs/timeswap-v1-core": "^1.0.0",
+    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.3",
     "tiny-invariant": "^1.1.0"
   }
 }
