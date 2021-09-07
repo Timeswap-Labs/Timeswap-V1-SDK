@@ -1,7 +1,10 @@
 import { Provider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { Uint256, ERC20Token as ERC20Core } from '../../';
-import { Erc20, Erc20__factory } from '../../typechain/abi';
+import {
+  Uint256,
+  ERC20Token as ERC20Core,
+} from '@timeswap-labs/timeswap-v1-sdk-core';
+import { Erc20, Erc20__factory } from '../typechain/abi';
 import { ContractTransaction } from 'ethers';
 
 export class ERC20Token extends ERC20Core {

@@ -1,10 +1,17 @@
-import { ERC20Token, Uint112, Uint128, Uint256, Uint40 } from '../../';
+import {
+  ERC20Token,
+  Uint112,
+  Uint128,
+  Uint256,
+  Uint40,
+} from '@timeswap-labs/timeswap-v1-sdk-core';
 
 import { Provider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
-import { TimeswapConvenience__factory } from '../../typechain/timeswap';
-import { TimeswapConvenience } from '../../typechain/timeswap';
+import { TimeswapConvenience__factory } from '../typechain/timeswap';
+import { TimeswapConvenience } from '../typechain/timeswap';
 import { ContractTransaction } from 'ethers';
+import { CONVENIENCE } from '..';
 
 export class Conv {
   protected providerOrSigner: Provider | Signer;
@@ -542,20 +549,6 @@ interface NewLiquidityETHCollateral {
   deadline: Uint256;
 }
 
-interface _NewLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  debtOut: Uint112;
-  collateralIn: Uint112;
-  deadline: Uint256;
-}
-
 interface AddLiquidity {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -591,20 +584,6 @@ interface AddLiquidityETHCollateral {
   deadline: Uint256;
 }
 
-interface _AddLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface RemoveLiquidity {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -662,19 +641,6 @@ interface LendGivenBondETHCollateral {
   deadline: Uint256;
 }
 
-interface _LendGivenBond {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
 interface LendGivenInsurance {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -700,19 +666,6 @@ interface LendGivenInsuranceETHAsset {
 interface LendGivenInsuranceETHCollateral {
   asset: ERC20Token;
   maturity: Uint256;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
-}
-
-interface _LendGivenInsurance {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
   bondTo: string;
   insuranceTo: string;
   assetIn: Uint112;
@@ -757,19 +710,6 @@ interface LendGivenPercentETHCollateral {
   deadline: Uint256;
 }
 
-interface _LendGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
 interface Collect {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -833,18 +773,6 @@ interface BorrowGivenDebtETHCollateral {
   deadline: Uint256;
 }
 
-interface _BorrowGivenDebt {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface BorrowGivenCollateral {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -874,19 +802,6 @@ interface BorrowGivenCollateralETHCollateral {
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
-}
-
-interface _BorrowGivenCollateral {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -927,19 +842,6 @@ interface BorrowGivenPercentETHCollateral {
   deadline: Uint256;
 }
 
-interface _BorrowGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface Repay {
   asset: ERC20Token;
   collateral: ERC20Token;
@@ -962,17 +864,6 @@ interface RepayETHAsset {
 interface RepayETHCollateral {
   asset: ERC20Token;
   maturity: Uint256;
-  collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
-}
-
-interface _Repay {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
   collateralTo: string;
   ids: Uint256[];
   maxAssetsIn: Uint112[];

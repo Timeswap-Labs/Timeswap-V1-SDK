@@ -1,6 +1,5 @@
 import invariant from 'tiny-invariant';
-import { Claims, State, Uint112, Uint128, Uint16, Uint256 } from '..';
-import { Due } from '../interface';
+import { Due, State, Uint112, Uint128, Uint16, Uint256 } from '..';
 import { Uint40 } from '../uint';
 import { checkConstantProduct, getConstantProduct } from './constantProduct';
 import { mulDivUp } from './fullMath';

@@ -1,3 +1,4 @@
+import { validateAndParseAddress } from '../helpers/validateAndParseAddress';
 import { AbstractToken } from './abstractToken';
 
 export class ERC20Token extends AbstractToken {
@@ -14,6 +15,6 @@ export class ERC20Token extends AbstractToken {
     name?: string
   ) {
     super(chainID, decimals, symbol, name);
-    this.address = address;
+    this.address = validateAndParseAddress(address);
   }
 }

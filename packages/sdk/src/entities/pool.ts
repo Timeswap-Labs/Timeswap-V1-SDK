@@ -12,7 +12,7 @@ import {
   Uint256,
   Uint32,
   Uint40,
-} from '../..'; //from sdk-core
+} from '@timeswap-labs/timeswap-v1-sdk-core'; //from sdk-core
 import { Pair, PairSigner } from './pair';
 
 export class Pool {
@@ -109,13 +109,13 @@ export class Pool {
     return this.pair.calculateCf(this.cache!.state);
   }
 
-  async calculateNewLiquidity(
-    assetIn: Uint112,
-    debtOut: Uint112,
-    collateralIn: Uint112 // : Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }>
-  ) {
-    if (!this.cache) await this.updateCache();
-  }
+  // async calculateNewLiquidity(
+  //   assetIn: Uint112,
+  //   debtOut: Uint112,
+  //   collateralIn: Uint112 // : Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }>
+  // ) {
+  //   if (!this.cache) await this.updateCache();
+  // }
 
   async calculateLendGivenBond(
     assetIn: Uint112,
@@ -351,19 +351,6 @@ interface NewLiquidity {
   deadline: Uint256;
 }
 
-interface _NewLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  debtOut: Uint112;
-  collateralIn: Uint112;
-  deadline: Uint256;
-}
-
 interface AddLiquidity {
   liquidityTo: string;
   dueTo: string;
@@ -374,20 +361,6 @@ interface AddLiquidity {
   deadline: Uint256;
 }
 
-interface _AddLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface RemoveLiquidity {
   assetTo: string;
   collateralTo: string;
@@ -403,36 +376,10 @@ interface LendGivenBond {
   deadline: Uint256;
 }
 
-interface _LendGivenBond {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
 interface LendGivenInsurance {
   bondTo: string;
   insuranceTo: string;
   assetIn?: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
-}
-
-interface _LendGivenInsurance {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
   insuranceOut: Uint128;
   minBond: Uint128;
   deadline: Uint256;
@@ -448,19 +395,6 @@ interface LendGivenPercent {
   deadline: Uint256;
 }
 
-interface _LendGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
 interface Collect {
   assetTo: string;
   collateralTo: string;
@@ -481,36 +415,11 @@ interface BorrowGivenDebt {
   deadline: Uint256;
 }
 
-interface _BorrowGivenDebt {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface BorrowGivenCollateral {
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
   collateralIn?: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
-}
-
-interface _BorrowGivenCollateral {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -525,31 +434,7 @@ interface BorrowGivenPercent {
   deadline: Uint256;
 }
 
-interface _BorrowGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface Repay {
-  collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
-}
-
-interface _Repay {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-
-  from: string;
   collateralTo: string;
   ids: Uint256[];
   maxAssetsIn: Uint112[];

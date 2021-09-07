@@ -7,32 +7,21 @@ import {
   ERC20Token,
   NativeToken,
   Due as DueCalculated,
+  Pair as PairCore,
   Uint112,
   Uint128,
   Uint16,
   Uint256,
   Uint32,
   Uint40,
-} from '../..'; //from sdk-core
-import {
-  borrow,
-  givenCollateral,
-  givenDebt,
-  givenPercent as givenPercentBorrow,
-} from '../../helpers/borrowMath';
-import {
-  givenBond,
-  givenInsurance,
-  givenPercent as givenPercentLend,
-  lend,
-} from '../../helpers/lendMath';
+} from '@timeswap-labs/timeswap-v1-sdk-core'; //from sdk-core
 import {
   TimeswapFactory__factory,
   TimeswapPair,
   TimeswapPair__factory,
-} from '../../typechain/timeswap';
+} from '../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
-import { Pool } from './pool';
+// import { Pool } from './pool';
 
 export class Pair {
   protected conv: Conv;
@@ -199,11 +188,11 @@ export class Pair {
       .div(state.cdp);
   }
 
-  calculateNewLiquidity(
-    assetIn: Uint112,
-    debtOut: Uint112,
-    collateralIn: Uint112 // : Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }>
-  ) {}
+  // calculateNewLiquidity(
+  //   assetIn: Uint112,
+  //   debtOut: Uint112,
+  //   collateralIn: Uint112 // : Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }>
+  // ) {}
 
   calculateLendGivenBond(
     state: State,
@@ -213,26 +202,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenBond(
-      fee,
-      state,
-      maturity,
-      assetIn,
-      bondOut,
-      now
-    );
-
-    const claims = lend(
-      fee,
-      state,
-      maturity,
-      assetIn,
-      interestDecrease,
-      cdpDecrease,
-      now
-    );
-
-    return claims;
+    return PairCore.lendGivenBond(state, maturity, assetIn, bondOut, now, fee);
   }
 
   calculateLendGivenInsurance(
@@ -243,26 +213,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenInsurance(
-      fee,
+    return PairCore.lendGivenInsurance(
       state,
       maturity,
       assetIn,
       insuranceOut,
-      now
+      now,
+      fee
     );
-
-    const claims = lend(
-      fee,
-      state,
-      maturity,
-      assetIn,
-      interestDecrease,
-      cdpDecrease,
-      now
-    );
-
-    return claims;
   }
 
   calculateLendGivenPercent(
@@ -273,24 +231,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenPercentLend(
-      fee,
-      state,
-      assetIn,
-      percent
-    );
-
-    const claims = lend(
-      fee,
+    return PairCore.lendGivenPercent(
       state,
       maturity,
       assetIn,
-      interestDecrease,
-      cdpDecrease,
-      now
+      percent,
+      now,
+      fee
     );
-
-    return claims;
   }
 
   calculateBorrowGivenDebt(
@@ -301,26 +249,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): DueCalculated {
-    const { interestIncrease, cdpIncrease } = givenDebt(
-      fee,
+    return PairCore.borrowGivenDebt(
       state,
       maturity,
       assetOut,
       debtIn,
-      now
+      now,
+      fee
     );
-
-    const due = borrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      interestIncrease,
-      cdpIncrease,
-      now
-    );
-
-    return due;
   }
 
   calculateBorrowGivenCollateral(
@@ -331,26 +267,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): DueCalculated {
-    const { interestIncrease, cdpIncrease } = givenCollateral(
-      fee,
+    return PairCore.borrowGivenCollateral(
       state,
       maturity,
       assetOut,
       collateralIn,
-      now
+      now,
+      fee
     );
-
-    const due = borrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      interestIncrease,
-      cdpIncrease,
-      now
-    );
-
-    return due;
   }
 
   calculateBorrowGivenPercent(
@@ -361,24 +285,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): DueCalculated {
-    const { interestIncrease, cdpIncrease } = givenPercentBorrow(
-      fee,
-      state,
-      assetOut,
-      percent
-    );
-
-    const due = borrow(
-      fee,
+    return PairCore.borrowGivenPercent(
       state,
       maturity,
       assetOut,
-      interestIncrease,
-      cdpIncrease,
-      now
+      percent,
+      now,
+      fee
     );
-
-    return due;
   }
 }
 
@@ -788,20 +702,6 @@ interface NewLiquidity {
   deadline: Uint256;
 }
 
-interface _NewLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  debtOut: Uint112;
-  collateralIn: Uint112;
-  deadline: Uint256;
-}
-
 interface AddLiquidity {
   maturity: Uint256;
   liquidityTo: string;
@@ -813,20 +713,6 @@ interface AddLiquidity {
   deadline: Uint256;
 }
 
-interface _AddLiquidity {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  assetFrom: string;
-  collateralFrom: string;
-  liquidityTo: string;
-  dueTo: string;
-  assetIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface RemoveLiquidity {
   maturity: Uint256;
   assetTo: string;
@@ -844,37 +730,11 @@ interface LendGivenBond {
   deadline: Uint256;
 }
 
-interface _LendGivenBond {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
-
 interface LendGivenInsurance {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
   assetIn?: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
-}
-
-interface _LendGivenInsurance {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
   insuranceOut: Uint128;
   minBond: Uint128;
   deadline: Uint256;
@@ -891,19 +751,6 @@ interface LendGivenPercent {
   deadline: Uint256;
 }
 
-interface _LendGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  bondTo: string;
-  insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
-}
 interface Collect {
   maturity: Uint256;
   assetTo: string;
@@ -926,37 +773,12 @@ interface BorrowGivenDebt {
   deadline: Uint256;
 }
 
-interface _BorrowGivenDebt {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface BorrowGivenCollateral {
   maturity: Uint256;
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
   collateralIn?: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
-}
-
-interface _BorrowGivenCollateral {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -972,32 +794,8 @@ interface BorrowGivenPercent {
   deadline: Uint256;
 }
 
-interface _BorrowGivenPercent {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
-  assetTo: string;
-  dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
-}
 interface Repay {
   maturity: Uint256;
-  collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
-}
-
-interface _Repay {
-  asset: ERC20Token;
-  collateral: ERC20Token;
-  maturity: Uint256;
-  from: string;
   collateralTo: string;
   ids: Uint256[];
   maxAssetsIn: Uint112[];

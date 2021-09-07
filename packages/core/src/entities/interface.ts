@@ -1,4 +1,4 @@
-import { Uint112, Uint128 } from '.';
+import { Uint112, Uint128 } from '..';
 
 export interface State {
   asset: Uint112;
