@@ -13,7 +13,7 @@ export abstract class Uint {
   }
 
   private valid(): boolean {
-    const maxValue = 2n ** this.bits() - 1n;
+    const maxValue = (1n << this.bits()) - 1n;
     return 0n <= this.value && this.value <= maxValue ? true : false;
   }
 
