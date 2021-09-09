@@ -17,6 +17,7 @@ import { Pair, PairSigner } from './pair';
 
 export class Pool {
   protected pair: Pair;
+  protected convAddress?: string;
 
   readonly asset: NativeToken | ERC20Token;
   readonly collateral: NativeToken | ERC20Token;
@@ -35,6 +36,7 @@ export class Pool {
     convAddress?: string
   ) {
     this.pair = new Pair(providerOrSigner, asset, collateral, convAddress);
+    this.convAddress = convAddress;
 
     this.asset = this.pair.asset;
     this.collateral = this.pair.collateral;
@@ -42,7 +44,13 @@ export class Pool {
   }
 
   upgrade(signer: Signer): PoolSigner {
-    return new PoolSigner(signer, this.asset, this.collateral, this.maturity);
+    return new PoolSigner(
+      signer,
+      this.asset,
+      this.collateral,
+      this.maturity,
+      this.convAddress
+    );
   }
 
   async initPair() {
@@ -227,9 +235,10 @@ export class PoolSigner extends Pool {
     signer: Signer,
     asset: AbstractToken,
     collateral: AbstractToken,
-    maturity: Uint256
+    maturity: Uint256,
+    convAddress?: string
   ) {
-    super(signer, asset, collateral, maturity);
+    super(signer, asset, collateral, maturity, convAddress);
     this.pairSigner = this.pair.upgrade(signer);
   }
 
