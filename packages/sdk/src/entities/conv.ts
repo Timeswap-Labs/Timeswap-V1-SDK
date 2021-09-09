@@ -32,8 +32,12 @@ export class Conv {
     }
   }
 
+  address(): string {
+    return this.convContract.address;
+  }
+
   upgrade(signer: Signer): ConvSigner {
-    return new ConvSigner(signer);
+    return new ConvSigner(signer, this.address());
   }
 
   getProviderOrSigner(): Provider | Signer {
@@ -62,8 +66,8 @@ export class Conv {
 }
 
 export class ConvSigner extends Conv {
-  constructor(signer: Signer) {
-    super(signer);
+  constructor(signer: Signer, address?: string) {
+    super(signer, address);
   }
 
   async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {

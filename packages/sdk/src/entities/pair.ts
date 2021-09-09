@@ -21,11 +21,9 @@ import {
   TimeswapPair__factory,
 } from '../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
-// import { Pool } from './pool';
 
 export class Pair {
   protected conv: Conv;
-  protected convAddress?: string;
 
   readonly asset: NativeToken | ERC20Token;
   readonly collateral: NativeToken | ERC20Token;
@@ -39,7 +37,6 @@ export class Pair {
     convAddress?: string
   ) {
     this.conv = new Conv(providerOrSigner, convAddress);
-    this.convAddress = convAddress;
 
     invariant(!(asset.isNative && collateral.isNative), 'Invalid Tokens');
 
@@ -52,8 +49,12 @@ export class Pair {
       signer,
       this.asset,
       this.collateral,
-      this.convAddress
+      this.conv.address()
     );
+  }
+
+  convAddress(): string {
+    return this.conv.address();
   }
 
   // getPool(maturity: Uint256) : Pool {
