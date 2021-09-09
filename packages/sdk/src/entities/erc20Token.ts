@@ -4,7 +4,8 @@ import {
   Uint256,
   ERC20Token as ERC20Core,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import { Erc20, Erc20__factory } from '../typechain/abi';
+import type { Erc20 } from '../typechain/abi';
+import { Erc20__factory } from '../typechain/abi';
 import { ContractTransaction } from 'ethers';
 
 export class ERC20Token extends ERC20Core {

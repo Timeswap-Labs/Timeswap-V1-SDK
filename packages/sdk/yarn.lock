@@ -1027,7 +1027,7 @@
   dependencies:
     "@ethersproject/bignumber" "^5.4.0"
 
-"@ethersproject/contracts@5.4.1", "@ethersproject/contracts@^5.4.1":
+"@ethersproject/contracts@5.4.1":
   version "5.4.1"
   resolved "https://registry.yarnpkg.com/@ethersproject/contracts/-/contracts-5.4.1.tgz#3eb4f35b7fe60a962a75804ada2746494df3e470"
   integrity sha512-m+z2ZgPy4pyR15Je//dUaymRUZq5MtDajF6GwFbGAVmKz/RF+DNIPwF0k5qEcL3wPGVqUjFg2/krlCRVTU4T5w==
@@ -1630,10 +1630,10 @@
     "@openzeppelin/contracts" "^4.1.0"
     dotenv "^10.0.0"
 
-"@timeswap-labs/timeswap-v1-sdk-core@0.1.3":
-  version "0.1.3"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.3/a944a8a538ba5475495691c684450ba5223d51f2316630c422eeb9fdd263b08a#17374daf9b88ba18ca0389e05e602a69075bd750"
-  integrity sha512-mFrnSw4OMgkaTTLePCHzg49f88SWHZDYXFGEEC8UpatHAoAy8+M+EYqcijC8srCl91mdjRT32ADBmIkCe1HIXQ==
+"@timeswap-labs/timeswap-v1-sdk-core@0.1.4":
+  version "0.1.4"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.4/688aee57fe8d8a338238e15b09deead55a5ff5a1f014c835d30ef9bc621896d7#8e400c368cd4aeeac58d1ed372e207f9af8e3b79"
+  integrity sha512-X03buRb62iZIFdPRbk+kaBt2S1KQs8vZX/C1EAc101ACHQHcRhb7let85R97yuQn1ivxNaayav3DKZnDadzujA==
   dependencies:
     "@ethersproject/address" "^5.4.0"
     tiny-invariant "^1.1.0"
