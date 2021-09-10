@@ -68,43 +68,43 @@ export class Pool {
   }
 
   async getFee(): Promise<Uint16> {
-    return await this.pair.getFee();
+    return this.pair.getFee();
   }
 
   async getProtocolFee(): Promise<Uint16> {
-    return await this.pair.getProtocolFee();
+    return this.pair.getProtocolFee();
   }
 
   async getState(): Promise<State> {
-    return await this.pair.getState(this.maturity);
+    return this.pair.getState(this.maturity);
   }
 
   async getTotalLocked(): Promise<Tokens> {
-    return await this.pair.getTotalLocked(this.maturity);
+    return this.pair.getTotalLocked(this.maturity);
   }
 
   async getTotalLiquidity(): Promise<Uint256> {
-    return await this.pair.getTotalLiquidity(this.maturity);
+    return this.pair.getTotalLiquidity(this.maturity);
   }
 
   async getLiquidityOf(address: string): Promise<Uint256> {
-    return await this.pair.getLiquidityOf(this.maturity, address);
+    return this.pair.getLiquidityOf(this.maturity, address);
   }
 
   async getTotalClaims(): Promise<Claims> {
-    return await this.pair.getTotalClaims(this.maturity);
+    return this.pair.getTotalClaims(this.maturity);
   }
 
   async getClaimsOf(address: string): Promise<Claims> {
-    return await this.pair.getClaimsOf(this.maturity, address);
+    return this.pair.getClaimsOf(this.maturity, address);
   }
 
   async getDuesOf(address: string): Promise<Due[]> {
-    return await this.pair.getDuesOf(this.maturity, address);
+    return this.pair.getDuesOf(this.maturity, address);
   }
 
   async getNative(): Promise<Native> {
-    return await this.pair.getNative(this.maturity);
+    return this.pair.getNative(this.maturity);
   }
 
   async calculateApr() {
@@ -245,28 +245,28 @@ export class PoolSigner extends Pool {
   }
 
   async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
-    return await this.pairSigner.newLiquidity({
+    return this.pairSigner.newLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
-    return await this.pairSigner.addLiquidity({
+    return this.pairSigner.addLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
-    return await this.pairSigner.removeLiquidity({
+    return this.pairSigner.removeLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async lendGivenBond(params: LendGivenBond): Promise<ContractTransaction> {
-    return await this.pairSigner.lendGivenBond({
+    return this.pairSigner.lendGivenBond({
       ...params,
       maturity: this.maturity,
     });
@@ -275,7 +275,7 @@ export class PoolSigner extends Pool {
   async lendGivenInsurance(
     params: LendGivenInsurance
   ): Promise<ContractTransaction> {
-    return await this.pairSigner.lendGivenInsurance({
+    return this.pairSigner.lendGivenInsurance({
       ...params,
       maturity: this.maturity,
     });
@@ -284,21 +284,21 @@ export class PoolSigner extends Pool {
   async lendGivenPercent(
     params: LendGivenPercent
   ): Promise<ContractTransaction> {
-    return await this.pairSigner.lendGivenPercent({
+    return this.pairSigner.lendGivenPercent({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async collect(params: Collect): Promise<ContractTransaction> {
-    return await this.pairSigner.collect({
+    return this.pairSigner.collect({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async borrowGivenDebt(params: BorrowGivenDebt): Promise<ContractTransaction> {
-    return await this.pairSigner.borrowGivenDebt({
+    return this.pairSigner.borrowGivenDebt({
       ...params,
       maturity: this.maturity,
     });
@@ -307,7 +307,7 @@ export class PoolSigner extends Pool {
   async borrowGivenCollateral(
     params: BorrowGivenCollateral
   ): Promise<ContractTransaction> {
-    return await this.pairSigner.borrowGivenCollateral({
+    return this.pairSigner.borrowGivenCollateral({
       ...params,
       maturity: this.maturity,
     });
@@ -316,14 +316,14 @@ export class PoolSigner extends Pool {
   async borrowGivenPercent(
     params: BorrowGivenPercent
   ): Promise<ContractTransaction> {
-    return await this.pairSigner.borrowGivenPercent({
+    return this.pairSigner.borrowGivenPercent({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async repay(params: Repay): Promise<ContractTransaction> {
-    return await this.pairSigner.repay({
+    return this.pairSigner.repay({
       ...params,
       maturity: this.maturity,
     });
@@ -353,6 +353,7 @@ interface Native {
   insurance: string;
   collateralizedDebt: string;
 }
+
 interface NewLiquidity {
   liquidityTo: string;
   dueTo: string;

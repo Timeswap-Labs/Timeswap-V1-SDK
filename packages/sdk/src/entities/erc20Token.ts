@@ -39,15 +39,15 @@ export class ERC20Token extends ERC20Core {
 
   //view
   async getName(): Promise<string> {
-    return await this.erc20Contract.name();
+    return this.erc20Contract.name();
   }
 
   async getSymbol(): Promise<string> {
-    return await this.erc20Contract.symbol();
+    return this.erc20Contract.symbol();
   }
 
   async getDecimals(): Promise<number> {
-    return await this.erc20Contract.decimals();
+    return this.erc20Contract.decimals();
   }
 
   async totalSupply(): Promise<Uint256> {
@@ -83,14 +83,14 @@ export class ERC20TokenSigner extends ERC20Token {
     spender: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return await this.erc20Contract.approve(spender, amount.value);
+    return this.erc20Contract.approve(spender, amount.value);
   }
 
   async transfer(
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return await this.erc20Contract.transfer(recipient, amount.value);
+    return this.erc20Contract.transfer(recipient, amount.value);
   }
 
   async transferFrom(
@@ -98,10 +98,6 @@ export class ERC20TokenSigner extends ERC20Token {
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return await this.erc20Contract.transferFrom(
-      sender,
-      recipient,
-      amount.value
-    );
+    return this.erc20Contract.transferFrom(sender, recipient, amount.value);
   }
 }

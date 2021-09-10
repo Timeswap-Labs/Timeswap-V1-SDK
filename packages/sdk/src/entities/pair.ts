@@ -73,7 +73,7 @@ export class Pair {
         token: NativeToken | ERC20Token
       ): Promise<string> => {
         if (token instanceof ERC20Token) return token.address;
-        else return await this.conv.weth();
+        else return this.conv.weth();
       };
 
       const asset = await getTokenAddress(this.asset);
@@ -175,7 +175,7 @@ export class Pair {
     invariant(asset instanceof ERC20Token, 'asset is not ERC20');
     invariant(collateral instanceof ERC20Token, 'collateral is not ERC20');
 
-    return await this.conv.getNative(asset, collateral, maturity);
+    return this.conv.getNative(asset, collateral, maturity);
   }
 
   calculateApr(state: State): Uint112 {
@@ -319,7 +319,7 @@ export class PairSigner extends Pair {
       invariant(assetIn, 'assetIn is undefined');
       invariant(collateralIn, 'collateralIn is undefined');
 
-      return await this.convSigner.newLiquidity({
+      return this.convSigner.newLiquidity({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
@@ -330,7 +330,7 @@ export class PairSigner extends Pair {
       const { collateralIn } = params;
       invariant(collateralIn, 'collateralIn is undefined');
 
-      return await this.convSigner.newLiquidityETHAsset({
+      return this.convSigner.newLiquidityETHAsset({
         ...params,
         collateral: this.collateral,
         collateralIn,
@@ -339,7 +339,7 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.newLiquidityETHCollateral({
+      return this.convSigner.newLiquidityETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
@@ -358,7 +358,7 @@ export class PairSigner extends Pair {
       invariant(assetIn, 'assetIn is undefined');
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.addLiquidity({
+      return this.convSigner.addLiquidity({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
@@ -369,7 +369,7 @@ export class PairSigner extends Pair {
       const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.addLiquidityETHAsset({
+      return this.convSigner.addLiquidityETHAsset({
         ...params,
         collateral: this.collateral,
         maxCollateral,
@@ -378,7 +378,7 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.addLiquidityETHCollateral({
+      return this.convSigner.addLiquidityETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
@@ -393,18 +393,18 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return await this.convSigner.removeLiquidity({
+      return this.convSigner.removeLiquidity({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.removeLiquidityETHAsset({
+      return this.convSigner.removeLiquidityETHAsset({
         ...params,
         collateral: this.collateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.removeLiquidityETHCollateral({
+      return this.convSigner.removeLiquidityETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -421,14 +421,14 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenBond({
+      return this.convSigner.lendGivenBond({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
         assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.lendGivenBondETHAsset({
+      return this.convSigner.lendGivenBondETHAsset({
         ...params,
         collateral: this.collateral,
       });
@@ -436,7 +436,7 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenBondETHCollateral({
+      return this.convSigner.lendGivenBondETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
@@ -456,14 +456,14 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenInsurance({
+      return this.convSigner.lendGivenInsurance({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
         assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.lendGivenInsuranceETHAsset({
+      return this.convSigner.lendGivenInsuranceETHAsset({
         ...params,
         collateral: this.collateral,
       });
@@ -471,7 +471,7 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenInsuranceETHCollateral({
+      return this.convSigner.lendGivenInsuranceETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
@@ -491,14 +491,14 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenPercent({
+      return this.convSigner.lendGivenPercent({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
         assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.lendGivenPercentETHAsset({
+      return this.convSigner.lendGivenPercentETHAsset({
         ...params,
         collateral: this.collateral,
       });
@@ -506,7 +506,7 @@ export class PairSigner extends Pair {
       const { assetIn } = params;
       invariant(assetIn, 'assetIn is undefined');
 
-      return await this.convSigner.lendGivenPercentETHCollateral({
+      return this.convSigner.lendGivenPercentETHCollateral({
         ...params,
         asset: this.asset,
         assetIn,
@@ -521,18 +521,18 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return await this.convSigner.collect({
+      return this.convSigner.collect({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.collectETHAsset({
+      return this.convSigner.collectETHAsset({
         ...params,
         collateral: this.collateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.collectETHCollateral({
+      return this.convSigner.collectETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -549,7 +549,7 @@ export class PairSigner extends Pair {
       const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.borrowGivenDebt({
+      return this.convSigner.borrowGivenDebt({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
@@ -559,13 +559,13 @@ export class PairSigner extends Pair {
       const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.borrowGivenDebtETHAsset({
+      return this.convSigner.borrowGivenDebtETHAsset({
         ...params,
         collateral: this.collateral,
         maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.borrowGivenDebtETHCollateral({
+      return this.convSigner.borrowGivenDebtETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -584,7 +584,7 @@ export class PairSigner extends Pair {
       const { collateralIn } = params;
       invariant(collateralIn, 'collateralIn is undefined');
 
-      return await this.convSigner.borrowGivenCollateral({
+      return this.convSigner.borrowGivenCollateral({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
@@ -594,13 +594,13 @@ export class PairSigner extends Pair {
       const { collateralIn } = params;
       invariant(collateralIn, 'collateralIn is undefined');
 
-      return await this.convSigner.borrowGivenCollateralETHAsset({
+      return this.convSigner.borrowGivenCollateralETHAsset({
         ...params,
         collateral: this.collateral,
         collateralIn,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.borrowGivenCollateralETHCollateral({
+      return this.convSigner.borrowGivenCollateralETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -619,7 +619,7 @@ export class PairSigner extends Pair {
       const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.borrowGivenPercent({
+      return this.convSigner.borrowGivenPercent({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
@@ -629,13 +629,13 @@ export class PairSigner extends Pair {
       const { maxCollateral } = params;
       invariant(maxCollateral, 'maxCollateral is undefined');
 
-      return await this.convSigner.borrowGivenPercentETHAsset({
+      return this.convSigner.borrowGivenPercentETHAsset({
         ...params,
         collateral: this.collateral,
         maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.borrowGivenPercentETHCollateral({
+      return this.convSigner.borrowGivenPercentETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -649,18 +649,18 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return await this.convSigner.repay({
+      return this.convSigner.repay({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return await this.convSigner.repayETHAsset({
+      return this.convSigner.repayETHAsset({
         ...params,
         collateral: this.collateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return await this.convSigner.repayETHCollateral({
+      return this.convSigner.repayETHCollateral({
         ...params,
         asset: this.asset,
       });
@@ -693,6 +693,7 @@ interface Native {
   insurance: string;
   collateralizedDebt: string;
 }
+
 interface NewLiquidity {
   maturity: Uint256;
   liquidityTo: string;
