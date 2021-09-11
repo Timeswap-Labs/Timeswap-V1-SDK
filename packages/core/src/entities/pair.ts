@@ -1,15 +1,6 @@
-import {
-  ERC20Token,
-  Pool,
-  Uint112,
-  Uint128,
-  Uint16,
-  Uint256,
-  State,
-  Uint40,
-  Claims,
-  Due,
-} from '../';
+import { ERC20Token } from './erc20Token';
+import { CP, Due, Claims } from './interface';
+import { Uint16, Uint256, Uint112, Uint128, Uint40 } from '../uint';
 import {
   givenBond,
   givenInsurance,
@@ -22,6 +13,7 @@ import {
   givenPercent as givenPercentBorrow,
   givenDebt,
 } from '../helpers/borrowMath';
+import { givenAdd, givenNew, mint } from '../helpers/mintMath';
 
 export class Pair {
   public readonly asset: ERC20Token;
@@ -43,19 +35,67 @@ export class Pair {
     this.protocolFee = new Uint16(protocolFee);
   }
 
-  getPool(maturity: Uint256): Pool {
-    return new Pool(this, maturity);
+  static newLiquidity(
+    state: CP,
+    maturity: Uint256,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    debtIn: Uint112,
+    collateralIn: Uint112,
+    now: Uint256,
+    protocolFee: Uint16
+  ): { liquidityOut: Uint256; dueOut: Due } {
+    const { yIncrease, zIncrease } = givenNew(
+      maturity,
+      assetIn,
+      debtIn,
+      collateralIn,
+      now
+    );
+
+    return mint(
+      protocolFee,
+      state,
+      totalLiquidity,
+      maturity,
+      assetIn,
+      yIncrease,
+      zIncrease,
+      now
+    );
+  }
+
+  static addLiquidity(
+    state: CP,
+    maturity: Uint256,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    now: Uint256,
+    protocolFee: Uint16
+  ): { liquidityOut: Uint256; dueOut: Due } {
+    const { yIncrease, zIncrease } = givenAdd(state, assetIn);
+
+    return mint(
+      protocolFee,
+      state,
+      totalLiquidity,
+      maturity,
+      assetIn,
+      yIncrease,
+      zIncrease,
+      now
+    );
   }
 
   static lendGivenBond(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetIn: Uint112,
     bondOut: Uint128,
     now: Uint256,
     fee: Uint16
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenBond(
+    const { yDecrease, zDecrease } = givenBond(
       fee,
       state,
       maturity,
@@ -69,8 +109,8 @@ export class Pair {
       state,
       maturity,
       assetIn,
-      interestDecrease,
-      cdpDecrease,
+      yDecrease,
+      zDecrease,
       now
     );
 
@@ -78,14 +118,14 @@ export class Pair {
   }
 
   static lendGivenInsurance(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetIn: Uint112,
     insuranceOut: Uint128,
     now: Uint256,
     fee: Uint16
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenInsurance(
+    const { yDecrease, zDecrease } = givenInsurance(
       fee,
       state,
       maturity,
@@ -99,8 +139,8 @@ export class Pair {
       state,
       maturity,
       assetIn,
-      interestDecrease,
-      cdpDecrease,
+      yDecrease,
+      zDecrease,
       now
     );
 
@@ -108,14 +148,14 @@ export class Pair {
   }
 
   static lendGivenPercent(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetIn: Uint112,
     percent: Uint40,
     now: Uint256,
     fee: Uint16
   ): Claims {
-    const { interestDecrease, cdpDecrease } = givenPercentLend(
+    const { yDecrease, zDecrease } = givenPercentLend(
       fee,
       state,
       assetIn,
@@ -127,8 +167,8 @@ export class Pair {
       state,
       maturity,
       assetIn,
-      interestDecrease,
-      cdpDecrease,
+      yDecrease,
+      zDecrease,
       now
     );
 
@@ -136,14 +176,14 @@ export class Pair {
   }
 
   static borrowGivenDebt(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetOut: Uint112,
     debtIn: Uint112,
     now: Uint256,
     fee: Uint16
   ): Due {
-    const { interestIncrease, cdpIncrease } = givenDebt(
+    const { yIncrease, zIncrease } = givenDebt(
       fee,
       state,
       maturity,
@@ -157,8 +197,8 @@ export class Pair {
       state,
       maturity,
       assetOut,
-      interestIncrease,
-      cdpIncrease,
+      yIncrease,
+      zIncrease,
       now
     );
 
@@ -166,14 +206,14 @@ export class Pair {
   }
 
   static borrowGivenCollateral(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetOut: Uint112,
     collateralIn: Uint112,
     now: Uint256,
     fee: Uint16
   ): Due {
-    const { interestIncrease, cdpIncrease } = givenCollateral(
+    const { yIncrease, zIncrease } = givenCollateral(
       fee,
       state,
       maturity,
@@ -187,8 +227,8 @@ export class Pair {
       state,
       maturity,
       assetOut,
-      interestIncrease,
-      cdpIncrease,
+      yIncrease,
+      zIncrease,
       now
     );
 
@@ -196,14 +236,14 @@ export class Pair {
   }
 
   static borrowGivenPercent(
-    state: State,
+    state: CP,
     maturity: Uint256,
     assetOut: Uint112,
     percent: Uint40,
     now: Uint256,
     fee: Uint16
   ): Due {
-    const { interestIncrease, cdpIncrease } = givenPercentBorrow(
+    const { yIncrease, zIncrease } = givenPercentBorrow(
       fee,
       state,
       assetOut,
@@ -215,8 +255,8 @@ export class Pair {
       state,
       maturity,
       assetOut,
-      interestIncrease,
-      cdpIncrease,
+      yIncrease,
+      zIncrease,
       now
     );
 

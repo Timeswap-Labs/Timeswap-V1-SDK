@@ -1,13 +1,6 @@
-import {
-  Pair,
-  State,
-  Uint112,
-  Uint128,
-  Uint256,
-  Uint40,
-  Claims,
-  Due,
-} from '../';
+import { Pair } from './pair';
+import { CP, Claims, Due } from './interface';
+import { Uint256, Uint112, Uint128, Uint40 } from '../uint';
 
 export class Pool {
   pair: Pair;
@@ -19,7 +12,7 @@ export class Pool {
   }
 
   lendGivenBond(
-    state: State,
+    state: CP,
     assetIn: Uint112,
     bondOut: Uint128,
     now: Uint256
@@ -35,7 +28,7 @@ export class Pool {
   }
 
   lendGivenInsurance(
-    state: State,
+    state: CP,
     assetIn: Uint112,
     insuranceOut: Uint128,
     now: Uint256
@@ -51,7 +44,7 @@ export class Pool {
   }
 
   lendGivenPercent(
-    state: State,
+    state: CP,
     assetIn: Uint112,
     percent: Uint40,
     now: Uint256
@@ -67,7 +60,7 @@ export class Pool {
   }
 
   borrowGivenDebt(
-    state: State,
+    state: CP,
     assetOut: Uint112,
     debtIn: Uint112,
     now: Uint256
@@ -83,7 +76,7 @@ export class Pool {
   }
 
   borrowGivenCollateral(
-    state: State,
+    state: CP,
     assetOut: Uint112,
     collateralIn: Uint112,
     now: Uint256
@@ -99,7 +92,7 @@ export class Pool {
   }
 
   borrowGivenPercent(
-    state: State,
+    state: CP,
     assetOut: Uint112,
     percent: Uint40,
     now: Uint256

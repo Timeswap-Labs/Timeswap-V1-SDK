@@ -1,4 +1,4 @@
-import { Uint256 } from '..';
+import { Uint256 } from '../uint';
 
 export function mulDiv(a: Uint256, b: Uint256, denominator: Uint256): Uint256 {
   return new Uint256((a.value * b.value) / denominator.value);

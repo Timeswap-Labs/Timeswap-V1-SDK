@@ -1,9 +1,9 @@
-import { Uint112, Uint128 } from '..';
+import { Uint112, Uint128 } from '../uint';
 
-export interface State {
-  asset: Uint112;
-  interest: Uint112;
-  cdp: Uint112;
+export interface CP {
+  x: Uint112;
+  y: Uint112;
+  z: Uint112;
 }
 
 export interface Claims {
