@@ -10,8 +10,8 @@
     "size": "size-limit",
     "analyze": "size-limit --why",
     "gentype": "yarn gentype:contracts && yarn gentype:abi",
-    "gentype:contracts": "typechain --target=ethers-v5 --always-generate-overloads --out-dir src/typechain/timeswap './node_modules/@timeswap-labs/timeswap-v1-?(core|convenience)/artifacts/contracts/**/*.json'",
-    "gentype:abi": "typechain --target=ethers-v5 --always-generate-overloads --out-dir src/typechain/abi './src/abi/*.json'"
+    "gentype:contracts": "typechain --target=ethers-v5 --out-dir src/typechain/timeswap './node_modules/@timeswap-labs/timeswap-v1-?(core|convenience)/artifacts/contracts/**/Timeswap?(Pair|Factory|Convenience).json'",
+    "gentype:abi": "typechain --target=ethers-v5 --out-dir src/typechain/abi './src/abi/*.json'"
   },
   "prettier": {
     "printWidth": 80,
@@ -39,9 +39,10 @@
   "devDependencies": {
     "@ethersproject/abi": "^5.4.1",
     "@ethersproject/bytes": "^5.4.0",
+    "@ethersproject/providers": "^5.4.5",
     "@size-limit/preset-small-lib": "^5.0.3",
-    "@timeswap-labs/timeswap-v1-convenience": "^1.0.0",
-    "@timeswap-labs/timeswap-v1-core": "^1.0.0",
+    "@timeswap-labs/timeswap-v1-convenience": "1.0.6",
+    "@timeswap-labs/timeswap-v1-core": "1.0.6",
     "@typechain/ethers-v5": "^7.0.1",
     "ethers": "^5.4.6",
     "husky": "^7.0.1",
@@ -54,8 +55,8 @@
   },
   "dependencies": {
     "@ethersproject/abstract-signer": "^5.4.1",
-    "@ethersproject/providers": "^5.4.5",
-    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.4",
+    "@ethersproject/abstract-provider": "^5.4.1",
+    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.7",
     "tiny-invariant": "^1.1.0"
   }
 }

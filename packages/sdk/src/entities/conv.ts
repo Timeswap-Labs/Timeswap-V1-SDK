@@ -6,12 +6,12 @@ import {
   Uint40,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
 
-import { Provider } from '@ethersproject/providers';
+import { Provider } from '@ethersproject/abstract-provider';
 import { Signer } from '@ethersproject/abstract-signer';
 import { TimeswapConvenience__factory } from '../typechain/timeswap';
 import type { TimeswapConvenience } from '../typechain/timeswap';
 import { ContractTransaction } from 'ethers';
-import { CONVENIENCE } from '..';
+import { CONVENIENCE } from '../constants';
 
 export class Conv {
   protected providerOrSigner: Provider | Signer;
@@ -78,7 +78,7 @@ export class ConvSigner extends Conv {
       liquidityTo: params.liquidityTo,
       dueTo: params.dueTo,
       assetIn: params.assetIn.value,
-      debtOut: params.debtOut.value,
+      debtIn: params.debtIn.value,
       collateralIn: params.collateralIn.value,
       deadline: params.deadline.value,
     });
@@ -92,7 +92,7 @@ export class ConvSigner extends Conv {
       maturity: params.maturity.value,
       liquidityTo: params.liquidityTo,
       dueTo: params.dueTo,
-      debtOut: params.debtOut.value,
+      debtIn: params.debtIn.value,
       collateralIn: params.collateralIn.value,
       deadline: params.deadline.value,
     });
@@ -107,7 +107,7 @@ export class ConvSigner extends Conv {
       liquidityTo: params.liquidityTo,
       dueTo: params.dueTo,
       assetIn: params.assetIn.value,
-      debtOut: params.debtOut.value,
+      debtIn: params.debtIn.value,
       deadline: params.deadline.value,
     });
   }
@@ -559,7 +559,7 @@ interface NewLiquidity {
   liquidityTo: string;
   dueTo: string;
   assetIn: Uint112;
-  debtOut: Uint112;
+  debtIn: Uint112;
   collateralIn: Uint112;
   deadline: Uint256;
 }
@@ -569,7 +569,7 @@ interface NewLiquidityETHAsset {
   maturity: Uint256;
   liquidityTo: string;
   dueTo: string;
-  debtOut: Uint112;
+  debtIn: Uint112;
   collateralIn: Uint112;
   deadline: Uint256;
 }
@@ -580,7 +580,7 @@ interface NewLiquidityETHCollateral {
   liquidityTo: string;
   dueTo: string;
   assetIn: Uint112;
-  debtOut: Uint112;
+  debtIn: Uint112;
   deadline: Uint256;
 }
 

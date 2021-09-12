@@ -1,6 +1,6 @@
 import { Signer } from '@ethersproject/abstract-signer';
 import { ContractTransaction } from '@ethersproject/contracts';
-import { Provider } from '@ethersproject/providers';
+import { Provider } from '@ethersproject/abstract-provider';
 import invariant from 'tiny-invariant';
 import {
   AbstractToken,
@@ -14,10 +14,12 @@ import {
   Uint256,
   Uint32,
   Uint40,
-} from '@timeswap-labs/timeswap-v1-sdk-core'; //from sdk-core
+  CP,
+  Uint120,
+} from '@timeswap-labs/timeswap-v1-sdk-core';
+import type { TimeswapPair } from '../typechain/timeswap';
 import {
   TimeswapFactory__factory,
-  TimeswapPair,
   TimeswapPair__factory,
 } from '../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
@@ -34,7 +36,8 @@ export class Pair {
     providerOrSigner: Provider | Signer,
     asset: NativeToken | ERC20Token,
     collateral: NativeToken | ERC20Token,
-    convAddress?: string
+    convAddress?: string,
+    pairAddress?: string
   ) {
     this.conv = new Conv(providerOrSigner, convAddress);
 
@@ -42,6 +45,12 @@ export class Pair {
 
     this.asset = asset;
     this.collateral = collateral;
+
+    if (pairAddress) {
+      this.pair = TimeswapPair__factory.connect(pairAddress, providerOrSigner);
+    } else {
+      this.initPair();
+    }
   }
 
   upgrade(signer: Signer): PairSigner {
@@ -49,17 +58,18 @@ export class Pair {
       signer,
       this.asset,
       this.collateral,
-      this.conv.address()
+      this.conv.address(),
+      this.pair?.address
     );
+  }
+
+  address(): string | undefined {
+    return this.pair?.address;
   }
 
   convAddress(): string {
     return this.conv.address();
   }
-
-  // getPool(maturity: Uint256) : Pool {
-  //   return new Pool(this.)
-  // }
 
   async initPair() {
     if (!this.pair) {
@@ -101,20 +111,20 @@ export class Pair {
     return new Uint16(protocolFee);
   }
 
-  async getState(maturity: Uint256): Promise<State> {
+  async getConstantProduct(maturity: Uint256): Promise<CP> {
     await this.initPair();
-    const state = await this.pair!.state(maturity.value);
+    const state = await this.pair!.constantProduct(maturity.value);
 
-    const asset = new Uint112(state.asset.toString());
-    const interest = new Uint112(state.interest.toString());
-    const cdp = new Uint112(state.cdp.toString());
+    const x = new Uint112(state.x.toString());
+    const y = new Uint112(state.y.toString());
+    const z = new Uint112(state.z.toString());
 
-    return { asset, interest, cdp };
+    return { x, y, z };
   }
 
-  async getTotalLocked(maturity: Uint256): Promise<Tokens> {
+  async getTotalReserves(maturity: Uint256): Promise<Tokens> {
     await this.initPair();
-    const tokens = await this.pair!.totalLocked(maturity.value);
+    const tokens = await this.pair!.totalReserves(maturity.value);
 
     const asset = new Uint128(tokens.asset.toString());
     const collateral = new Uint128(tokens.collateral.toString());
@@ -156,6 +166,13 @@ export class Pair {
     return { bond, insurance };
   }
 
+  async getTotalDebtCreated(maturity: Uint256): Promise<Uint120> {
+    await this.initPair();
+    const totalDebtCreated = await this.pair!.totalDebtCreated(maturity.value);
+
+    return new Uint120(totalDebtCreated.toString());
+  }
+
   async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
     await this.initPair();
     const dues = await this.pair!.duesOf(maturity.value, address);
@@ -178,25 +195,57 @@ export class Pair {
     return this.conv.getNative(asset, collateral, maturity);
   }
 
-  calculateApr(state: State): Uint112 {
+  calculateApr(state: CP): Uint112 {
     const SECONDS = 31556926;
-    return state.interest.shiftLeft(32).mul(SECONDS).div(state.asset);
+    return state.y.shiftLeft(32).mul(SECONDS).div(state.x);
   }
 
-  calculateCf(state: State): Uint112 {
-    return state.asset
-      .mul(10n ** BigInt(this.collateral.decimals))
-      .div(state.cdp);
+  calculateCf(state: CP): Uint112 {
+    return state.x.mul(10n ** BigInt(this.collateral.decimals)).div(state.y);
   }
 
-  // calculateNewLiquidity(
-  //   assetIn: Uint112,
-  //   debtOut: Uint112,
-  //   collateralIn: Uint112 // : Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }>
-  // ) {}
+  calculateNewLiquidity(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    debtIn: Uint112,
+    collateralIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): { liquidityOut: Uint256; dueOut: DueCalculated } {
+    return PairCore.newLiquidity(
+      state,
+      maturity,
+      totalLiquidity,
+      assetIn,
+      debtIn,
+      collateralIn,
+      now,
+      protocolFee
+    );
+  }
+
+  calculateAddLiquidity(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): { liquidityOut: Uint256; dueOut: DueCalculated } {
+    return PairCore.addLiquidity(
+      state,
+      maturity,
+      totalLiquidity,
+      assetIn,
+      now,
+      protocolFee
+    );
+  }
 
   calculateLendGivenBond(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetIn: Uint112,
     bondOut: Uint128,
@@ -207,7 +256,7 @@ export class Pair {
   }
 
   calculateLendGivenInsurance(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetIn: Uint112,
     insuranceOut: Uint128,
@@ -225,7 +274,7 @@ export class Pair {
   }
 
   calculateLendGivenPercent(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetIn: Uint112,
     percent: Uint40,
@@ -243,7 +292,7 @@ export class Pair {
   }
 
   calculateBorrowGivenDebt(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetOut: Uint112,
     debtIn: Uint112,
@@ -261,7 +310,7 @@ export class Pair {
   }
 
   calculateBorrowGivenCollateral(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetOut: Uint112,
     collateralIn: Uint112,
@@ -279,7 +328,7 @@ export class Pair {
   }
 
   calculateBorrowGivenPercent(
-    state: State,
+    state: CP,
     fee: Uint16,
     assetOut: Uint112,
     percent: Uint40,
@@ -304,9 +353,10 @@ export class PairSigner extends Pair {
     signer: Signer,
     asset: AbstractToken,
     collateral: AbstractToken,
-    convAddress?: string
+    convAddress?: string,
+    pairAddress?: string
   ) {
-    super(signer, asset, collateral, convAddress);
+    super(signer, asset, collateral, convAddress, pairAddress);
     this.convSigner = this.conv.upgrade(signer);
   }
 
@@ -675,12 +725,6 @@ interface Tokens {
   collateral: Uint128;
 }
 
-interface State {
-  asset: Uint112;
-  interest: Uint112;
-  cdp: Uint112;
-}
-
 interface Due {
   debt: Uint112;
   collateral: Uint112;
@@ -699,7 +743,7 @@ interface NewLiquidity {
   liquidityTo: string;
   dueTo: string;
   assetIn?: Uint112;
-  debtOut: Uint112;
+  debtIn: Uint112;
   collateralIn?: Uint112;
   deadline: Uint256;
 }
