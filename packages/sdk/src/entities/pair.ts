@@ -195,13 +195,17 @@ export class Pair {
     return this.conv.getNative(asset, collateral, maturity);
   }
 
-  calculateApr(state: CP): Uint112 {
+  calculateApr(state: CP): number {
     const SECONDS = 31556926;
-    return state.y.shiftLeft(32).mul(SECONDS).div(state.x);
+    const temp = state.y.mul(SECONDS).mul(10000).div(state.x.shiftLeft(32));
+    const apr = Number(temp.value.toString()) / 10000;
+    return apr;
   }
 
   calculateCf(state: CP): Uint112 {
-    return state.x.mul(10n ** BigInt(this.collateral.decimals)).div(state.y);
+    let temp = 1n;
+    for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
+    return state.x.mul(temp).div(state.y);
   }
 
   calculateNewLiquidity(

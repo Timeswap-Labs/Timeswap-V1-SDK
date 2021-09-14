@@ -133,13 +133,13 @@ export class Pool {
     return this.pair.getNative(this.maturity);
   }
 
-  async calculateApr() {
+  async calculateApr(): Promise<number> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateApr(this.cache!.state);
   }
 
-  async calculateCf() {
+  async calculateCf(): Promise<Uint112> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateCf(this.cache!.state);
