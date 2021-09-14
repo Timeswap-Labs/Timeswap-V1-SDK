@@ -153,7 +153,7 @@ export function lend(
   zDecrease: Uint112,
   now: Uint256
 ): Claims {
-  invariant(now < maturity, 'Expired');
+  invariant(now.value < maturity.value, 'Expired');
 
   check(state, xIncrease, yDecrease, zDecrease, fee);
 

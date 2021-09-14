@@ -153,7 +153,7 @@ export function borrow(
   zIncrease: Uint112,
   now: Uint256
 ): Due {
-  invariant(now < maturity, 'Expired');
+  invariant(now.value < maturity.value, 'Expired');
 
   check(state, xDecrease, yIncrease, zIncrease, fee);
 

@@ -57,7 +57,7 @@ export function mint(
   liquidityOut: Uint256;
   dueOut: Due;
 } {
-  invariant(now < maturity, 'Expired');
+  invariant(now.value < maturity.value, 'Expired');
 
   let liquidityOut: Uint256;
 
