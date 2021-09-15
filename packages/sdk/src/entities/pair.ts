@@ -210,16 +210,16 @@ export class Pair {
   }
 
   calculateApr(state: CP): number {
-    const SECONDS = 31556926;
-    const temp = state.y.mul(SECONDS).mul(10000).div(state.x.shiftLeft(32));
-    const apr = Number(temp.value.toString()) / 10000;
+    const SECONDS = 31556926n;
+    const temp = (state.y.value * SECONDS * 10000n) / (state.x.value << 32n);
+    const apr = Number(temp) / 10000;
     return apr;
   }
 
   calculateCf(state: CP): Uint112 {
     let temp = 1n;
     for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
-    return state.x.mul(temp).div(state.y);
+    return new Uint112((state.x.value * temp) / state.y.value);
   }
 
   calculateNewLiquidity(
