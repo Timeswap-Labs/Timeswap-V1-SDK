@@ -1609,12 +1609,13 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@timeswap-labs/timeswap-v1-convenience@1.0.6":
-  version "1.0.6"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.6/c4d52dec93b61e1030daec94173fad14a8f8ad122f220571daaaf775cdf375c6#16e70da0b4b79278864fe574871435467954ace2"
-  integrity sha512-bPyP/B6Y/jLa1oWa5zfWXICpF/wXrhzlhFG2/9r4VT0t406gfG5+QloZKIGQW6cUMXVZpCT7zO1w7dm9blURnQ==
+"@timeswap-labs/timeswap-v1-convenience@1.0.12":
+  version "1.0.12"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.12/8ea2b2b07929e44e245e7f2c19a6083ae92ad3ffe1b9d554d513e76b44d5d5bd#07e4e283696cba08f80e989dd1863bab2d07dad8"
+  integrity sha512-mWL9BlkyeCNW7ckvfvk5LjOFgCvNp+0/bGBeMDtlGtfdvbbQKiJK3fJiKTimm5Ewx2tE1rCe/CDc9gvNqGE+ZQ==
   dependencies:
     "@openzeppelin/contracts" "^4.1.0"
+    base64-sol "1.0.1"
     dotenv "^10.0.0"
     eslint "^7.29.0"
     hardhat-deploy "^0.8.11"
@@ -1623,18 +1624,18 @@
     solhint "^3.2.1"
     solhint-plugin-prettier "^0.0.5"
 
-"@timeswap-labs/timeswap-v1-core@1.0.6":
-  version "1.0.6"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-core/1.0.6/682607446f08fc5783ce6b8aa9d90d08b450dc5e62f8739e433f0de3bf8a5b87#6d97d1a942fcc1506e3301aa65abbf3fa1834af7"
-  integrity sha512-yUKMlDsGOdCrVPbAEsqI5fk6I5KSilmPEwbSPs9Fx6k+xJnZX5zctoioto1xRlTtCT4zzkcKmJYt6dpbZjx4KA==
+"@timeswap-labs/timeswap-v1-core@1.0.7":
+  version "1.0.7"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-core/1.0.7/00e5f62fe8ed47bdaaa4ef6f68144e5db5c5d9743fc4aa79598d54bba3758a4d#a6ed30f3df64c7b9c69bc04613db63af3c046188"
+  integrity sha512-8d1X3Sk2JxabM/44F2B+cgBwzjn054pZ2e9nnetzD88Tr+YScoCj7my/BituLak2/TctYtbEcn9chYPrEqL5og==
   dependencies:
     "@openzeppelin/contracts" "^4.1.0"
     dotenv "^10.0.0"
 
-"@timeswap-labs/timeswap-v1-sdk-core@0.1.8":
-  version "0.1.8"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.8/536f5a0e869f946d3825a09a955122e0d991626d67350c700f460316145a7ca6#c3d39327aa70e82f93a2de132d7a20985daf3cd8"
-  integrity sha512-WcM1S1gqKoA1YBBVz9lmWBU2jD494GdZIP8waF7xVjhGU2JIi6buLvN9Hhpy6ZJLuuoQhubX2fqYO4RpFpkA+Q==
+"@timeswap-labs/timeswap-v1-sdk-core@0.1.9":
+  version "0.1.9"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.9/161609aadbd5557b071260a851d7b2a2ce556b1a9ff83fc6e6ff3adc1d53bc2b#8d78d4bff7aa9e8085215fdbd1caaf5ebcede587"
+  integrity sha512-uL7hstVWM28xX0hnK7BCTLW4xyddeCYmC5B5QJfPQQ3RWaKwbOLs9UwmKMxB90gLZCBPkROJsCbQjo0CVxDmMA==
   dependencies:
     "@ethersproject/address" "^5.4.0"
     tiny-invariant "^1.1.0"
@@ -2492,6 +2493,11 @@ base64-js@^1.0.2:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
   integrity sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==
+
+base64-sol@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/base64-sol/-/base64-sol-1.0.1.tgz#91317aa341f0bc763811783c5729f1c2574600f6"
+  integrity sha512-ld3cCNMeXt4uJXmLZBHFGMvVpK9KsLVEhPpFRXnvSVAqABKbuNZg/+dsq3NuM+wxFLb/UrVkz7m1ciWmkMfTbg==
 
 base@^0.11.1:
   version "0.11.2"
