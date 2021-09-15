@@ -14,20 +14,18 @@ import { ContractTransaction } from 'ethers';
 import { CONVENIENCE } from '../constants';
 
 export class Conv {
-  protected providerOrSigner: Provider | Signer;
   protected convContract: TimeswapConvenience;
 
   constructor(providerOrSigner: Provider | Signer, address?: string) {
-    this.providerOrSigner = providerOrSigner;
     if (address) {
       this.convContract = TimeswapConvenience__factory.connect(
         address,
-        this.providerOrSigner
+        providerOrSigner
       );
     } else {
       this.convContract = TimeswapConvenience__factory.connect(
         CONVENIENCE,
-        this.providerOrSigner
+        providerOrSigner
       );
     }
   }
@@ -36,12 +34,20 @@ export class Conv {
     return this.convContract.address;
   }
 
-  upgrade(signer: Signer): ConvSigner {
-    return new ConvSigner(signer, this.address());
+  connect(providerOrSigner: Provider | Signer) {
+    this.convContract = this.convContract.connect(providerOrSigner);
   }
 
-  getProviderOrSigner(): Provider | Signer {
-    return this.providerOrSigner;
+  upgrade(signer: Signer): ConvSigner {
+    return new ConvSigner(signer, this.convContract.address);
+  }
+
+  provider(): Provider {
+    return this.convContract.provider;
+  }
+
+  signer(): Signer {
+    return this.convContract.signer;
   }
 
   async factory(): Promise<string> {
@@ -66,10 +72,6 @@ export class Conv {
 }
 
 export class ConvSigner extends Conv {
-  constructor(signer: Signer, address?: string) {
-    super(signer, address);
-  }
-
   async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
     return this.convContract.newLiquidity({
       asset: params.asset.address,

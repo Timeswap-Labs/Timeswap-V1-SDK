@@ -16,7 +16,6 @@ export class NativeToken extends NativeCore {
     name?: string
   ) {
     super(chainID, decimals, symbol, name);
-
     this.providerOrSigner = providerOrSigner;
   }
 

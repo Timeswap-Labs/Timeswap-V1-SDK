@@ -9,7 +9,6 @@ import { Erc20__factory } from '../typechain/abi';
 import { ContractTransaction } from 'ethers';
 
 export class ERC20Token extends ERC20Core {
-  protected providerOrSigner: Provider | Signer;
   protected erc20Contract: Erc20;
 
   constructor(
@@ -21,9 +20,11 @@ export class ERC20Token extends ERC20Core {
     name?: string
   ) {
     super(chainID, decimals, address, symbol, name);
+    this.erc20Contract = Erc20__factory.connect(address, providerOrSigner);
+  }
 
-    this.providerOrSigner = providerOrSigner;
-    this.erc20Contract = Erc20__factory.connect(address, this.providerOrSigner);
+  connect(providerOrSigner: Provider | Signer) {
+    this.erc20Contract.connect(providerOrSigner);
   }
 
   upgrade(signer: Signer): ERC20TokenSigner {
@@ -37,7 +38,14 @@ export class ERC20Token extends ERC20Core {
     );
   }
 
-  //view
+  provider(): Provider {
+    return this.erc20Contract.provider;
+  }
+
+  signer(): Signer {
+    return this.erc20Contract.signer;
+  }
+
   async getName(): Promise<string> {
     return this.erc20Contract.name();
   }
@@ -67,18 +75,6 @@ export class ERC20Token extends ERC20Core {
 }
 
 export class ERC20TokenSigner extends ERC20Token {
-  constructor(
-    signer: Signer,
-    chainID: number,
-    decimals: number,
-    address: string,
-    symbol?: string,
-    name?: string
-  ) {
-    super(signer, chainID, decimals, address, symbol, name);
-  }
-
-  //update
   async approve(
     spender: string,
     amount: Uint256
