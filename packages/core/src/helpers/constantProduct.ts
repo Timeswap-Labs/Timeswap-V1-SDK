@@ -37,3 +37,9 @@ export function checkConstantProduct(
   const oldProd = state.y.value * state.z.shiftLeft(32).value * state.x.value;
   invariant(newProd >= oldProd, 'Invariance');
 }
+
+export function checkMinimum(state: CP, xReserve: Uint112, yAdjusted: Uint128) {
+  const newProd = new Uint256(yAdjusted).mul(xReserve);
+  const oldProd = new Uint256(state.y.shiftLeft(12)).mul(state.x);
+  invariant(newProd.value >= oldProd.value, 'Minimum');
+}

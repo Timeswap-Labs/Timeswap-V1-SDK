@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant';
 import { Claims, CP } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
-import { checkConstantProduct } from './constantProduct';
+import { checkConstantProduct, checkMinimum } from './constantProduct';
 import { mulDiv, mulDivUp } from './fullMath';
 import { divUp } from './math';
 
@@ -101,16 +101,17 @@ export function givenPercent(
 ): LendResult {
   const feeBase = new Uint256(fee).add(0x10000);
 
+  const xAdjust = new Uint256(cp.x);
+  xAdjust.addAssign(assetIn);
+
   const minimum = new Uint256(assetIn);
   minimum.mulAssign(cp.y);
-  minimum.divAssign(new Uint256(cp.x).shiftLeft(4));
-
-  const maximum = new Uint256(cp.y);
-  maximum.shiftLeftAssign(16);
-  maximum.mulAssign(assetIn);
-  const denominator = new Uint256(cp.x);
-  denominator.addAssign(assetIn);
+  minimum.shiftLeftAssign(12);
+  const maximum = new Uint256(minimum);
+  maximum.shiftLeftAssign(4);
+  const denominator = new Uint256(xAdjust);
   denominator.mulAssign(feeBase);
+  minimum.divAssign(denominator);
   maximum.divAssign(denominator);
 
   const _yDecrease = new Uint256(maximum);
@@ -123,9 +124,6 @@ export function givenPercent(
   const yAdjust = new Uint256(cp.y);
   yAdjust.shiftLeftAssign(16);
   yAdjust.subAssign(_yDecrease.mul(feeBase));
-
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.addAssign(assetIn);
 
   const _zDecrease = new Uint256(xAdjust);
   _zDecrease.mulAssign(yAdjust);
@@ -165,30 +163,29 @@ export function lend(
 
 function check(
   state: CP,
-  assetIn: Uint112,
+  xIncrease: Uint112,
   yDecrease: Uint112,
   zDecrease: Uint112,
   fee: Uint16
 ) {
   const feeBase = new Uint128(fee).add(0x10000);
-  const xReserve = state.x.add(assetIn);
-  const yAdjusted = adjust(state.y, yDecrease, feeBase);
-  const zAdjusted = adjust(state.z, zDecrease, feeBase);
+  const xReserve = state.x.add(xIncrease);
+  const yAdjusted = adjust(state.y, yDecrease, feeBase, 16);
+  const zAdjusted = adjust(state.z, zDecrease, feeBase, 16);
   checkConstantProduct(state, xReserve, yAdjusted, zAdjusted);
 
-  const minimum = new Uint256(assetIn);
-  minimum.mulAssign(state.y);
-  minimum.divAssign(new Uint256(xReserve).shiftLeft(4));
-  invariant(yDecrease.value >= minimum.value, 'Invalid');
+  yAdjusted.set(adjust(state.y, yDecrease, feeBase, 12));
+  checkMinimum(state, xReserve, yAdjusted);
 }
 
 function adjust(
   reserve: Uint112,
   decrease: Uint112,
-  feeBase: Uint128
+  feeBase: Uint128,
+  shift: number
 ): Uint128 {
   const adjusted = new Uint128(reserve);
-  adjusted.shiftLeftAssign(16);
+  adjusted.shiftLeftAssign(shift);
   adjusted.subAssign(feeBase.mul(decrease));
   return adjusted;
 }
