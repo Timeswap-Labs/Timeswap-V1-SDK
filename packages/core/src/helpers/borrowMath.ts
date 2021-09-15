@@ -1,7 +1,7 @@
 import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
-import { checkConstantProduct, checkMinimum } from './constantProduct';
+import { checkConstantProduct } from './constantProduct';
 import { mulDiv, mulDivUp } from './fullMath';
 import { divUp, shiftUp } from './math';
 
@@ -170,22 +170,26 @@ function check(
 ) {
   const feeBase = new Uint128(0x10000).sub(fee);
   const xReserve = state.x.sub(xDecrease);
-  const yAdjusted = adjust(state.y, yIncrease, feeBase, 16);
-  const zAdjusted = adjust(state.z, zIncrease, feeBase, 16);
+  const yAdjusted = adjust(state.y, yIncrease, feeBase);
+  const zAdjusted = adjust(state.z, zIncrease, feeBase);
   checkConstantProduct(state, xReserve, yAdjusted, zAdjusted);
 
-  yAdjusted.set(adjust(state.y, yIncrease, feeBase, 12));
-  checkMinimum(state, xReserve, yAdjusted);
+  const minimum = new Uint256(xDecrease);
+  minimum.mulAssign(state.y);
+  minimum.shiftLeftAssign(12);
+  const denominator = new Uint256(xReserve);
+  denominator.mulAssign(feeBase);
+  minimum.set(divUp(minimum, denominator));
+  invariant(yIncrease.value >= minimum.value, 'Minimum');
 }
 
 function adjust(
   reserve: Uint112,
   increase: Uint112,
-  feeBase: Uint128,
-  shift: number
+  feeBase: Uint128
 ): Uint128 {
   const adjusted = new Uint128(reserve);
-  adjusted.shiftLeftAssign(shift);
+  adjusted.shiftLeftAssign(16);
   adjusted.addAssign(feeBase.mul(increase));
   return adjusted;
 }
