@@ -16,7 +16,7 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { TimeswapPair } from '../typechain/timeswap';
+import type { TimeswapPair, TimeswapConvenience } from '../typechain/timeswap';
 import {
   TimeswapFactory__factory,
   TimeswapPair__factory,
@@ -84,6 +84,10 @@ export class Pair {
 
   signer(): Signer {
     return this.conv.signer();
+  }
+
+  contract(): TimeswapConvenience {
+    return this.conv.contract();
   }
 
   async initPair() {
@@ -237,7 +241,7 @@ export class Pair {
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): { liquidityOut: Uint256; dueOut: DueCalculated } {
+  ): LiquidityReturn {
     return PairCore.newLiquidity(
       state,
       maturity,
@@ -257,7 +261,7 @@ export class Pair {
     assetIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): { liquidityOut: Uint256; dueOut: DueCalculated } {
+  ): LiquidityReturn {
     return PairCore.addLiquidity(
       state,
       maturity,
@@ -275,7 +279,7 @@ export class Pair {
     bondOut: Uint128,
     maturity: Uint256,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return PairCore.lendGivenBond(state, maturity, assetIn, bondOut, now, fee);
   }
 
@@ -286,7 +290,7 @@ export class Pair {
     insuranceOut: Uint128,
     maturity: Uint256,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return PairCore.lendGivenInsurance(
       state,
       maturity,
@@ -304,7 +308,7 @@ export class Pair {
     percent: Uint40,
     maturity: Uint256,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return PairCore.lendGivenPercent(
       state,
       maturity,
@@ -322,7 +326,7 @@ export class Pair {
     debtIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): DueCalculated {
+  ): BorrowReturn {
     return PairCore.borrowGivenDebt(
       state,
       maturity,
@@ -340,7 +344,7 @@ export class Pair {
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): DueCalculated {
+  ): BorrowReturn {
     return PairCore.borrowGivenCollateral(
       state,
       maturity,
@@ -358,7 +362,7 @@ export class Pair {
     percent: Uint40,
     maturity: Uint256,
     now: Uint256
-  ): DueCalculated {
+  ): BorrowReturn {
     return PairCore.borrowGivenPercent(
       state,
       maturity,
@@ -742,6 +746,25 @@ export class PairSigner extends Pair {
       throw 'Unreachable';
     }
   }
+}
+
+interface LiquidityReturn {
+  liquidityOut: Uint256;
+  dueOut: DueCalculated;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+}
+
+interface LendReturn {
+  claims: Claims;
+  yDecrease: Uint112;
+  zDecrease: Uint112;
+}
+
+interface BorrowReturn {
+  due: DueCalculated;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
 }
 
 interface Tokens {

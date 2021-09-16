@@ -50,6 +50,10 @@ export class Conv {
     return this.convContract.signer;
   }
 
+  contract(): TimeswapConvenience {
+    return this.convContract;
+  }
+
   async factory(): Promise<string> {
     return this.convContract.factory();
   }

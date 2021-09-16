@@ -44,7 +44,7 @@ export class Pair {
     collateralIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): { liquidityOut: Uint256; dueOut: Due } {
+  ): LiquidityReturn {
     const { yIncrease, zIncrease } = givenNew(
       maturity,
       assetIn,
@@ -53,7 +53,7 @@ export class Pair {
       now
     );
 
-    return mint(
+    const { liquidityOut, dueOut } = mint(
       protocolFee,
       state,
       totalLiquidity,
@@ -63,6 +63,8 @@ export class Pair {
       zIncrease,
       now
     );
+
+    return { liquidityOut, dueOut, yIncrease, zIncrease };
   }
 
   static addLiquidity(
@@ -72,10 +74,10 @@ export class Pair {
     assetIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): { liquidityOut: Uint256; dueOut: Due } {
+  ): LiquidityReturn {
     const { yIncrease, zIncrease } = givenAdd(state, assetIn);
 
-    return mint(
+    const { liquidityOut, dueOut } = mint(
       protocolFee,
       state,
       totalLiquidity,
@@ -85,6 +87,8 @@ export class Pair {
       zIncrease,
       now
     );
+
+    return { liquidityOut, dueOut, yIncrease, zIncrease };
   }
 
   static lendGivenBond(
@@ -94,7 +98,7 @@ export class Pair {
     bondOut: Uint128,
     now: Uint256,
     fee: Uint16
-  ): Claims {
+  ): LendReturn {
     const { yDecrease, zDecrease } = givenBond(
       fee,
       state,
@@ -114,7 +118,7 @@ export class Pair {
       now
     );
 
-    return claims;
+    return { claims, yDecrease, zDecrease };
   }
 
   static lendGivenInsurance(
@@ -124,7 +128,7 @@ export class Pair {
     insuranceOut: Uint128,
     now: Uint256,
     fee: Uint16
-  ): Claims {
+  ): LendReturn {
     const { yDecrease, zDecrease } = givenInsurance(
       fee,
       state,
@@ -144,7 +148,7 @@ export class Pair {
       now
     );
 
-    return claims;
+    return { claims, yDecrease, zDecrease };
   }
 
   static lendGivenPercent(
@@ -154,7 +158,7 @@ export class Pair {
     percent: Uint40,
     now: Uint256,
     fee: Uint16
-  ): Claims {
+  ): LendReturn {
     const { yDecrease, zDecrease } = givenPercentLend(
       fee,
       state,
@@ -172,7 +176,7 @@ export class Pair {
       now
     );
 
-    return claims;
+    return { claims, yDecrease, zDecrease };
   }
 
   static borrowGivenDebt(
@@ -182,7 +186,7 @@ export class Pair {
     debtIn: Uint112,
     now: Uint256,
     fee: Uint16
-  ): Due {
+  ): BorrowReturn {
     const { yIncrease, zIncrease } = givenDebt(
       fee,
       state,
@@ -202,7 +206,7 @@ export class Pair {
       now
     );
 
-    return due;
+    return { due, yIncrease, zIncrease };
   }
 
   static borrowGivenCollateral(
@@ -212,7 +216,7 @@ export class Pair {
     collateralIn: Uint112,
     now: Uint256,
     fee: Uint16
-  ): Due {
+  ): BorrowReturn {
     const { yIncrease, zIncrease } = givenCollateral(
       fee,
       state,
@@ -232,7 +236,7 @@ export class Pair {
       now
     );
 
-    return due;
+    return { due, yIncrease, zIncrease };
   }
 
   static borrowGivenPercent(
@@ -242,7 +246,7 @@ export class Pair {
     percent: Uint40,
     now: Uint256,
     fee: Uint16
-  ): Due {
+  ): BorrowReturn {
     const { yIncrease, zIncrease } = givenPercentBorrow(
       fee,
       state,
@@ -260,6 +264,25 @@ export class Pair {
       now
     );
 
-    return due;
+    return { due, yIncrease, zIncrease };
   }
+}
+
+interface LiquidityReturn {
+  liquidityOut: Uint256;
+  dueOut: Due;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+}
+
+interface LendReturn {
+  claims: Claims;
+  yDecrease: Uint112;
+  zDecrease: Uint112;
+}
+
+interface BorrowReturn {
+  due: Due;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
 }

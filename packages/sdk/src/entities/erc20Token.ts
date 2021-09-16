@@ -53,6 +53,10 @@ export class ERC20Token extends ERC20Core {
     return this.erc20Contract.signer;
   }
 
+  contract(): Erc20 {
+    return this.erc20Contract;
+  }
+
   async getName(): Promise<string> {
     return this.erc20Contract.name();
   }

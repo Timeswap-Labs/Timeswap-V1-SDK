@@ -1632,10 +1632,10 @@
     "@openzeppelin/contracts" "^4.1.0"
     dotenv "^10.0.0"
 
-"@timeswap-labs/timeswap-v1-sdk-core@0.1.10":
-  version "0.1.10"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.10/d45fac221bafc6f574ef691569a868a64cddcedbd3d2e46fc8178b50d190d4ce#f18a1c0abe4696c3ee44eebd1c7bfcc79b383451"
-  integrity sha512-Owm55e7ahQJlfkbK7utWu77LrwAPWaz7cb+P9U0tRB/JK53zMymmxQeJCVkB91GNhoDLmov0r5/Ox8Mahx6geQ==
+"@timeswap-labs/timeswap-v1-sdk-core@0.1.11":
+  version "0.1.11"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.11/1fd45134afcd60a5fee9fcfb4fcdd6ca167e97badde5d582ea6527449f4cd29d#b6636030ffb088e803a87a3ba64f9353fb85f395"
+  integrity sha512-VI0CwLqK5Mip10IVnjJo4v07P20vHNKBG4lniAxvqVqGGcM62DOb3DGssZOqsk531xMagVIh2MLXXWAylNQhxg==
   dependencies:
     "@ethersproject/address" "^5.4.0"
     tiny-invariant "^1.1.0"

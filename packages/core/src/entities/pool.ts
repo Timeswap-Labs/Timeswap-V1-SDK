@@ -11,12 +11,48 @@ export class Pool {
     this.maturity = new Uint256(maturity);
   }
 
+  newLiquidity(
+    state: CP,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    debtIn: Uint112,
+    collateralIn: Uint112,
+    now: Uint256
+  ): LiquidityReturn {
+    return Pair.newLiquidity(
+      state,
+      this.maturity,
+      totalLiquidity,
+      assetIn,
+      debtIn,
+      collateralIn,
+      now,
+      this.pair.protocolFee
+    );
+  }
+
+  addLiquidity(
+    state: CP,
+    totalLiquidity: Uint256,
+    assetIn: Uint112,
+    now: Uint256
+  ): LiquidityReturn {
+    return Pair.addLiquidity(
+      state,
+      this.maturity,
+      totalLiquidity,
+      assetIn,
+      now,
+      this.pair.protocolFee
+    );
+  }
+
   lendGivenBond(
     state: CP,
     assetIn: Uint112,
     bondOut: Uint128,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return Pair.lendGivenBond(
       state,
       this.maturity,
@@ -32,7 +68,7 @@ export class Pool {
     assetIn: Uint112,
     insuranceOut: Uint128,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return Pair.lendGivenInsurance(
       state,
       this.maturity,
@@ -48,7 +84,7 @@ export class Pool {
     assetIn: Uint112,
     percent: Uint40,
     now: Uint256
-  ): Claims {
+  ): LendReturn {
     return Pair.lendGivenPercent(
       state,
       this.maturity,
@@ -64,7 +100,7 @@ export class Pool {
     assetOut: Uint112,
     debtIn: Uint112,
     now: Uint256
-  ): Due {
+  ): BorrowReturn {
     return Pair.borrowGivenDebt(
       state,
       this.maturity,
@@ -80,7 +116,7 @@ export class Pool {
     assetOut: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): Due {
+  ): BorrowReturn {
     return Pair.borrowGivenCollateral(
       state,
       this.maturity,
@@ -96,7 +132,7 @@ export class Pool {
     assetOut: Uint112,
     percent: Uint40,
     now: Uint256
-  ): Due {
+  ): BorrowReturn {
     return Pair.borrowGivenPercent(
       state,
       this.maturity,
@@ -106,4 +142,23 @@ export class Pool {
       this.pair.fee
     );
   }
+}
+
+interface LiquidityReturn {
+  liquidityOut: Uint256;
+  dueOut: Due;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+}
+
+interface LendReturn {
+  claims: Claims;
+  yDecrease: Uint112;
+  zDecrease: Uint112;
+}
+
+interface BorrowReturn {
+  due: Due;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
 }

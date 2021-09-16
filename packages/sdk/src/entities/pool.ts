@@ -14,6 +14,7 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
+import type { TimeswapConvenience } from '../typechain/timeswap';
 import { Pair, PairSigner } from './pair';
 
 export class Pool {
@@ -79,6 +80,10 @@ export class Pool {
 
   signer(): Signer {
     return this.pair.signer();
+  }
+
+  contract(): TimeswapConvenience {
+    return this.pair.contract();
   }
 
   async initPair() {
@@ -172,7 +177,7 @@ export class Pool {
     debtIn: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateNewLiquidity(
@@ -190,7 +195,7 @@ export class Pool {
   async calculateAddLiquidity(
     assetIn: Uint112,
     now: Uint256
-  ): Promise<{ liquidityOut: Uint256; dueOut: DueCalculated }> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateAddLiquidity(
@@ -207,7 +212,7 @@ export class Pool {
     assetIn: Uint112,
     bondOut: Uint128,
     now: Uint256
-  ): Promise<Claims> {
+  ): Promise<LendReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLendGivenBond(
@@ -224,7 +229,7 @@ export class Pool {
     assetIn: Uint112,
     insuranceOut: Uint128,
     now: Uint256
-  ): Promise<Claims> {
+  ): Promise<LendReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLendGivenInsurance(
@@ -241,7 +246,7 @@ export class Pool {
     assetIn: Uint112,
     percent: Uint40,
     now: Uint256
-  ): Promise<Claims> {
+  ): Promise<LendReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLendGivenPercent(
@@ -258,7 +263,7 @@ export class Pool {
     assetOut: Uint112,
     debtIn: Uint112,
     now: Uint256
-  ): Promise<DueCalculated> {
+  ): Promise<BorrowReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateBorrowGivenDebt(
@@ -275,7 +280,7 @@ export class Pool {
     assetOut: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): Promise<DueCalculated> {
+  ): Promise<BorrowReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateBorrowGivenCollateral(
@@ -292,7 +297,7 @@ export class Pool {
     assetOut: Uint112,
     percent: Uint40,
     now: Uint256
-  ): Promise<DueCalculated> {
+  ): Promise<BorrowReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateBorrowGivenPercent(
@@ -406,6 +411,25 @@ export class PoolSigner extends Pool {
       maturity: this.maturity,
     });
   }
+}
+
+interface LiquidityReturn {
+  liquidityOut: Uint256;
+  dueOut: DueCalculated;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+}
+
+interface LendReturn {
+  claims: Claims;
+  yDecrease: Uint112;
+  zDecrease: Uint112;
+}
+
+interface BorrowReturn {
+  due: DueCalculated;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
 }
 
 interface Cache {
