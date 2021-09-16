@@ -1,5 +1,5 @@
 {
-  "version": "0.1.12",
+  "version": "0.1.13",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -41,8 +41,8 @@
     "@ethersproject/bytes": "^5.4.0",
     "@ethersproject/providers": "^5.4.5",
     "@size-limit/preset-small-lib": "^5.0.3",
-    "@timeswap-labs/timeswap-v1-convenience": "1.0.13",
-    "@timeswap-labs/timeswap-v1-core": "1.0.8",
+    "@timeswap-labs/timeswap-v1-convenience": "1.0.14",
+    "@timeswap-labs/timeswap-v1-core": "1.0.9",
     "@typechain/ethers-v5": "^7.0.1",
     "ethers": "^5.4.6",
     "husky": "^7.0.1",
