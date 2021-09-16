@@ -34,8 +34,8 @@ export class Conv {
     return this.convContract.address;
   }
 
-  connect(providerOrSigner: Provider | Signer) {
-    this.convContract = this.convContract.connect(providerOrSigner);
+  connect(providerOrSigner: Provider | Signer): this {
+    return this.constructor(providerOrSigner, this.convContract.address);
   }
 
   upgrade(signer: Signer): ConvSigner {

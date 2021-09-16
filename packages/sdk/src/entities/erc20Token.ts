@@ -23,8 +23,15 @@ export class ERC20Token extends ERC20Core {
     this.erc20Contract = Erc20__factory.connect(address, providerOrSigner);
   }
 
-  connect(providerOrSigner: Provider | Signer) {
-    this.erc20Contract.connect(providerOrSigner);
+  connect(providerOrSigner: Provider | Signer): this {
+    return this.constructor(
+      providerOrSigner,
+      this.chainID,
+      this.decimals,
+      this.address,
+      this.symbol,
+      this.name
+    );
   }
 
   upgrade(signer: Signer): ERC20TokenSigner {

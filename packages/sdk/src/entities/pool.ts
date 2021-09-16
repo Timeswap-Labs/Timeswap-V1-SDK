@@ -307,29 +307,44 @@ export class Pool {
 }
 
 export class PoolSigner extends Pool {
+  private pairSigner: PairSigner;
+
+  public constructor(
+    signer: Signer,
+    asset: NativeToken | ERC20Token,
+    collateral: NativeToken | ERC20Token,
+    maturity: Uint256,
+    convAddress?: string,
+    pairAddress?: string,
+    cache?: Cache
+  ) {
+    super(signer, asset, collateral, maturity, convAddress, pairAddress, cache);
+    this.pairSigner = this.pair.upgrade(signer);
+  }
+
   async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).newLiquidity({
+    return this.pairSigner.newLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).addLiquidity({
+    return this.pairSigner.addLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).removeLiquidity({
+    return this.pairSigner.removeLiquidity({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async lendGivenBond(params: LendGivenBond): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).lendGivenBond({
+    return this.pairSigner.lendGivenBond({
       ...params,
       maturity: this.maturity,
     });
@@ -338,7 +353,7 @@ export class PoolSigner extends Pool {
   async lendGivenInsurance(
     params: LendGivenInsurance
   ): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).lendGivenInsurance({
+    return this.pairSigner.lendGivenInsurance({
       ...params,
       maturity: this.maturity,
     });
@@ -347,21 +362,21 @@ export class PoolSigner extends Pool {
   async lendGivenPercent(
     params: LendGivenPercent
   ): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).lendGivenPercent({
+    return this.pairSigner.lendGivenPercent({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async collect(params: Collect): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).collect({
+    return this.pairSigner.collect({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async borrowGivenDebt(params: BorrowGivenDebt): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).borrowGivenDebt({
+    return this.pairSigner.borrowGivenDebt({
       ...params,
       maturity: this.maturity,
     });
@@ -370,7 +385,7 @@ export class PoolSigner extends Pool {
   async borrowGivenCollateral(
     params: BorrowGivenCollateral
   ): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).borrowGivenCollateral({
+    return this.pairSigner.borrowGivenCollateral({
       ...params,
       maturity: this.maturity,
     });
@@ -379,14 +394,14 @@ export class PoolSigner extends Pool {
   async borrowGivenPercent(
     params: BorrowGivenPercent
   ): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).borrowGivenPercent({
+    return this.pairSigner.borrowGivenPercent({
       ...params,
       maturity: this.maturity,
     });
   }
 
   async repay(params: Repay): Promise<ContractTransaction> {
-    return (this.pair as PairSigner).repay({
+    return this.pairSigner.repay({
       ...params,
       maturity: this.maturity,
     });
