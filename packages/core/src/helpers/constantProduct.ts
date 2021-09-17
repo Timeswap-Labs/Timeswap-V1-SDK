@@ -34,6 +34,6 @@ export function checkConstantProduct(
   zAdjusted: Uint128
 ) {
   const newProd = yAdjusted.value * zAdjusted.value * xReserve.value;
-  const oldProd = state.y.value * state.z.shiftLeft(32).value * state.x.value;
+  const oldProd = state.y.value * (state.z.value << 32n) * state.x.value;
   invariant(newProd >= oldProd, 'Invariance');
 }

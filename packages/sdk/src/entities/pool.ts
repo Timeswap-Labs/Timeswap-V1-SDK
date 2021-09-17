@@ -58,8 +58,16 @@ export class Pool {
     return this.pair.convAddress();
   }
 
-  connect(providerOrSigner: Provider | Signer) {
-    this.pair.connect(providerOrSigner);
+  connect(providerOrSigner: Provider | Signer): this {
+    return this.constructor(
+      providerOrSigner,
+      this.asset,
+      this.collateral,
+      this.maturity,
+      this.convAddress,
+      this.pairAddress,
+      this.cache
+    );
   }
 
   upgrade(signer: Signer): PoolSigner {
