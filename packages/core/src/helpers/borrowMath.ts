@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
 import { checkConstantProduct } from './constantProduct';
-import { mulDiv, mulDivUp } from './fullMath';
+import { mulDivUp } from './fullMath';
 import { divUp, shiftUp } from './math';
 
 export function givenDebt(
@@ -55,16 +55,18 @@ export function givenCollateral(
 ): BorrowResult {
   const feeBase = new Uint256(0x10000).sub(fee);
 
+  const xAdjust = new Uint256(cp.x);
+  xAdjust.subAssign(assetOut);
+
   const _zIncrease = new Uint256(collateralIn);
   const subtrahend = new Uint256(maturity);
   subtrahend.subAssign(now);
   subtrahend.mulAssign(cp.y);
   subtrahend.addAssign(new Uint256(cp.x).shiftLeft(32));
-  const denominator = new Uint256(cp.x);
-  denominator.subAssign(assetOut);
+  const denominator = new Uint256(xAdjust);
   denominator.mulAssign(new Uint256(cp.x).shiftLeft(32));
   subtrahend.set(
-    mulDiv(subtrahend, new Uint256(assetOut).mul(cp.z), denominator)
+    mulDivUp(subtrahend, new Uint256(assetOut).mul(cp.z), denominator)
   );
   _zIncrease.subAssign(subtrahend);
   const zIncrease = new Uint112(_zIncrease);
@@ -72,9 +74,6 @@ export function givenCollateral(
   const zAdjust = new Uint256(cp.z);
   zAdjust.shiftLeftAssign(16);
   zAdjust.addAssign(_zIncrease.mul(feeBase));
-
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.subAssign(assetOut);
 
   const _yIncrease = new Uint256(cp.x);
   _yIncrease.mulAssign(cp.z);

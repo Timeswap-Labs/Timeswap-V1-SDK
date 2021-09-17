@@ -1609,10 +1609,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@timeswap-labs/timeswap-v1-convenience@1.0.14":
-  version "1.0.14"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.14/a63e5bb81ee479cb6c5503958609694d329592156cd2748311caf827fcba5915#02f48d09ebd4c272fe7fec340eda01e3ef3b9772"
-  integrity sha512-gGKteAfQbWfFcHALi8DZQZ2FEGz25rrPRN+NrgaFGiRSZ3Ya6wbg9mKKN2pzSfuSFbpyXUoGtJW5HMapZ32Qhw==
+"@timeswap-labs/timeswap-v1-convenience@1.0.15":
+  version "1.0.15"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.15/806300c734bc47a05cf047ccdbd77dab8ffffa065218c162f6e3276f8c8377df#537b72bf0f570384ba10712ba949995b4dcac8b9"
+  integrity sha512-3+ZCfbi55m5ppzZK1V2+6WCaKA+YfwXuYAdUEjwoC3aprK5rfXsQjKOmvz8QjklDmNoL6p5FmuMlTUSYsND1LA==
   dependencies:
     "@openzeppelin/contracts" "^4.1.0"
     base64-sol "1.0.1"
@@ -1632,10 +1632,10 @@
     "@openzeppelin/contracts" "^4.1.0"
     dotenv "^10.0.0"
 
-"@timeswap-labs/timeswap-v1-sdk-core@0.1.11":
-  version "0.1.11"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.11/1fd45134afcd60a5fee9fcfb4fcdd6ca167e97badde5d582ea6527449f4cd29d#b6636030ffb088e803a87a3ba64f9353fb85f395"
-  integrity sha512-VI0CwLqK5Mip10IVnjJo4v07P20vHNKBG4lniAxvqVqGGcM62DOb3DGssZOqsk531xMagVIh2MLXXWAylNQhxg==
+"@timeswap-labs/timeswap-v1-sdk-core@0.1.12":
+  version "0.1.12"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.12/31cf9048320f86a45d35637ea88c60cbcd3dc633e9a1594e049d072412ef1264#d8f52f60d0896876d8ff5ca1d6f7b23787435254"
+  integrity sha512-XYqvTOWblnnHSMm0gig0XHed+CR3vE0G+Tf3EcniyMRmQvmgHrXwCByC+y2snaeOXcWZjTYC3gnVb+8ge0fHpw==
   dependencies:
     "@ethersproject/address" "^5.4.0"
     tiny-invariant "^1.1.0"

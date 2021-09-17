@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 import { Claims, CP } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
 import { checkConstantProduct } from './constantProduct';
-import { mulDiv, mulDivUp } from './fullMath';
+import { mulDiv } from './fullMath';
 import { divUp } from './math';
 
 export function givenBond(
@@ -55,16 +55,18 @@ export function givenInsurance(
 ): LendResult {
   const feeBase = new Uint256(fee).add(0x10000);
 
+  const xAdjust = new Uint256(cp.x);
+  xAdjust.addAssign(assetIn);
+
   const _zDecrease = new Uint256(insuranceOut);
   const subtrahend = new Uint256(maturity);
   subtrahend.subAssign(now);
   subtrahend.mulAssign(cp.y);
   subtrahend.addAssign(new Uint256(cp.x).shiftLeft(32));
-  const denominator = new Uint256(cp.x);
-  denominator.addAssign(assetIn);
+  const denominator = new Uint256(xAdjust);
   denominator.mulAssign(new Uint256(cp.x).shiftLeft(32));
   subtrahend.set(
-    mulDivUp(subtrahend, new Uint256(assetIn).mul(cp.z), denominator)
+    mulDiv(subtrahend, new Uint256(assetIn).mul(cp.z), denominator)
   );
   _zDecrease.subAssign(subtrahend);
   const zDecrease = new Uint112(_zDecrease);
@@ -73,15 +75,12 @@ export function givenInsurance(
   zAdjust.shiftLeftAssign(16);
   zAdjust.subAssign(zDecrease.mul(feeBase));
 
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.addAssign(assetIn);
-
   const _yDecrease = new Uint256(xAdjust);
   _yDecrease.mulAssign(zAdjust);
   subtrahend.set(cp.x);
   subtrahend.mulAssign(cp.z);
   subtrahend.shiftLeftAssign(16);
-  _zDecrease.subAssign(subtrahend);
+  _yDecrease.subAssign(subtrahend);
   denominator.set(xAdjust);
   denominator.mulAssign(zAdjust);
   denominator.mulAssign(feeBase);
