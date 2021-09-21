@@ -372,6 +372,14 @@ export class Pair {
       fee
     );
   }
+
+  calculateWithdraw(
+    reserves: Tokens,
+    totalClaims: Claims,
+    claimsIn: Claims
+  ): Tokens {
+    return PairCore.withdraw(reserves, totalClaims, claimsIn);
+  }
 }
 
 export class PairSigner extends Pair {

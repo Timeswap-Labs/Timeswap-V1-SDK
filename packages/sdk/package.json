@@ -1,5 +1,5 @@
 {
-  "version": "0.1.15",
+  "version": "0.1.16",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -56,7 +56,7 @@
   "dependencies": {
     "@ethersproject/abstract-provider": "^5.4.1",
     "@ethersproject/abstract-signer": "^5.4.1",
-    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.12",
+    "@timeswap-labs/timeswap-v1-sdk-core": "0.1.14",
     "tiny-invariant": "^1.1.0"
   }
 }

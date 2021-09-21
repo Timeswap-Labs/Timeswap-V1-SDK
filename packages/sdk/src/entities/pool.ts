@@ -105,10 +105,14 @@ export class Pool {
   async updateCache() {
     if (this.cache) {
       this.cache.state = await this.getConstantProduct();
+      this.cache.reserves = await this.getTotalReserves();
+      this.cache.totalClaims = await this.getTotalClaims();
       this.cache.totalLiquidity = await this.getTotalLiquidity();
     } else {
       this.cache = {
         state: await this.getConstantProduct(),
+        reserves: await this.getTotalReserves(),
+        totalClaims: await this.getTotalClaims(),
         totalLiquidity: await this.getTotalLiquidity(),
         fee: await this.getFee(),
         protocolFee: await this.getProtocolFee(),
@@ -317,6 +321,16 @@ export class Pool {
       now
     );
   }
+
+  async calculateWithdraw(claimsIn: Claims): Promise<Tokens> {
+    if (!this.cache) await this.updateCache();
+
+    return this.pair.calculateWithdraw(
+      this.cache!.reserves,
+      this.cache!.totalClaims,
+      claimsIn
+    );
+  }
 }
 
 export class PoolSigner extends Pool {
@@ -442,6 +456,8 @@ interface BorrowReturn {
 
 interface Cache {
   state: CP;
+  reserves: Tokens;
+  totalClaims: Claims;
   totalLiquidity: Uint256;
   fee: Uint16;
   protocolFee: Uint16;

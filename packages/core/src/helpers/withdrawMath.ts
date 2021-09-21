@@ -2,47 +2,64 @@ import { Claims, Tokens } from '../entities';
 import { Uint256, Uint128 } from '../uint';
 import { mulDiv } from './fullMath';
 
-export function getAsset(
-  claims: Claims,
+export function withdraw(
   reserves: Tokens,
+  totalClaims: Claims,
+  claimsIn: Claims
+): Tokens {
+  const asset = getAsset(reserves, totalClaims, claimsIn.bond);
+  const collateral = getCollateral(reserves, totalClaims, claimsIn.insurance);
+
+  return { asset, collateral };
+}
+
+function getAsset(
+  reserves: Tokens,
+  totalClaims: Claims,
   bondIn: Uint128
 ): Uint128 {
   const assetOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.value >= claims.bond.value) {
-    const assetOut = bondIn;
+  if (assetReserve.value >= totalClaims.bond.value) {
+    assetOut.set(bondIn);
     return assetOut;
   }
   const _assetOut = new Uint256(bondIn);
   _assetOut.mulAssign(assetReserve);
-  _assetOut.divAssign(claims.bond);
+  _assetOut.divAssign(totalClaims.bond);
   assetOut.set(_assetOut);
   return assetOut;
 }
 
-export function getCollateral(
+function getCollateral(
   reserves: Tokens,
-  claims: Claims,
+  totalClaims: Claims,
   insuranceIn: Uint128
 ): Uint128 {
   const collateralOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.value >= claims.bond.value) return collateralOut;
-  const _collateralOut = new Uint256(claims.bond);
+  if (assetReserve.value >= totalClaims.bond.value) return collateralOut;
+  const _collateralOut = new Uint256(totalClaims.bond);
   _collateralOut.subAssign(assetReserve);
-  _collateralOut.mulAssign(claims.insurance);
-  if (reserves.collateral.mul(claims.bond).value >= _collateralOut.value) {
-    const collateralOut = insuranceIn;
+  _collateralOut.mulAssign(totalClaims.insurance);
+  if (reserves.collateral.mul(totalClaims.bond).value >= _collateralOut.value) {
+    collateralOut.set(insuranceIn);
     return collateralOut;
   }
   _collateralOut.set(
     mulDiv(
       _collateralOut,
       new Uint256(insuranceIn),
-      new Uint256(claims.bond.mul(claims.insurance))
+      new Uint256(totalClaims.bond.mul(totalClaims.insurance))
     )
   );
   collateralOut.set(_collateralOut);
 
   return collateralOut;
 }
+
+export default {
+  withdraw,
+  getAsset,
+  getCollateral,
+};

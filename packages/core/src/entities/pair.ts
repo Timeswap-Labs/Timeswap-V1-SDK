@@ -1,5 +1,5 @@
 import { ERC20Token } from './erc20Token';
-import { CP, Due, Claims } from './interface';
+import { CP, Due, Claims, Tokens } from './interface';
 import { Uint16, Uint256, Uint112, Uint128, Uint40 } from '../uint';
 import {
   givenBond,
@@ -14,6 +14,7 @@ import {
   givenDebt,
 } from '../helpers/borrowMath';
 import { givenAdd, givenNew, mint } from '../helpers/mintMath';
+import { withdraw } from '../helpers/withdrawMath';
 
 export class Pair {
   public readonly asset: ERC20Token;
@@ -265,6 +266,14 @@ export class Pair {
     );
 
     return { due, yIncrease, zIncrease };
+  }
+
+  static withdraw(
+    reserves: Tokens,
+    totalClaims: Claims,
+    claimsIn: Claims
+  ): Tokens {
+    return withdraw(reserves, totalClaims, claimsIn);
   }
 }
 
