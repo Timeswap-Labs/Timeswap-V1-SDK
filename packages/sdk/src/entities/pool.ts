@@ -106,20 +106,23 @@ export class Pool {
     this.cache = cache;
   }
 
-  async updateCache() {
+  async updateCache(cache?: CacheModifier) {
     if (this.cache) {
-      this.cache.state = await this.getConstantProduct();
-      this.cache.reserves = await this.getTotalReserves();
-      this.cache.totalClaims = await this.getTotalClaims();
-      this.cache.totalLiquidity = await this.getTotalLiquidity();
+      this.cache.state = cache?.state ?? (await this.getConstantProduct());
+      this.cache.reserves = cache?.reserves ?? (await this.getTotalReserves());
+      this.cache.totalClaims =
+        cache?.totalClaims ?? (await this.getTotalClaims());
+      this.cache.totalLiquidity =
+        cache?.totalLiquidity ?? (await this.getTotalLiquidity());
     } else {
       this.cache = {
-        state: await this.getConstantProduct(),
-        reserves: await this.getTotalReserves(),
-        totalClaims: await this.getTotalClaims(),
-        totalLiquidity: await this.getTotalLiquidity(),
-        fee: await this.getFee(),
-        protocolFee: await this.getProtocolFee(),
+        state: cache?.state ?? (await this.getConstantProduct()),
+        reserves: cache?.reserves ?? (await this.getTotalReserves()),
+        totalClaims: cache?.totalClaims ?? (await this.getTotalClaims()),
+        totalLiquidity:
+          cache?.totalLiquidity ?? (await this.getTotalLiquidity()),
+        fee: cache?.fee ?? (await this.getFee()),
+        protocolFee: cache?.protocolFee ?? (await this.getProtocolFee()),
       };
     }
   }
@@ -465,6 +468,15 @@ interface Cache {
   totalLiquidity: Uint256;
   fee: Uint16;
   protocolFee: Uint16;
+}
+
+interface CacheModifier {
+  state?: CP;
+  reserves?: Tokens;
+  totalClaims?: Claims;
+  totalLiquidity?: Uint256;
+  fee?: Uint16;
+  protocolFee?: Uint16;
 }
 
 interface Tokens {
