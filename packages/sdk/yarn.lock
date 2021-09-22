@@ -1609,10 +1609,10 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
-"@timeswap-labs/timeswap-v1-convenience@1.0.15":
-  version "1.0.15"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.15/806300c734bc47a05cf047ccdbd77dab8ffffa065218c162f6e3276f8c8377df#537b72bf0f570384ba10712ba949995b4dcac8b9"
-  integrity sha512-3+ZCfbi55m5ppzZK1V2+6WCaKA+YfwXuYAdUEjwoC3aprK5rfXsQjKOmvz8QjklDmNoL6p5FmuMlTUSYsND1LA==
+"@timeswap-labs/timeswap-v1-convenience@1.0.23":
+  version "1.0.23"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-convenience/1.0.23/d7059859f4d12061baa4ec4b487372b625ad9744e48fb57cb2a83a7224659391#bc157213cf620ac0d99c4acbbc160628a9ebbc15"
+  integrity sha512-uQFIyYuHAKBKI5PGofQvHUQVZAJP4iDz3SCHufsr399v+I82gn7W3F/8Jo1SsPMikgLc4SKyY9i2EsacKcAWUQ==
   dependencies:
     "@openzeppelin/contracts" "^4.1.0"
     base64-sol "1.0.1"
@@ -1624,10 +1624,10 @@
     solhint "^3.2.1"
     solhint-plugin-prettier "^0.0.5"
 
-"@timeswap-labs/timeswap-v1-core@1.0.9":
-  version "1.0.9"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-core/1.0.9/3d1ab453a1ab5f350775bc53d2ec6cfe3d2d8353f55f50ad3597ec4c34850ed0#f0d6bfd138d5c08382fa4cde419b0b9f58b89f75"
-  integrity sha512-C2Cg/NGf0L8U5UZR+DX3ptO7sVAXREoBThhREUtVqSWmHD/PqUAqsDS4B1EQywBazTszr9IntY5VofxNyhEeGA==
+"@timeswap-labs/timeswap-v1-core@1.0.10":
+  version "1.0.10"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-core/1.0.10/3024a9b14eb8f42f31b4ed0d57d2ea2bd8b8667fdb61885f08a76c1673ab9a0c#d049b3e138f3b5070d3f901a4cc11c4a0b2d1519"
+  integrity sha512-O7aBAaZnKTmMkMVR1zSCxXtRXvZgESR1X+V1pcbCYzesjbIjMGXE8sQwzLMBzTuam+LeFPM4OofywoifC6zRiA==
   dependencies:
     "@openzeppelin/contracts" "^4.1.0"
     dotenv "^10.0.0"

@@ -343,7 +343,7 @@ export class ConvSigner extends Conv {
       collateralTo: params.collateralTo,
       claimsIn: {
         bond: params.claimsIn.bond.value,
-        insurance: params.claimsIn.bond.value,
+        insurance: params.claimsIn.insurance.value,
       },
     });
   }
@@ -356,7 +356,7 @@ export class ConvSigner extends Conv {
       collateralTo: params.collateralTo,
       claimsIn: {
         bond: params.claimsIn.bond.value,
-        insurance: params.claimsIn.bond.value,
+        insurance: params.claimsIn.insurance.value,
       },
     });
   }
@@ -371,7 +371,7 @@ export class ConvSigner extends Conv {
       collateralTo: params.collateralTo,
       claimsIn: {
         bond: params.claimsIn.bond.value,
-        insurance: params.claimsIn.bond.value,
+        insurance: params.claimsIn.insurance.value,
       },
     });
   }

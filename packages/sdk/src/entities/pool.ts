@@ -14,7 +14,7 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { TimeswapConvenience } from '../typechain/timeswap';
+import type { TimeswapConvenience, TimeswapPair } from '../typechain/timeswap';
 import { Pair, PairSigner } from './pair';
 
 export class Pool {
@@ -90,8 +90,12 @@ export class Pool {
     return this.pair.signer();
   }
 
-  contract(): TimeswapConvenience {
+  pairContract(): TimeswapPair | undefined {
     return this.pair.contract();
+  }
+
+  convContract(): TimeswapConvenience {
+    return this.pair.convContract();
   }
 
   async initPair() {

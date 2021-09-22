@@ -86,7 +86,11 @@ export class Pair {
     return this.conv.signer();
   }
 
-  contract(): TimeswapConvenience {
+  contract(): TimeswapPair | undefined {
+    return this.pair;
+  }
+
+  convContract(): TimeswapConvenience {
     return this.conv.contract();
   }
 
