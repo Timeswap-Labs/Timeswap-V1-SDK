@@ -500,19 +500,19 @@ interface Native {
 interface NewLiquidity {
   liquidityTo: string;
   dueTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   debtIn: Uint112;
-  collateralIn?: Uint112;
+  collateralIn: Uint112;
   deadline: Uint256;
 }
 
 interface AddLiquidity {
   liquidityTo: string;
   dueTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   minLiquidity: Uint256;
   maxDebt: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
   deadline: Uint256;
 }
 
@@ -525,7 +525,7 @@ interface RemoveLiquidity {
 interface LendGivenBond {
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   bondOut: Uint128;
   minInsurance: Uint128;
   deadline: Uint256;
@@ -534,7 +534,7 @@ interface LendGivenBond {
 interface LendGivenInsurance {
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   insuranceOut: Uint128;
   minBond: Uint128;
   deadline: Uint256;
@@ -543,7 +543,7 @@ interface LendGivenInsurance {
 interface LendGivenPercent {
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   percent: Uint40;
   minBond: Uint128;
   minInsurance: Uint128;
@@ -566,7 +566,7 @@ interface BorrowGivenDebt {
   dueTo: string;
   assetOut: Uint112;
   debtIn: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
   deadline: Uint256;
 }
 
@@ -574,7 +574,7 @@ interface BorrowGivenCollateral {
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
-  collateralIn?: Uint112;
+  collateralIn: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -585,7 +585,7 @@ interface BorrowGivenPercent {
   assetOut: Uint112;
   percent: Uint40;
   maxDebt: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
   deadline: Uint256;
 }
 

@@ -91,31 +91,39 @@ export class ConvSigner extends Conv {
   }
 
   async newLiquidityETHAsset(
-    params: NewLiquidityETHAsset
+    params: NewLiquidityETHAsset,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.newLiquidityETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      liquidityTo: params.liquidityTo,
-      dueTo: params.dueTo,
-      debtIn: params.debtIn.value,
-      collateralIn: params.collateralIn.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.newLiquidityETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        liquidityTo: params.liquidityTo,
+        dueTo: params.dueTo,
+        debtIn: params.debtIn.value,
+        collateralIn: params.collateralIn.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async newLiquidityETHCollateral(
-    params: NewLiquidityETHCollateral
+    params: NewLiquidityETHCollateral,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.newLiquidityETHCollateral({
-      asset: params.asset.address,
-      maturity: params.maturity.value,
-      liquidityTo: params.liquidityTo,
-      dueTo: params.dueTo,
-      assetIn: params.assetIn.value,
-      debtIn: params.debtIn.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.newLiquidityETHCollateral(
+      {
+        asset: params.asset.address,
+        maturity: params.maturity.value,
+        liquidityTo: params.liquidityTo,
+        dueTo: params.dueTo,
+        assetIn: params.assetIn.value,
+        debtIn: params.debtIn.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
@@ -134,33 +142,41 @@ export class ConvSigner extends Conv {
   }
 
   async addLiquidityETHAsset(
-    params: AddLiquidityETHAsset
+    params: AddLiquidityETHAsset,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.addLiquidityETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      liquidityTo: params.liquidityTo,
-      dueTo: params.dueTo,
-      minLiquidity: params.minLiquidity.value,
-      maxDebt: params.maxDebt.value,
-      maxCollateral: params.maxCollateral.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.addLiquidityETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        liquidityTo: params.liquidityTo,
+        dueTo: params.dueTo,
+        minLiquidity: params.minLiquidity.value,
+        maxDebt: params.maxDebt.value,
+        maxCollateral: params.maxCollateral.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async addLiquidityETHCollateral(
-    params: AddLiquidityETHCollateral
+    params: AddLiquidityETHCollateral,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.addLiquidityETHCollateral({
-      asset: params.asset.address,
-      maturity: params.maturity.value,
-      liquidityTo: params.liquidityTo,
-      dueTo: params.dueTo,
-      assetIn: params.assetIn.value,
-      minLiquidity: params.minLiquidity.value,
-      maxDebt: params.maxDebt.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.addLiquidityETHCollateral(
+      {
+        asset: params.asset.address,
+        maturity: params.maturity.value,
+        liquidityTo: params.liquidityTo,
+        dueTo: params.dueTo,
+        assetIn: params.assetIn.value,
+        minLiquidity: params.minLiquidity.value,
+        maxDebt: params.maxDebt.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
@@ -213,17 +229,21 @@ export class ConvSigner extends Conv {
   }
 
   async lendGivenBondETHAsset(
-    params: LendGivenBondETHAsset
+    params: LendGivenBondETHAsset,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenBondETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      bondTo: params.bondTo,
-      insuranceTo: params.insuranceTo,
-      bondOut: params.bondOut.value,
-      minInsurance: params.minInsurance.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.lendGivenBondETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        bondTo: params.bondTo,
+        insuranceTo: params.insuranceTo,
+        bondOut: params.bondOut.value,
+        minInsurance: params.minInsurance.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async lendGivenBondETHCollateral(
@@ -258,17 +278,21 @@ export class ConvSigner extends Conv {
   }
 
   async lendGivenInsuranceETHAsset(
-    params: LendGivenInsuranceETHAsset
+    params: LendGivenInsuranceETHAsset,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenInsuranceETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      bondTo: params.bondTo,
-      insuranceTo: params.insuranceTo,
-      insuranceOut: params.insuranceOut.value,
-      minBond: params.minBond.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.lendGivenInsuranceETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        bondTo: params.bondTo,
+        insuranceTo: params.insuranceTo,
+        insuranceOut: params.insuranceOut.value,
+        minBond: params.minBond.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async lendGivenInsuranceETHCollateral(
@@ -304,18 +328,22 @@ export class ConvSigner extends Conv {
   }
 
   async lendGivenPercentETHAsset(
-    params: LendGivenPercentETHAsset
+    params: LendGivenPercentETHAsset,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenPercentETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      bondTo: params.bondTo,
-      insuranceTo: params.insuranceTo,
-      percent: params.percent.value,
-      minBond: params.minBond.value,
-      minInsurance: params.minInsurance.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.lendGivenPercentETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        bondTo: params.bondTo,
+        insuranceTo: params.insuranceTo,
+        percent: params.percent.value,
+        minBond: params.minBond.value,
+        minInsurance: params.minInsurance.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async lendGivenPercentETHCollateral(
@@ -406,17 +434,21 @@ export class ConvSigner extends Conv {
   }
 
   async borrowGivenDebtETHCollateral(
-    params: BorrowGivenDebtETHCollateral
+    params: BorrowGivenDebtETHCollateral,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenDebtETHCollateral({
-      asset: params.asset.address,
-      maturity: params.maturity.value,
-      assetTo: params.assetTo,
-      dueTo: params.dueTo,
-      assetOut: params.assetOut.value,
-      debtIn: params.debtIn.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.borrowGivenDebtETHCollateral(
+      {
+        asset: params.asset.address,
+        maturity: params.maturity.value,
+        assetTo: params.assetTo,
+        dueTo: params.dueTo,
+        assetOut: params.assetOut.value,
+        debtIn: params.debtIn.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async borrowGivenCollateral(
@@ -451,17 +483,21 @@ export class ConvSigner extends Conv {
   }
 
   async borrowGivenCollateralETHCollateral(
-    params: BorrowGivenCollateralETHCollateral
+    params: BorrowGivenCollateralETHCollateral,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenCollateralETHCollateral({
-      asset: params.asset.address,
-      maturity: params.maturity.value,
-      assetTo: params.assetTo,
-      dueTo: params.dueTo,
-      assetOut: params.assetOut.value,
-      maxDebt: params.maxDebt.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.borrowGivenCollateralETHCollateral(
+      {
+        asset: params.asset.address,
+        maturity: params.maturity.value,
+        assetTo: params.assetTo,
+        dueTo: params.dueTo,
+        assetOut: params.assetOut.value,
+        maxDebt: params.maxDebt.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async borrowGivenPercent(
@@ -498,18 +534,22 @@ export class ConvSigner extends Conv {
   }
 
   async borrowGivenPercentETHCollateral(
-    params: BorrowGivenPercentETHCollateral
+    params: BorrowGivenPercentETHCollateral,
+    txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenPercentETHCollateral({
-      asset: params.asset.address,
-      maturity: params.maturity.value,
-      assetTo: params.assetTo,
-      dueTo: params.dueTo,
-      assetOut: params.assetOut.value,
-      percent: params.percent.value,
-      maxDebt: params.maxDebt.value,
-      deadline: params.deadline.value,
-    });
+    return this.convContract.borrowGivenPercentETHCollateral(
+      {
+        asset: params.asset.address,
+        maturity: params.maturity.value,
+        assetTo: params.assetTo,
+        dueTo: params.dueTo,
+        assetOut: params.assetOut.value,
+        percent: params.percent.value,
+        maxDebt: params.maxDebt.value,
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async repay(params: Repay): Promise<ContractTransaction> {
@@ -524,15 +564,21 @@ export class ConvSigner extends Conv {
     });
   }
 
-  async repayETHAsset(params: RepayETHAsset): Promise<ContractTransaction> {
-    return this.convContract.repayETHAsset({
-      collateral: params.collateral.address,
-      maturity: params.maturity.value,
-      collateralTo: params.collateralTo,
-      ids: params.ids.map((value) => value.value),
-      maxAssetsIn: params.maxAssetsIn.map((value) => value.value),
-      deadline: params.deadline.value,
-    });
+  async repayETHAsset(
+    params: RepayETHAsset,
+    txnParams: TransactionParams
+  ): Promise<ContractTransaction> {
+    return this.convContract.repayETHAsset(
+      {
+        collateral: params.collateral.address,
+        maturity: params.maturity.value,
+        collateralTo: params.collateralTo,
+        ids: params.ids.map((value) => value.value),
+        maxAssetsIn: params.maxAssetsIn.map((value) => value.value),
+        deadline: params.deadline.value,
+      },
+      { value: txnParams.value.value }
+    );
   }
 
   async repayETHCollateral(
@@ -550,6 +596,10 @@ export class ConvSigner extends Conv {
 }
 
 // Interface
+
+interface TransactionParams {
+  value: Uint112;
+}
 
 interface Native {
   liquidity: string;
