@@ -4,12 +4,11 @@ import {
   Uint256,
   ERC20Token as ERC20Core,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { IERC20Metadata } from '../typechain/abi';
-import { IERC20Metadata__factory } from '../typechain/abi';
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, Contract } from '@ethersproject/contracts';
+import erc20abi from '../abi/erc20';
 
 export class ERC20Token extends ERC20Core {
-  protected erc20Contract: IERC20Metadata;
+  protected erc20Contract: Contract;
 
   constructor(
     providerOrSigner: Provider | Signer,
@@ -20,10 +19,7 @@ export class ERC20Token extends ERC20Core {
     name?: string
   ) {
     super(chainID, decimals, address, symbol, name);
-    this.erc20Contract = IERC20Metadata__factory.connect(
-      address,
-      providerOrSigner
-    );
+    this.erc20Contract = new Contract(address, erc20abi, providerOrSigner);
   }
 
   connect(providerOrSigner: Provider | Signer): this {
@@ -56,7 +52,7 @@ export class ERC20Token extends ERC20Core {
     return this.erc20Contract.signer;
   }
 
-  contract(): IERC20Metadata {
+  contract(): Contract {
     return this.erc20Contract;
   }
 

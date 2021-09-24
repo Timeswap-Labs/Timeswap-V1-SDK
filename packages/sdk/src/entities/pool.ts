@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { ContractTransaction } from '@ethersproject/contracts';
+import { Contract, ContractTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
 import {
   ERC20Token,
@@ -14,7 +14,6 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { TimeswapConvenience, TimeswapPair } from '../typechain/timeswap';
 import { Pair, PairSigner } from './pair';
 
 export class Pool {
@@ -90,11 +89,11 @@ export class Pool {
     return this.pair.signer();
   }
 
-  pairContract(): TimeswapPair | undefined {
+  pairContract(): Contract | undefined {
     return this.pair.contract();
   }
 
-  convContract(): TimeswapConvenience {
+  convContract(): Contract {
     return this.pair.convContract();
   }
 

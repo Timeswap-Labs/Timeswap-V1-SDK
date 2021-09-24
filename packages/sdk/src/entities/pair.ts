@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { ContractTransaction } from '@ethersproject/contracts';
+import { Contract, ContractTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
 import invariant from 'tiny-invariant';
 import {
@@ -16,12 +16,9 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { TimeswapPair, TimeswapConvenience } from '../typechain/timeswap';
-import {
-  TimeswapFactory__factory,
-  TimeswapPair__factory,
-} from '../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
+import pairAbi from '../abi/pair';
+import factoryAbi from '../abi/factory';
 
 export class Pair {
   protected conv: Conv;
@@ -29,7 +26,7 @@ export class Pair {
   readonly asset: NativeToken | ERC20Token;
   readonly collateral: NativeToken | ERC20Token;
 
-  protected pair?: TimeswapPair;
+  protected pair?: Contract;
 
   constructor(
     providerOrSigner: Provider | Signer,
@@ -46,7 +43,7 @@ export class Pair {
     this.collateral = collateral;
 
     if (pairAddress) {
-      this.pair = TimeswapPair__factory.connect(pairAddress, providerOrSigner);
+      this.pair = new Contract(pairAddress, pairAbi, providerOrSigner);
     }
   }
 
@@ -86,19 +83,20 @@ export class Pair {
     return this.conv.signer();
   }
 
-  contract(): TimeswapPair | undefined {
+  contract(): Contract | undefined {
     return this.pair;
   }
 
-  convContract(): TimeswapConvenience {
+  convContract(): Contract {
     return this.conv.contract();
   }
 
   async initPair() {
     if (!this.pair) {
       const factory = await this.conv.factory();
-      const factoryContract = TimeswapFactory__factory.connect(
+      const factoryContract = new Contract(
         factory,
+        factoryAbi,
         this.conv.provider()
       );
 
@@ -113,7 +111,7 @@ export class Pair {
       const collateral = await getTokenAddress(this.collateral);
 
       const pair = await factoryContract.getPair(asset, collateral);
-      this.pair = TimeswapPair__factory.connect(pair, this.conv.provider());
+      this.pair = new Contract(pair, pairAbi, this.conv.provider());
     }
   }
 
@@ -143,9 +141,9 @@ export class Pair {
     await this.initPair();
     const state = await this.pair!.constantProduct(maturity.value);
 
-    const x = new Uint112(state.x.toString());
-    const y = new Uint112(state.y.toString());
-    const z = new Uint112(state.z.toString());
+    const x = new Uint112(state[0].toString());
+    const y = new Uint112(state[1].toString());
+    const z = new Uint112(state[2].toString());
 
     return { x, y, z };
   }
@@ -154,8 +152,8 @@ export class Pair {
     await this.initPair();
     const tokens = await this.pair!.totalReserves(maturity.value);
 
-    const asset = new Uint128(tokens.asset.toString());
-    const collateral = new Uint128(tokens.collateral.toString());
+    const asset = new Uint128(tokens[0].toString());
+    const collateral = new Uint128(tokens[1].toString());
 
     return { asset, collateral };
   }
@@ -178,8 +176,8 @@ export class Pair {
     await this.initPair();
     const claims = await this.pair!.totalClaims(maturity.value);
 
-    const bond = new Uint128(claims.bond.toString());
-    const insurance = new Uint128(claims.insurance.toString());
+    const bond = new Uint128(claims[0].toString());
+    const insurance = new Uint128(claims[1].toString());
 
     return { bond, insurance };
   }
@@ -188,8 +186,8 @@ export class Pair {
     await this.initPair();
     const claims = await this.pair!.claimsOf(maturity.value, address);
 
-    const bond = new Uint128(claims.bond.toString());
-    const insurance = new Uint128(claims.insurance.toString());
+    const bond = new Uint128(claims[0].toString());
+    const insurance = new Uint128(claims[1].toString());
 
     return { bond, insurance };
   }
@@ -203,12 +201,12 @@ export class Pair {
 
   async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
     await this.initPair();
-    const dues = await this.pair!.duesOf(maturity.value, address);
+    const dues: any[] = await this.pair!.duesOf(maturity.value, address);
 
     return dues.map((due) => {
-      const debt = new Uint112(due.debt.toString());
-      const collateral = new Uint112(due.collateral.toString());
-      const startBlock = new Uint32(due.startBlock);
+      const debt = new Uint112(due[0].toString());
+      const collateral = new Uint112(due[1].toString());
+      const startBlock = new Uint32(due[2]);
 
       return { debt, collateral, startBlock };
     });
@@ -217,10 +215,20 @@ export class Pair {
   async getNative(maturity: Uint256): Promise<Native> {
     const asset = this.asset;
     const collateral = this.collateral;
-    invariant(asset instanceof ERC20Token, 'asset is not ERC20');
-    invariant(collateral instanceof ERC20Token, 'collateral is not ERC20');
 
-    return this.conv.getNative(asset, collateral, maturity);
+    if (asset instanceof NativeToken) {
+      const weth = new ERC20Token(asset.chainID, 18, await this.conv.weth());
+      return this.conv.getNative(weth, collateral as ERC20Token, maturity);
+    } else if (collateral instanceof NativeToken) {
+      const weth = new ERC20Token(
+        collateral.chainID,
+        18,
+        await this.conv.weth()
+      );
+      return this.conv.getNative(asset, weth, maturity);
+    } else {
+      return this.conv.getNative(asset, collateral, maturity);
+    }
   }
 
   calculateApr(state: CP): number {
@@ -233,7 +241,7 @@ export class Pair {
   calculateCf(state: CP): Uint112 {
     let temp = 1n;
     for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
-    return new Uint112((state.x.value * temp) / state.y.value);
+    return new Uint112((state.x.value * temp) / state.z.value);
   }
 
   calculateNewLiquidity(
