@@ -68,11 +68,18 @@ export class Conv {
     collateral: ERC20Token,
     maturity: Uint256
   ): Promise<Native> {
-    return this.convContract.getNative(
+    const native = await this.convContract.getNative(
       asset.address,
       collateral.address,
       maturity.value
     );
+
+    return {
+      liquidity: native[0],
+      bond: native[1],
+      insurance: native[2],
+      collateralizedDebt: native[3],
+    };
   }
 }
 
@@ -550,8 +557,8 @@ export class ConvSigner extends Conv {
       params.collateral.address,
       params.maturity.value,
       params.collateralTo,
-      params.ids.map((value) => value.value),
-      params.maxAssetsIn.map((value) => value.value),
+      params.ids.map(value => value.value),
+      params.maxAssetsIn.map(value => value.value),
       params.deadline.value,
     ]);
   }
@@ -565,8 +572,8 @@ export class ConvSigner extends Conv {
         params.collateral.address,
         params.maturity.value,
         params.collateralTo,
-        params.ids.map((value) => value.value),
-        params.maxAssetsIn.map((value) => value.value),
+        params.ids.map(value => value.value),
+        params.maxAssetsIn.map(value => value.value),
         params.deadline.value,
       ],
       { value: txnParams.value.value }
@@ -580,8 +587,8 @@ export class ConvSigner extends Conv {
       params.asset.address,
       params.maturity.value,
       params.collateralTo,
-      params.ids.map((value) => value.value),
-      params.maxAssetsIn.map((value) => value.value),
+      params.ids.map(value => value.value),
+      params.maxAssetsIn.map(value => value.value),
       params.deadline.value,
     ]);
   }
