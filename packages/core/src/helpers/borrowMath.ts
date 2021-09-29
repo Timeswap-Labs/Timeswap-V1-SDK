@@ -150,7 +150,7 @@ export function borrow(
   zIncrease: Uint112,
   now: Uint256
 ): Due {
-  invariant(now.value < maturity.value, 'Expired');
+  invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
 
   check(state, xDecrease, yIncrease, zIncrease, fee);
 
@@ -179,7 +179,7 @@ function check(
   const denominator = new Uint256(xReserve);
   denominator.mulAssign(feeBase);
   minimum.set(divUp(minimum, denominator));
-  invariant(yIncrease.value >= minimum.value, 'Minimum');
+  invariant(yIncrease.toBigInt() >= minimum.toBigInt(), 'Minimum');
 }
 
 function adjust(

@@ -139,7 +139,7 @@ export class Pair {
 
   async getConstantProduct(maturity: Uint256): Promise<CP> {
     await this.initPair();
-    const state = await this.pair!.constantProduct(maturity.value);
+    const state = await this.pair!.constantProduct(maturity.toBigInt());
 
     const x = new Uint112(state[0].toString());
     const y = new Uint112(state[1].toString());
@@ -150,7 +150,7 @@ export class Pair {
 
   async getTotalReserves(maturity: Uint256): Promise<Tokens> {
     await this.initPair();
-    const tokens = await this.pair!.totalReserves(maturity.value);
+    const tokens = await this.pair!.totalReserves(maturity.toBigInt());
 
     const asset = new Uint128(tokens[0].toString());
     const collateral = new Uint128(tokens[1].toString());
@@ -160,21 +160,24 @@ export class Pair {
 
   async getTotalLiquidity(maturity: Uint256): Promise<Uint256> {
     await this.initPair();
-    const totalLiquidity = await this.pair!.totalLiquidity(maturity.value);
+    const totalLiquidity = await this.pair!.totalLiquidity(maturity.toBigInt());
 
     return new Uint256(totalLiquidity.toString());
   }
 
   async getLiquidityOf(maturity: Uint256, address: string): Promise<Uint256> {
     await this.initPair();
-    const liquidityOf = await this.pair!.liquidityOf(maturity.value, address);
+    const liquidityOf = await this.pair!.liquidityOf(
+      maturity.toBigInt(),
+      address
+    );
 
     return new Uint256(liquidityOf.toString());
   }
 
   async getTotalClaims(maturity: Uint256): Promise<Claims> {
     await this.initPair();
-    const claims = await this.pair!.totalClaims(maturity.value);
+    const claims = await this.pair!.totalClaims(maturity.toBigInt());
 
     const bond = new Uint128(claims[0].toString());
     const insurance = new Uint128(claims[1].toString());
@@ -184,7 +187,7 @@ export class Pair {
 
   async getClaimsOf(maturity: Uint256, address: string): Promise<Claims> {
     await this.initPair();
-    const claims = await this.pair!.claimsOf(maturity.value, address);
+    const claims = await this.pair!.claimsOf(maturity.toBigInt(), address);
 
     const bond = new Uint128(claims[0].toString());
     const insurance = new Uint128(claims[1].toString());
@@ -194,16 +197,18 @@ export class Pair {
 
   async getTotalDebtCreated(maturity: Uint256): Promise<Uint120> {
     await this.initPair();
-    const totalDebtCreated = await this.pair!.totalDebtCreated(maturity.value);
+    const totalDebtCreated = await this.pair!.totalDebtCreated(
+      maturity.toBigInt()
+    );
 
     return new Uint120(totalDebtCreated.toString());
   }
 
   async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
     await this.initPair();
-    const dues: any[] = await this.pair!.duesOf(maturity.value, address);
+    const dues: any[] = await this.pair!.duesOf(maturity.toBigInt(), address);
 
-    return dues.map((due) => {
+    return dues.map(due => {
       const debt = new Uint112(due[0].toString());
       const collateral = new Uint112(due[1].toString());
       const startBlock = new Uint32(due[2]);
@@ -233,7 +238,8 @@ export class Pair {
 
   calculateApr(state: CP): number {
     const SECONDS = 31556926n;
-    const temp = (state.y.value * SECONDS * 10000n) / (state.x.value << 32n);
+    const temp =
+      (state.y.toBigInt() * SECONDS * 10000n) / (state.x.toBigInt() << 32n);
     const apr = Number(temp) / 10000;
     return apr;
   }
@@ -241,7 +247,7 @@ export class Pair {
   calculateCf(state: CP): Uint112 {
     let temp = 1n;
     for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
-    return new Uint112((state.x.value * temp) / state.z.value);
+    return new Uint112((state.x.toBigInt() * temp) / state.z.toBigInt());
   }
 
   calculateNewLiquidity(
@@ -391,6 +397,15 @@ export class Pair {
     claimsIn: Claims
   ): Tokens {
     return PairCore.withdraw(reserves, totalClaims, claimsIn);
+  }
+
+  calculateBurn(
+    reserves: Tokens,
+    totalClaims: Claims,
+    totalLiquidity: Uint256,
+    liquidityIn: Uint256
+  ): Tokens {
+    return PairCore.burn(reserves, totalClaims, totalLiquidity, liquidityIn);
   }
 }
 

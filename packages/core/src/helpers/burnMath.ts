@@ -19,7 +19,7 @@ export function burn(
   return { asset, collateral };
 }
 
-export function getAsset(
+function getAsset(
   reserves: Tokens,
   totalClaims: Claims,
   totalLiquidity: Uint256,
@@ -27,7 +27,7 @@ export function getAsset(
 ): Uint128 {
   const assetOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.value <= totalClaims.bond.value) return assetOut;
+  if (assetReserve.toBigInt() <= totalClaims.bond.toBigInt()) return assetOut;
   const _assetOut = new Uint256(assetReserve);
   _assetOut.subAssign(totalClaims.bond);
   _assetOut.set(mulDiv(_assetOut, liquidityIn, totalLiquidity));
@@ -35,7 +35,7 @@ export function getAsset(
   return assetOut;
 }
 
-export function getCollateral(
+function getCollateral(
   reserves: Tokens,
   totalClaims: Claims,
   totalLiquidity: Uint256,
@@ -44,7 +44,7 @@ export function getCollateral(
   const collateralOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
   const _collateralOut = new Uint256(reserves.collateral);
-  if (assetReserve.value >= totalClaims.bond.value) {
+  if (assetReserve.toBigInt() >= totalClaims.bond.toBigInt()) {
     _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
     collateralOut.set(_collateralOut);
     return collateralOut;
@@ -52,7 +52,10 @@ export function getCollateral(
   const _reduce = new Uint256(totalClaims.bond);
   _reduce.subAssign(assetReserve);
   _reduce.mulAssign(totalClaims.insurance);
-  if (reserves.collateral.mul(totalClaims.bond).value <= _reduce.value)
+  if (
+    reserves.collateral.toBigInt() * totalClaims.bond.toBigInt() <=
+    _reduce.toBigInt()
+  )
     return collateralOut;
   _collateralOut.mulAssign(totalClaims.bond);
   _collateralOut.subAssign(_reduce);
@@ -62,3 +65,9 @@ export function getCollateral(
   collateralOut.set(_collateralOut);
   return collateralOut;
 }
+
+export default {
+  burn,
+  getAsset,
+  getCollateral,
+};

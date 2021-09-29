@@ -20,7 +20,7 @@ function getAsset(
 ): Uint128 {
   const assetOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.value >= totalClaims.bond.value) {
+  if (assetReserve.toBigInt() >= totalClaims.bond.toBigInt()) {
     assetOut.set(bondIn);
     return assetOut;
   }
@@ -38,11 +38,15 @@ function getCollateral(
 ): Uint128 {
   const collateralOut = new Uint128(0);
   const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.value >= totalClaims.bond.value) return collateralOut;
+  if (assetReserve.toBigInt() >= totalClaims.bond.toBigInt())
+    return collateralOut;
   const _collateralOut = new Uint256(totalClaims.bond);
   _collateralOut.subAssign(assetReserve);
   _collateralOut.mulAssign(totalClaims.insurance);
-  if (reserves.collateral.mul(totalClaims.bond).value >= _collateralOut.value) {
+  if (
+    reserves.collateral.toBigInt() * totalClaims.bond.toBigInt() >=
+    _collateralOut.toBigInt()
+  ) {
     collateralOut.set(insuranceIn);
     return collateralOut;
   }

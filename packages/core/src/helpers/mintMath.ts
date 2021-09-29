@@ -57,11 +57,11 @@ export function mint(
   liquidityOut: Uint256;
   dueOut: Due;
 } {
-  invariant(now.value < maturity.value, 'Expired');
+  invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
 
   let liquidityOut: Uint256;
 
-  if (totalLiquidity.value === 0n) {
+  if (totalLiquidity.toBigInt() === 0n) {
     const liquidityTotal = getLiquidityTotal1(xIncrease);
     liquidityOut = getLiquidity(maturity, liquidityTotal, protocolFee, now);
   } else {

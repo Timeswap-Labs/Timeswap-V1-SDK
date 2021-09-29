@@ -15,6 +15,7 @@ import {
 } from '../helpers/borrowMath';
 import { givenAdd, givenNew, mint } from '../helpers/mintMath';
 import { withdraw } from '../helpers/withdrawMath';
+import { burn } from '../helpers/burnMath';
 
 export class Pair {
   public readonly asset: ERC20Token;
@@ -274,6 +275,15 @@ export class Pair {
     claimsIn: Claims
   ): Tokens {
     return withdraw(reserves, totalClaims, claimsIn);
+  }
+
+  static burn(
+    reserves: Tokens,
+    totalClaims: Claims,
+    totalLiquidity: Uint256,
+    liquidityIn: Uint256
+  ): Tokens {
+    return burn(reserves, totalClaims, totalLiquidity, liquidityIn);
   }
 }
 

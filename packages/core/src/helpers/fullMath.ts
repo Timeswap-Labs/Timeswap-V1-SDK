@@ -1,7 +1,7 @@
 import { Uint256 } from '../uint';
 
 export function mulDiv(a: Uint256, b: Uint256, denominator: Uint256): Uint256 {
-  return new Uint256((a.value * b.value) / denominator.value);
+  return new Uint256((a.toBigInt() * b.toBigInt()) / denominator.toBigInt());
 }
 
 export function mulDivUp(
@@ -10,7 +10,7 @@ export function mulDivUp(
   denominator: Uint256
 ): Uint256 {
   const z = mulDiv(a, b, denominator);
-  const mulMod = (a.value * b.value) % denominator.value;
+  const mulMod = (a.toBigInt() * b.toBigInt()) % denominator.toBigInt();
   if (mulMod > 0n) return z.add(1);
   else return z;
 }

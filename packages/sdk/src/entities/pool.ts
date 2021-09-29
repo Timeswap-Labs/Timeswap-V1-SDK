@@ -337,6 +337,17 @@ export class Pool {
       claimsIn
     );
   }
+
+  async calculateBurn(liquidityIn: Uint256): Promise<Tokens> {
+    if (!this.cache) await this.updateCache();
+
+    return this.pair.calculateBurn(
+      this.cache!.reserves,
+      this.cache!.totalClaims,
+      this.cache!.totalLiquidity,
+      liquidityIn
+    );
+  }
 }
 
 export class PoolSigner extends Pool {

@@ -89,14 +89,14 @@ export class ERC20TokenSigner extends ERC20Token {
     spender: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.approve(spender, amount.value);
+    return this.erc20Contract.approve(spender, amount.toBigInt());
   }
 
   async transfer(
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transfer(recipient, amount.value);
+    return this.erc20Contract.transfer(recipient, amount.toBigInt());
   }
 
   async transferFrom(
@@ -104,6 +104,10 @@ export class ERC20TokenSigner extends ERC20Token {
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transferFrom(sender, recipient, amount.value);
+    return this.erc20Contract.transferFrom(
+      sender,
+      recipient,
+      amount.toBigInt()
+    );
   }
 }

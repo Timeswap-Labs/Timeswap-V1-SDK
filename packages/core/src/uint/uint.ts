@@ -4,7 +4,7 @@ export abstract class Uint {
   abstract bits(): bigint;
   abstract clone(): this;
 
-  value: bigint;
+  protected value: bigint;
 
   constructor(value: string | number | bigint | boolean | Uint) {
     if (value instanceof Uint) this.value = value.value;
@@ -17,8 +17,12 @@ export abstract class Uint {
     return 0n <= this.value && this.value <= maxValue ? true : false;
   }
 
-  get(): bigint {
+  toBigInt(): bigint {
     return this.value;
+  }
+
+  toString(): string {
+    return this.value.toString();
   }
 
   set(value: string | number | bigint | boolean | Uint) {

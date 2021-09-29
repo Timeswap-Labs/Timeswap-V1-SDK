@@ -1,5 +1,5 @@
 import { Pair } from './pair';
-import { CP, Claims, Due } from './interface';
+import { CP, Claims, Due, Tokens } from './interface';
 import { Uint256, Uint112, Uint128, Uint40 } from '../uint';
 
 export class Pool {
@@ -141,6 +141,19 @@ export class Pool {
       now,
       this.pair.fee
     );
+  }
+
+  withdraw(reserves: Tokens, totalClaims: Claims, claimsIn: Claims): Tokens {
+    return Pair.withdraw(reserves, totalClaims, claimsIn);
+  }
+
+  burn(
+    reserves: Tokens,
+    totalClaims: Claims,
+    totalLiquidity: Uint256,
+    liquidityIn: Uint256
+  ): Tokens {
+    return Pair.burn(reserves, totalClaims, totalLiquidity, liquidityIn);
   }
 }
 

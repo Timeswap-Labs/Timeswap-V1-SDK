@@ -71,7 +71,7 @@ export class Conv {
     const native = await this.convContract.getNative(
       asset.address,
       collateral.address,
-      maturity.value
+      maturity.toBigInt()
     );
 
     return {
@@ -88,13 +88,13 @@ export class ConvSigner extends Conv {
     return this.convContract.newLiquidity([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.liquidityTo,
       params.dueTo,
-      params.assetIn.value,
-      params.debtIn.value,
-      params.collateralIn.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.debtIn.toBigInt(),
+      params.collateralIn.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -105,14 +105,14 @@ export class ConvSigner extends Conv {
     return this.convContract.newLiquidityETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.liquidityTo,
         params.dueTo,
-        params.debtIn.value,
-        params.collateralIn.value,
-        params.deadline.value,
+        params.debtIn.toBigInt(),
+        params.collateralIn.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -123,14 +123,14 @@ export class ConvSigner extends Conv {
     return this.convContract.newLiquidityETHCollateral(
       [
         params.asset.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.value,
-        params.debtIn.value,
-        params.deadline.value,
+        params.assetIn.toBigInt(),
+        params.debtIn.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -138,14 +138,14 @@ export class ConvSigner extends Conv {
     return this.convContract.addLiquidity([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.liquidityTo,
       params.dueTo,
-      params.assetIn.value,
-      params.minLiquidity.value,
-      params.maxDebt.value,
-      params.maxCollateral.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.minLiquidity.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -156,15 +156,15 @@ export class ConvSigner extends Conv {
     return this.convContract.addLiquidityETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.liquidityTo,
         params.dueTo,
-        params.minLiquidity.value,
-        params.maxDebt.value,
-        params.maxCollateral.value,
-        params.deadline.value,
+        params.minLiquidity.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -175,15 +175,15 @@ export class ConvSigner extends Conv {
     return this.convContract.addLiquidityETHCollateral(
       [
         params.asset.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.value,
-        params.minLiquidity.value,
-        params.maxDebt.value,
-        params.deadline.value,
+        params.assetIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -191,10 +191,10 @@ export class ConvSigner extends Conv {
     return this.convContract.removeLiquidity([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      params.liquidityIn.value,
+      params.liquidityIn.toBigInt(),
     ]);
   }
 
@@ -203,10 +203,10 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.removeLiquidityETHAsset([
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      params.liquidityIn.value,
+      params.liquidityIn.toBigInt(),
     ]);
   }
 
@@ -215,10 +215,10 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.removeLiquidityETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      params.liquidityIn.value,
+      params.liquidityIn.toBigInt(),
     ]);
   }
 
@@ -226,13 +226,13 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenBond([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.bondOut.value,
-      params.minInsurance.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.bondOut.toBigInt(),
+      params.minInsurance.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -243,14 +243,14 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenBondETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.bondTo,
         params.insuranceTo,
-        params.bondOut.value,
-        params.minInsurance.value,
-        params.deadline.value,
+        params.bondOut.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -259,13 +259,13 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.lendGivenBondETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.bondOut.value,
-      params.minInsurance.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.bondOut.toBigInt(),
+      params.minInsurance.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -275,13 +275,13 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenInsurance([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.insuranceOut.value,
-      params.minBond.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.insuranceOut.toBigInt(),
+      params.minBond.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -292,14 +292,14 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenInsuranceETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.bondTo,
         params.insuranceTo,
-        params.insuranceOut.value,
-        params.minBond.value,
-        params.deadline.value,
+        params.insuranceOut.toBigInt(),
+        params.minBond.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -308,13 +308,13 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.lendGivenInsuranceETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.insuranceOut.value,
-      params.minBond.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.insuranceOut.toBigInt(),
+      params.minBond.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -324,14 +324,14 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenPercent([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.percent.value,
-      params.minBond.value,
-      params.minInsurance.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.percent.toBigInt(),
+      params.minBond.toBigInt(),
+      params.minInsurance.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -342,15 +342,15 @@ export class ConvSigner extends Conv {
     return this.convContract.lendGivenPercentETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.bondTo,
         params.insuranceTo,
-        params.percent.value,
-        params.minBond.value,
-        params.minInsurance.value,
-        params.deadline.value,
+        params.percent.toBigInt(),
+        params.minBond.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -359,14 +359,14 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.lendGivenPercentETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.bondTo,
       params.insuranceTo,
-      params.assetIn.value,
-      params.percent.value,
-      params.minBond.value,
-      params.minInsurance.value,
-      params.deadline.value,
+      params.assetIn.toBigInt(),
+      params.percent.toBigInt(),
+      params.minBond.toBigInt(),
+      params.minInsurance.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -374,20 +374,20 @@ export class ConvSigner extends Conv {
     return this.convContract.collect([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.value, params.claimsIn.insurance.value],
+      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
     ]);
   }
 
   async collectETHAsset(params: CollectETHAsset): Promise<ContractTransaction> {
     return this.convContract.collectETHAsset([
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.value, params.claimsIn.insurance.value],
+      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
     ]);
   }
 
@@ -396,10 +396,10 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.collectETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.value, params.claimsIn.insurance.value],
+      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
     ]);
   }
 
@@ -407,13 +407,13 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenDebt([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.debtIn.value,
-      params.maxCollateral.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.debtIn.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -422,13 +422,13 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.borrowGivenDebtETHAsset([
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.debtIn.value,
-      params.maxCollateral.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.debtIn.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -439,14 +439,14 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenDebtETHCollateral(
       [
         params.asset.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.assetTo,
         params.dueTo,
-        params.assetOut.value,
-        params.debtIn.value,
-        params.deadline.value,
+        params.assetOut.toBigInt(),
+        params.debtIn.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -456,13 +456,13 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenCollateral([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.collateralIn.value,
-      params.maxDebt.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.collateralIn.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -471,13 +471,13 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.borrowGivenCollateralETHAsset([
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.collateralIn.value,
-      params.maxDebt.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.collateralIn.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -488,14 +488,14 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenCollateralETHCollateral(
       [
         params.asset.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.assetTo,
         params.dueTo,
-        params.assetOut.value,
-        params.maxDebt.value,
-        params.deadline.value,
+        params.assetOut.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -505,14 +505,14 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenPercent([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.percent.value,
-      params.maxDebt.value,
-      params.maxCollateral.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.percent.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -521,14 +521,14 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.borrowGivenPercentETHAsset([
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.assetTo,
       params.dueTo,
-      params.assetOut.value,
-      params.percent.value,
-      params.maxDebt.value,
-      params.maxCollateral.value,
-      params.deadline.value,
+      params.assetOut.toBigInt(),
+      params.percent.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -539,15 +539,15 @@ export class ConvSigner extends Conv {
     return this.convContract.borrowGivenPercentETHCollateral(
       [
         params.asset.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.assetTo,
         params.dueTo,
-        params.assetOut.value,
-        params.percent.value,
-        params.maxDebt.value,
-        params.deadline.value,
+        params.assetOut.toBigInt(),
+        params.percent.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -555,11 +555,11 @@ export class ConvSigner extends Conv {
     return this.convContract.repay([
       params.asset.address,
       params.collateral.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.collateralTo,
-      params.ids.map(value => value.value),
-      params.maxAssetsIn.map(value => value.value),
-      params.deadline.value,
+      params.ids.map(value => value.toBigInt()),
+      params.maxAssetsIn.map(value => value.toBigInt()),
+      params.deadline.toBigInt(),
     ]);
   }
 
@@ -570,13 +570,13 @@ export class ConvSigner extends Conv {
     return this.convContract.repayETHAsset(
       [
         params.collateral.address,
-        params.maturity.value,
+        params.maturity.toBigInt(),
         params.collateralTo,
-        params.ids.map(value => value.value),
-        params.maxAssetsIn.map(value => value.value),
-        params.deadline.value,
+        params.ids.map(value => value.toBigInt()),
+        params.maxAssetsIn.map(value => value.toBigInt()),
+        params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.value }
+      { value: txnParams.value.toBigInt() }
     );
   }
 
@@ -585,11 +585,11 @@ export class ConvSigner extends Conv {
   ): Promise<ContractTransaction> {
     return this.convContract.repayETHCollateral([
       params.asset.address,
-      params.maturity.value,
+      params.maturity.toBigInt(),
       params.collateralTo,
-      params.ids.map(value => value.value),
-      params.maxAssetsIn.map(value => value.value),
-      params.deadline.value,
+      params.ids.map(value => value.toBigInt()),
+      params.maxAssetsIn.map(value => value.toBigInt()),
+      params.deadline.toBigInt(),
     ]);
   }
 }
