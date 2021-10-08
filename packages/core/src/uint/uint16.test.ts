@@ -1,11 +1,9 @@
 import { Uint16 } from './uint16';
 
-const MAX_UINT_16 = 2n ** 16n - 1n;
-
 describe('Uint16 tests', () => {
   it('Overflow', () => {
-    const num = new Uint16(MAX_UINT_16);
-    expect(num.toBigInt()).toEqual(MAX_UINT_16);
+    const num = new Uint16(Uint16.maxValue);
+    expect(num.toBigInt()).toEqual(Uint16.maxValue);
 
     expect(() => {
       num.addAssign(1);

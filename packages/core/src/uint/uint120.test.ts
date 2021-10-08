@@ -1,11 +1,9 @@
 import { Uint120 } from './uint120';
 
-const MAX_UINT_120 = 2n ** 120n - 1n;
-
 describe('Uint120 tests', () => {
   it('Overflow', () => {
-    const num = new Uint120(MAX_UINT_120);
-    expect(num.toBigInt()).toEqual(MAX_UINT_120);
+    const num = new Uint120(Uint120.maxValue);
+    expect(num.toBigInt()).toEqual(Uint120.maxValue);
 
     expect(() => {
       num.addAssign(1);

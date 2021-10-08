@@ -1,8 +1,8 @@
 import invariant from 'tiny-invariant';
 
 export abstract class Uint {
-  abstract bits(): bigint;
-  abstract clone(): this;
+  protected abstract valid(): boolean;
+  protected abstract clone(): this;
 
   protected value: bigint;
 
@@ -10,11 +10,6 @@ export abstract class Uint {
     if (value instanceof Uint) this.value = value.value;
     else this.value = BigInt(value);
     invariant(this.valid(), 'Invalid value');
-  }
-
-  private valid(): boolean {
-    const maxValue = (1n << this.bits()) - 1n;
-    return 0n <= this.value && this.value <= maxValue ? true : false;
   }
 
   toBigInt(): bigint {
@@ -120,5 +115,35 @@ export abstract class Uint {
     const result = this.clone();
     result.shiftRightAssign(other);
     return result;
+  }
+
+  eq(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value === other.value;
+    else return this.value === BigInt(other);
+  }
+
+  ne(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value !== other.value;
+    else return this.value !== BigInt(other);
+  }
+
+  gt(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value > other.value;
+    else return this.value > BigInt(other);
+  }
+
+  gte(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value >= other.value;
+    else return this.value >= BigInt(other);
+  }
+
+  lt(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value < other.value;
+    else return this.value < BigInt(other);
+  }
+
+  lte(other: string | number | bigint | boolean | Uint): boolean {
+    if (other instanceof Uint) return this.value <= other.value;
+    else return this.value <= BigInt(other);
   }
 }
