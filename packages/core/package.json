@@ -1,5 +1,5 @@
 {
-  "version": "0.1.16",
+  "version": "0.1.17",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -43,7 +43,7 @@
     "typescript": "^4.3.5"
   },
   "dependencies": {
-    "@ethersproject/address": "^5.4.0",
+    "@ethersproject/address": "^5.5.0",
     "tiny-invariant": "^1.1.0"
   }
 }
