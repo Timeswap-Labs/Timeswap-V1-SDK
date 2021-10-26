@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112 } from '../uint';
 import { mulDiv, mulDivUp } from './fullMath';
-import { shiftUp } from './math';
+import { shiftRightUp, cbrt } from './math';
 
 export function givenNew(
   maturity: Uint256,
@@ -62,7 +62,7 @@ export function mint(
   let liquidityOut: Uint256;
 
   if (totalLiquidity.toBigInt() === 0n) {
-    const liquidityTotal = getLiquidityTotal1(xIncrease);
+    const liquidityTotal = getLiquidityTotal1(xIncrease, yIncrease, zIncrease);
     liquidityOut = getLiquidity(maturity, liquidityTotal, protocolFee, now);
   } else {
     const liquidityTotal = getLiquidityTotal2(
@@ -88,9 +88,14 @@ export function mint(
   return { liquidityOut, dueOut };
 }
 
-function getLiquidityTotal1(xIncrease: Uint112): Uint256 {
-  const liquidityTotal = new Uint256(xIncrease);
-  liquidityTotal.shiftLeftAssign(56);
+function getLiquidityTotal1(
+  xIncrease: Uint112,
+  yIncrease: Uint112,
+  zIncrease: Uint112
+): Uint256 {
+  const liquidityTotal = new Uint256(yIncrease).mul(zIncrease);
+  liquidityTotal.set(cbrt(liquidityTotal));
+  liquidityTotal.mulAssign(cbrt(new Uint256(xIncrease)));
 
   return liquidityTotal;
 }
@@ -147,7 +152,7 @@ function getDebt(
   const _debtIn = new Uint256(maturity);
   _debtIn.subAssign(now);
   _debtIn.mulAssign(yIncrease);
-  _debtIn.set(shiftUp(_debtIn, new Uint256(32)));
+  _debtIn.set(shiftRightUp(_debtIn, new Uint256(32)));
   _debtIn.addAssign(xIncrease);
   const debtIn = new Uint112(_debtIn);
 

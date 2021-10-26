@@ -106,24 +106,27 @@ export class Pool {
   }
 
   async updateCache(cache?: CacheModifier) {
-    if (this.cache) {
-      this.cache.state = cache?.state ?? (await this.getConstantProduct());
-      this.cache.reserves = cache?.reserves ?? (await this.getTotalReserves());
-      this.cache.totalClaims =
-        cache?.totalClaims ?? (await this.getTotalClaims());
-      this.cache.totalLiquidity =
-        cache?.totalLiquidity ?? (await this.getTotalLiquidity());
-    } else {
-      this.cache = {
-        state: cache?.state ?? (await this.getConstantProduct()),
-        reserves: cache?.reserves ?? (await this.getTotalReserves()),
-        totalClaims: cache?.totalClaims ?? (await this.getTotalClaims()),
-        totalLiquidity:
-          cache?.totalLiquidity ?? (await this.getTotalLiquidity()),
-        fee: cache?.fee ?? (await this.getFee()),
-        protocolFee: cache?.protocolFee ?? (await this.getProtocolFee()),
-      };
-    }
+    this.cache = {
+      state:
+        cache?.state ?? this.cache?.state ?? (await this.getConstantProduct()),
+      reserves:
+        cache?.reserves ??
+        this.cache?.reserves ??
+        (await this.getTotalReserves()),
+      totalClaims:
+        cache?.totalClaims ??
+        this.cache?.totalClaims ??
+        (await this.getTotalClaims()),
+      totalLiquidity:
+        cache?.totalLiquidity ??
+        this.cache?.totalLiquidity ??
+        (await this.getTotalLiquidity()),
+      fee: cache?.fee ?? this.cache?.fee ?? (await this.getFee()),
+      protocolFee:
+        cache?.protocolFee ??
+        this.cache?.protocolFee ??
+        (await this.getProtocolFee()),
+    };
   }
 
   async factory(): Promise<string> {

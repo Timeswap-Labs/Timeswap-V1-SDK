@@ -3,7 +3,7 @@ import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
 import { checkConstantProduct } from './constantProduct';
 import { mulDivUp } from './fullMath';
-import { divUp, shiftUp } from './math';
+import { divUp, shiftRightUp } from './math';
 
 export function givenDebt(
   fee: Uint16,
@@ -202,7 +202,7 @@ function getDebt(
   const _debtIn = new Uint256(maturity);
   _debtIn.subAssign(now);
   _debtIn.mulAssign(yIncrease);
-  _debtIn.set(shiftUp(_debtIn, new Uint256(32)));
+  _debtIn.set(shiftRightUp(_debtIn, new Uint256(32)));
   _debtIn.addAssign(xDecrease);
   const debtIn = new Uint112(_debtIn);
 
