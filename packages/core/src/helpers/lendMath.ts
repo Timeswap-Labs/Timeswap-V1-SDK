@@ -221,7 +221,7 @@ function getInsurance(
   _insuranceOut.mulAssign(zDecrease);
   const addend = new Uint256(state.z);
   addend.mulAssign(xIncrease);
-  addend.shiftRightAssign(32);
+  addend.shiftLeftAssign(32);
   _insuranceOut.addAssign(addend);
   const denominator = new Uint256(state.x);
   denominator.addAssign(xIncrease);
