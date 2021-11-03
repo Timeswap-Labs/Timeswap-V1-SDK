@@ -1,8 +1,8 @@
 import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112 } from '../uint';
-import { mulDiv, mulDivUp } from './fullMath';
-import { shiftRightUp, cbrt } from './math';
+import { mulDiv } from './fullMath';
+import { shiftRightUp, cbrt, divUp } from './math';
 
 export function givenNew(
   maturity: Uint256,
@@ -17,13 +17,15 @@ export function givenNew(
   _yIncrease.divAssign(maturity.sub(now));
   const yIncrease = new Uint112(_yIncrease);
 
-  const denominator = new Uint256(maturity);
-  denominator.subAssign(now);
-  denominator.mulAssign(yIncrease);
-  denominator.addAssign(new Uint256(assetIn).shiftLeft(33));
   const _zIncrease = new Uint256(collateralIn);
   _zIncrease.mulAssign(assetIn);
   _zIncrease.shiftLeftAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.mulAssign(yIncrease);
+  const addend = new Uint256(assetIn);
+  addend.shiftLeftAssign(32);
+  denominator.addAssign(addend);
   _zIncrease.divAssign(denominator);
   const zIncrease = new Uint112(_zIncrease);
 
@@ -58,6 +60,7 @@ export function mint(
   dueOut: Due;
 } {
   invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
+  invariant(maturity.sub(now).lt(0x100000000), 'Duration overflow');
 
   let liquidityOut: Uint256;
 
@@ -169,14 +172,11 @@ function getCollateral(
   const _collateralIn = new Uint256(maturity);
   _collateralIn.subAssign(now);
   _collateralIn.mulAssign(yIncrease);
-  _collateralIn.addAssign(new Uint256(xIncrease).shiftLeft(33));
-  _collateralIn.set(
-    mulDivUp(
-      _collateralIn,
-      new Uint256(zIncrease),
-      new Uint256(xIncrease).shiftLeft(32)
-    )
-  );
+  _collateralIn.mulAssign(zIncrease);
+  const denominator = new Uint256(xIncrease);
+  denominator.shiftLeftAssign(32);
+  _collateralIn.set(divUp(_collateralIn, denominator));
+  _collateralIn.addAssign(zIncrease);
   const collateralIn = new Uint112(_collateralIn);
 
   return collateralIn;

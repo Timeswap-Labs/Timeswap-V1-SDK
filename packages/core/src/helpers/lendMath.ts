@@ -59,16 +59,15 @@ export function givenInsurance(
   xAdjust.addAssign(assetIn);
 
   const _zDecrease = new Uint256(insuranceOut);
-  const subtrahend = new Uint256(maturity);
-  subtrahend.subAssign(now);
-  subtrahend.mulAssign(cp.y);
-  subtrahend.addAssign(new Uint256(cp.x).shiftLeft(32));
-  const denominator = new Uint256(xAdjust);
-  denominator.mulAssign(new Uint256(cp.x).shiftLeft(32));
-  subtrahend.set(
-    mulDiv(subtrahend, new Uint256(assetIn).mul(cp.z), denominator)
-  );
+  _zDecrease.mulAssign(xAdjust);
+  const subtrahend = new Uint256(cp.z);
+  subtrahend.mulAssign(assetIn);
   _zDecrease.subAssign(subtrahend);
+  _zDecrease.shiftLeftAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.mulAssign(cp.y);
+  _zDecrease.set(divUp(_zDecrease, denominator));
   const zDecrease = new Uint112(_zDecrease);
 
   const zAdjust = new Uint256(cp.z);
@@ -219,15 +218,15 @@ function getInsurance(
   const _insuranceOut = new Uint256(maturity);
   _insuranceOut.subAssign(now);
   _insuranceOut.mulAssign(state.y);
-  _insuranceOut.addAssign(new Uint256(state.x).shiftLeft(32));
+  _insuranceOut.mulAssign(zDecrease);
+  const addend = new Uint256(state.z);
+  addend.mulAssign(xIncrease);
+  addend.shiftRightAssign(32);
+  _insuranceOut.addAssign(addend);
   const denominator = new Uint256(state.x);
   denominator.addAssign(xIncrease);
-  denominator.mulAssign(new Uint256(state.x));
   denominator.shiftLeftAssign(32);
-  _insuranceOut.set(
-    mulDiv(_insuranceOut, new Uint256(xIncrease).mul(state.z), denominator)
-  );
-  _insuranceOut.addAssign(zDecrease);
+  _insuranceOut.divAssign(denominator);
   const insuranceOut = new Uint128(_insuranceOut);
 
   return insuranceOut;

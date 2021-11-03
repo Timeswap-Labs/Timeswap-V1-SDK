@@ -59,16 +59,15 @@ export function givenCollateral(
   xAdjust.subAssign(assetOut);
 
   const _zIncrease = new Uint256(collateralIn);
-  const subtrahend = new Uint256(maturity);
-  subtrahend.subAssign(now);
-  subtrahend.mulAssign(cp.y);
-  subtrahend.addAssign(new Uint256(cp.x).shiftLeft(32));
-  const denominator = new Uint256(xAdjust);
-  denominator.mulAssign(new Uint256(cp.x).shiftLeft(32));
-  subtrahend.set(
-    mulDivUp(subtrahend, new Uint256(assetOut).mul(cp.z), denominator)
-  );
+  _zIncrease.mulAssign(xAdjust);
+  const subtrahend = new Uint256(cp.z);
+  subtrahend.mulAssign(assetOut);
   _zIncrease.subAssign(subtrahend);
+  _zIncrease.shiftLeftAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.mulAssign(cp.y);
+  _zIncrease.divAssign(denominator);
   const zIncrease = new Uint112(_zIncrease);
 
   const zAdjust = new Uint256(cp.z);
@@ -219,15 +218,15 @@ function getCollateral(
   const _collateralIn = new Uint256(maturity);
   _collateralIn.subAssign(now);
   _collateralIn.mulAssign(state.y);
-  _collateralIn.addAssign(new Uint256(state.x).shiftLeft(32));
+  _collateralIn.mulAssign(zIncrease);
+  const addend = new Uint256(state.z);
+  addend.mulAssign(xDecrease);
+  addend.shiftLeftAssign(32);
+  _collateralIn.addAssign(addend);
   const denominator = new Uint256(state.x);
   denominator.subAssign(xDecrease);
-  denominator.mulAssign(new Uint256(state.x));
   denominator.shiftLeftAssign(32);
-  _collateralIn.set(
-    mulDivUp(_collateralIn, new Uint256(xDecrease).mul(state.z), denominator)
-  );
-  _collateralIn.addAssign(zIncrease);
+  _collateralIn.set(divUp(_collateralIn, denominator));
   const collateralIn = new Uint112(_collateralIn);
 
   return collateralIn;
