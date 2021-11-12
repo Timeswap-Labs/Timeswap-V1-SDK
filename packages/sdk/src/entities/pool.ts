@@ -187,10 +187,10 @@ export class Pool {
     return this.pair.calculateApr(this.cache!.state);
   }
 
-  async calculateCf(): Promise<Uint112> {
+  async calculateCdp(): Promise<Uint112> {
     if (!this.cache) await this.updateCache();
 
-    return this.pair.calculateCf(this.cache!.state);
+    return this.pair.calculateCdp(this.cache!.state);
   }
 
   async calculateNewLiquidity(

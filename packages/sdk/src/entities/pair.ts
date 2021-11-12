@@ -244,10 +244,10 @@ export class Pair {
     return apr;
   }
 
-  calculateCf(state: CP): Uint112 {
+  calculateCdp(state: CP): Uint112 {
     let temp = 1n;
     for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
-    return new Uint112((state.x.toBigInt() * temp) / state.z.toBigInt());
+    return new Uint112(state.z.toBigInt() / (state.x.toBigInt() * temp));
   }
 
   calculateNewLiquidity(
