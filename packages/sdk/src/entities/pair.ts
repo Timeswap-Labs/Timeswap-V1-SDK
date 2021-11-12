@@ -244,10 +244,10 @@ export class Pair {
     return apr;
   }
 
-  calculateCdp(state: CP): Uint112 {
+  calculateCdp(state: CP): bigint {
     let temp = 1n;
     for (let i = 0; i < this.asset.decimals; i++) temp *= 10n;
-    return new Uint112((state.z.toBigInt() * temp) / state.x.toBigInt());
+    return (state.z.toBigInt() * temp) / state.x.toBigInt();
   }
 
   calculateNewLiquidity(

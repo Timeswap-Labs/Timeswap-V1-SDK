@@ -187,7 +187,7 @@ export class Pool {
     return this.pair.calculateApr(this.cache!.state);
   }
 
-  async calculateCdp(): Promise<Uint112> {
+  async calculateCdp(): Promise<bigint> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateCdp(this.cache!.state);
