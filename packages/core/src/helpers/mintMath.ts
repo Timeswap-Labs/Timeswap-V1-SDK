@@ -10,7 +10,10 @@ export function givenNew(
   debtIn: Uint112,
   collateralIn: Uint112,
   now: Uint256
-): MintResult {
+): {
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
   const _yIncrease = new Uint256(debtIn);
   _yIncrease.subAssign(assetIn);
   _yIncrease.shiftLeftAssign(32);
@@ -32,7 +35,13 @@ export function givenNew(
   return { yIncrease, zIncrease };
 }
 
-export function givenAdd(cp: CP, assetIn: Uint112): MintResult {
+export function givenAsset(
+  cp: CP,
+  assetIn: Uint112
+): {
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
   const _yIncrease = new Uint256(cp.y);
   _yIncrease.mulAssign(assetIn);
   _yIncrease.divAssign(cp.x);
@@ -44,6 +53,72 @@ export function givenAdd(cp: CP, assetIn: Uint112): MintResult {
   const zIncrease = new Uint112(_zIncrease);
 
   return { yIncrease, zIncrease };
+}
+
+export function givenDebt(
+  cp: CP,
+  maturity: Uint256,
+  debtIn: Uint112,
+  now: Uint256
+): {
+  xIncrease: Uint112;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
+  const _yIncrease = new Uint256(debtIn);
+  _yIncrease.mulAssign(cp.y);
+  _yIncrease.shiftLeftAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.mulAssign(cp.y);
+  const addend = new Uint256(cp.x);
+  addend.shiftLeftAssign(32);
+  denominator.addAssign(addend);
+  _yIncrease.divAssign(denominator);
+  const yIncrease = new Uint112(_yIncrease);
+
+  const _xIncrease = new Uint256(cp.x);
+  _xIncrease.mulAssign(_yIncrease);
+  _xIncrease.divAssign(cp.y);
+  const xIncrease = new Uint112(_xIncrease);
+
+  const _zIncrease = new Uint256(cp.z);
+  _zIncrease.mulAssign(_yIncrease);
+  _zIncrease.divAssign(cp.y);
+  const zIncrease = new Uint112(_zIncrease);
+
+  return { xIncrease, yIncrease, zIncrease };
+}
+
+export function givenCollateral(
+  cp: CP,
+  maturity: Uint256,
+  collateralIn: Uint112,
+  now: Uint256
+): {
+  xIncrease: Uint112;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
+  const _zIncrease = new Uint256(collateralIn);
+  _zIncrease.shiftLeftAssign(25);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.addAssign(0x2000000);
+  _zIncrease.divAssign(denominator);
+  const zIncrease = new Uint112(_zIncrease);
+
+  const _xIncrease = new Uint256(cp.x);
+  _xIncrease.mulAssign(_zIncrease);
+  _xIncrease.divAssign(cp.z);
+  const xIncrease = new Uint112(_xIncrease);
+
+  const _yIncrease = new Uint256(cp.y);
+  _yIncrease.mulAssign(_zIncrease);
+  _yIncrease.divAssign(cp.z);
+  const yIncrease = new Uint112(_yIncrease);
+
+  return { xIncrease, yIncrease, zIncrease };
 }
 
 export function mint(
@@ -182,14 +257,11 @@ function getCollateral(
   return collateralIn;
 }
 
-export interface MintResult {
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
 export default {
   givenNew,
-  givenAdd,
+  givenAsset,
+  givenDebt,
+  givenCollateral,
   mint,
   getLiquidityTotal1,
   getLiquidityTotal2,

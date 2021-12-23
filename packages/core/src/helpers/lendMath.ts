@@ -2,8 +2,9 @@ import invariant from 'tiny-invariant';
 import { Claims, CP } from '../entities';
 import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
 import { checkConstantProduct } from './constantProduct';
-import { mulDiv } from './fullMath';
+import { mulDiv, mulDivUp } from './fullMath';
 import { divUp } from './math';
+import { sqrtUp } from './squareRoot';
 
 export function givenBond(
   fee: Uint16,
@@ -21,12 +22,12 @@ export function givenBond(
   _yDecrease.set(divUp(_yDecrease, maturity.sub(now)));
   const yDecrease = new Uint112(_yDecrease);
 
+  const xAdjust = new Uint256(cp.x);
+  xAdjust.addAssign(assetIn);
+
   const yAdjust = new Uint256(cp.y);
   yAdjust.shiftLeftAssign(16);
   yAdjust.subAssign(_yDecrease.mul(feeBase));
-
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.addAssign(assetIn);
 
   const _zDecrease = new Uint256(xAdjust);
   _zDecrease.mulAssign(yAdjust);
@@ -63,10 +64,10 @@ export function givenInsurance(
   const subtrahend = new Uint256(cp.z);
   subtrahend.mulAssign(assetIn);
   _zDecrease.subAssign(subtrahend);
-  _zDecrease.shiftLeftAssign(32);
+  _zDecrease.shiftLeftAssign(25);
   const denominator = new Uint256(maturity);
   denominator.subAssign(now);
-  denominator.mulAssign(cp.y);
+  denominator.mulAssign(xAdjust);
   _zDecrease.set(divUp(_zDecrease, denominator));
   const zDecrease = new Uint112(_zDecrease);
 
@@ -102,40 +103,93 @@ export function givenPercent(
   const xAdjust = new Uint256(cp.x);
   xAdjust.addAssign(assetIn);
 
-  const minimum = new Uint256(assetIn);
-  minimum.mulAssign(cp.y);
-  minimum.shiftLeftAssign(12);
-  const maximum = new Uint256(minimum);
-  maximum.shiftLeftAssign(4);
-  const denominator = new Uint256(xAdjust);
-  denominator.mulAssign(feeBase);
-  minimum.divAssign(denominator);
-  maximum.divAssign(denominator);
+  const yDecrease = new Uint112(0);
+  const zDecrease = new Uint112(0);
 
-  const _yDecrease = new Uint256(maximum);
-  _yDecrease.subAssign(minimum);
-  _yDecrease.mulAssign(percent);
-  _yDecrease.shiftRightAssign(32);
-  _yDecrease.addAssign(minimum);
-  const yDecrease = new Uint112(_yDecrease);
+  if (percent.lte(0x80000000)) {
+    const yMid = new Uint256(cp.y);
+    yMid.shiftLeftAssign(16);
+    yMid.divAssign(feeBase);
+    const subtrahend = new Uint256(cp.y);
+    subtrahend.mulAssign(cp.y);
+    subtrahend.shiftLeftAssign(32);
+    const denominator = new Uint256(xAdjust);
+    denominator.mulAssign(feeBase);
+    denominator.mulAssign(feeBase);
+    subtrahend.set(mulDivUp(subtrahend, new Uint256(cp.x), denominator));
+    subtrahend.set(sqrtUp(subtrahend));
+    yMid.subAssign(subtrahend);
 
-  const yAdjust = new Uint256(cp.y);
-  yAdjust.shiftLeftAssign(16);
-  yAdjust.subAssign(_yDecrease.mul(feeBase));
+    const yMin = new Uint256(assetIn);
+    yMin.mulAssign(cp.y);
+    yMin.shiftLeftAssign(12);
+    denominator.set(xAdjust);
+    denominator.mulAssign(feeBase);
+    yMin.divAssign(denominator);
 
-  const _zDecrease = new Uint256(xAdjust);
-  _zDecrease.mulAssign(yAdjust);
-  const subtrahend = new Uint256(cp.x);
-  subtrahend.mulAssign(cp.y);
-  subtrahend.shiftLeftAssign(16);
-  _zDecrease.subAssign(subtrahend);
-  denominator.set(xAdjust);
-  denominator.mulAssign(yAdjust);
-  denominator.mulAssign(feeBase);
-  _zDecrease.set(
-    mulDiv(_zDecrease, new Uint256(cp.z).shiftLeft(16), denominator)
-  );
-  const zDecrease = new Uint112(_zDecrease);
+    const _yDecrease = new Uint256(yMid);
+    _yDecrease.subAssign(yMin);
+    _yDecrease.mulAssign(percent);
+    _yDecrease.shiftRightAssign(31);
+    _yDecrease.addAssign(yMin);
+    yDecrease.set(_yDecrease);
+
+    const yAdjust = new Uint256(cp.y);
+    yAdjust.shiftLeftAssign(16);
+    yAdjust.subAssign(_yDecrease.mul(feeBase));
+
+    const _zDecrease = new Uint256(xAdjust);
+    _zDecrease.mulAssign(yAdjust);
+    subtrahend.set(cp.x);
+    subtrahend.mulAssign(cp.y);
+    subtrahend.shiftLeftAssign(16);
+    _zDecrease.subAssign(subtrahend);
+    denominator.set(xAdjust);
+    denominator.mulAssign(yAdjust);
+    denominator.mulAssign(feeBase);
+    _zDecrease.set(
+      mulDiv(_zDecrease, new Uint256(cp.z).shiftLeft(16), denominator)
+    );
+    zDecrease.set(_zDecrease);
+  } else {
+    const zMid = new Uint256(cp.z);
+    zMid.shiftLeftAssign(16);
+    zMid.divAssign(feeBase);
+    const subtrahend = new Uint256(cp.z);
+    subtrahend.mulAssign(cp.z);
+    subtrahend.shiftLeftAssign(32);
+    const denominator = new Uint256(xAdjust);
+    denominator.mulAssign(feeBase);
+    denominator.mulAssign(feeBase);
+    subtrahend.set(mulDivUp(subtrahend, new Uint256(cp.x), denominator));
+    subtrahend.set(sqrtUp(subtrahend));
+    zMid.subAssign(subtrahend);
+
+    percent.set(new Uint40(0x100000000).sub(percent));
+
+    const _zDecrease = new Uint256(zMid);
+    _zDecrease.mulAssign(percent);
+    _zDecrease.shiftRightAssign(31);
+    zDecrease.set(_zDecrease);
+
+    const zAdjust = new Uint256(cp.z);
+    zAdjust.shiftLeftAssign(16);
+    zAdjust.subAssign(zDecrease.mul(feeBase));
+
+    const _yDecrease = new Uint256(xAdjust);
+    _yDecrease.mulAssign(zAdjust);
+    subtrahend.set(cp.x);
+    subtrahend.mulAssign(cp.z);
+    subtrahend.shiftLeftAssign(16);
+    _yDecrease.subAssign(subtrahend);
+    denominator.set(xAdjust);
+    denominator.mulAssign(zAdjust);
+    denominator.mulAssign(feeBase);
+    _yDecrease.set(
+      mulDiv(_yDecrease, new Uint256(cp.y).shiftLeft(16), denominator)
+    );
+    yDecrease.set(_yDecrease);
+  }
 
   return { yDecrease, zDecrease };
 }
