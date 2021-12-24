@@ -270,16 +270,14 @@ function getCollateral(
 ): Uint112 {
   const _collateralIn = new Uint256(maturity);
   _collateralIn.subAssign(now);
-  _collateralIn.mulAssign(state.y);
   _collateralIn.mulAssign(zIncrease);
-  const addend = new Uint256(state.z);
-  addend.mulAssign(xDecrease);
-  addend.shiftLeftAssign(32);
-  _collateralIn.addAssign(addend);
+  _collateralIn.set(shiftRightUp(_collateralIn, new Uint256(25)));
+  const minimum = new Uint256(state.z);
+  minimum.mulAssign(xDecrease);
   const denominator = new Uint256(state.x);
   denominator.subAssign(xDecrease);
-  denominator.shiftLeftAssign(32);
-  _collateralIn.set(divUp(_collateralIn, denominator));
+  minimum.set(divUp(minimum, denominator));
+  _collateralIn.addAssign(minimum);
   const collateralIn = new Uint112(_collateralIn);
 
   return collateralIn;

@@ -198,7 +198,7 @@ export class Pool {
     debtIn: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn> {
+  ): Promise<LiquidityReturn1> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateNewLiquidity(
@@ -213,17 +213,49 @@ export class Pool {
     );
   }
 
-  async calculateAddLiquidity(
+  async calculateLiquidityGivenAsset(
     assetIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn> {
+  ): Promise<LiquidityReturn1> {
     if (!this.cache) await this.updateCache();
 
-    return this.pair.calculateAddLiquidity(
+    return this.pair.calculateLiquidityGivenAsset(
       this.cache!.state,
       this.cache!.protocolFee,
       this.cache!.totalLiquidity,
       assetIn,
+      this.maturity,
+      now
+    );
+  }
+
+  async calculateLiquidityGivenDebt(
+    debtIn: Uint112,
+    now: Uint256
+  ): Promise<LiquidityReturn2> {
+    if (!this.cache) await this.updateCache();
+
+    return this.pair.calculateLiquidityGivenDebt(
+      this.cache!.state,
+      this.cache!.protocolFee,
+      this.cache!.totalLiquidity,
+      debtIn,
+      this.maturity,
+      now
+    );
+  }
+
+  async calculateLiquidityGivenCollateral(
+    collateralIn: Uint112,
+    now: Uint256
+  ): Promise<LiquidityReturn2> {
+    if (!this.cache) await this.updateCache();
+
+    return this.pair.calculateLiquidityGivenCollateral(
+      this.cache!.state,
+      this.cache!.protocolFee,
+      this.cache!.totalLiquidity,
+      collateralIn,
       this.maturity,
       now
     );
@@ -376,8 +408,28 @@ export class PoolSigner extends Pool {
     });
   }
 
-  async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
-    return this.pairSigner.addLiquidity({
+  async liquidityGivenAsset(
+    params: LiquidityGivenAsset
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.liquidityGivenAsset({
+      ...params,
+      maturity: this.maturity,
+    });
+  }
+
+  async liquidityGivenDebt(
+    params: LiquidityGivenDebt
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.liquidityGivenDebt({
+      ...params,
+      maturity: this.maturity,
+    });
+  }
+
+  async liquidityGivenCollateral(
+    params: LiquidityGivenCollateral
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.liquidityGivenCollateral({
       ...params,
       maturity: this.maturity,
     });
@@ -455,11 +507,15 @@ export class PoolSigner extends Pool {
   }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: DueCalculated;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {
@@ -519,13 +575,33 @@ interface NewLiquidity {
   deadline: Uint256;
 }
 
-interface AddLiquidity {
+interface LiquidityGivenAsset {
   liquidityTo: string;
   dueTo: string;
   assetIn: Uint112;
   minLiquidity: Uint256;
   maxDebt: Uint112;
   maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebt {
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateral {
+  liquidityTo: string;
+  dueTo: string;
+  collateralIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxDebt: Uint112;
   deadline: Uint256;
 }
 

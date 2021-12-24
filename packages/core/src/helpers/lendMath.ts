@@ -271,16 +271,14 @@ function getInsurance(
 ): Uint128 {
   const _insuranceOut = new Uint256(maturity);
   _insuranceOut.subAssign(now);
-  _insuranceOut.mulAssign(state.y);
   _insuranceOut.mulAssign(zDecrease);
-  const addend = new Uint256(state.z);
-  addend.mulAssign(xIncrease);
-  addend.shiftLeftAssign(32);
-  _insuranceOut.addAssign(addend);
+  _insuranceOut.shiftRightAssign(25);
+  const minimum = new Uint256(state.z);
+  minimum.mulAssign(xIncrease);
   const denominator = new Uint256(state.x);
   denominator.addAssign(xIncrease);
-  denominator.shiftLeftAssign(32);
-  _insuranceOut.divAssign(denominator);
+  minimum.divAssign(denominator);
+  _insuranceOut.addAssign(minimum);
   const insuranceOut = new Uint128(_insuranceOut);
 
   return insuranceOut;

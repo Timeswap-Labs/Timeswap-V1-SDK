@@ -134,8 +134,10 @@ export class ConvSigner extends Conv {
     );
   }
 
-  async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
-    return this.convContract.addLiquidity([
+  async liquidityGivenAsset(
+    params: LiquidityGivenAsset
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenAsset([
       params.asset.address,
       params.collateral.address,
       params.maturity.toBigInt(),
@@ -149,11 +151,11 @@ export class ConvSigner extends Conv {
     ]);
   }
 
-  async addLiquidityETHAsset(
-    params: AddLiquidityETHAsset,
+  async liquidityGivenAssetETHAsset(
+    params: LiquidityGivenAssetETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.addLiquidityETHAsset(
+    return this.convContract.liquidityGivenAssetETHAsset(
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -168,11 +170,11 @@ export class ConvSigner extends Conv {
     );
   }
 
-  async addLiquidityETHCollateral(
-    params: AddLiquidityETHCollateral,
+  async liquidityGivenAssetETHCollateral(
+    params: LiquidityGivenAssetETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.addLiquidityETHCollateral(
+    return this.convContract.liquidityGivenAssetETHCollateral(
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -180,6 +182,116 @@ export class ConvSigner extends Conv {
         params.dueTo,
         params.assetIn.toBigInt(),
         params.minLiquidity.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { value: txnParams.value.toBigInt() }
+    );
+  }
+
+  async liquidityGivenDebt(
+    params: LiquidityGivenDebt
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenDebt([
+      params.asset.address,
+      params.collateral.address,
+      params.maturity.toBigInt(),
+      params.liquidityTo,
+      params.dueTo,
+      params.debtIn.toBigInt(),
+      params.minLiquidity.toBigInt(),
+      params.maxAsset.toBigInt(),
+      params.maxCollateral.toBigInt(),
+      params.deadline.toBigInt(),
+    ]);
+  }
+
+  async liquidityGivenDebtETHAsset(
+    params: LiquidityGivenDebtETHAsset,
+    txnParams: TransactionParams
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenDebtETHAsset(
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.debtIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { value: txnParams.value.toBigInt() }
+    );
+  }
+
+  async liquidityGivenDebtETHCollateral(
+    params: LiquidityGivenDebtETHCollateral,
+    txnParams: TransactionParams
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenDebtETHCollateral(
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.debtIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxAsset.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { value: txnParams.value.toBigInt() }
+    );
+  }
+
+  async liquidityGivenCollateral(
+    params: LiquidityGivenCollateral
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenCollateral([
+      params.asset.address,
+      params.collateral.address,
+      params.maturity.toBigInt(),
+      params.liquidityTo,
+      params.dueTo,
+      params.collateralIn.toBigInt(),
+      params.minLiquidity.toBigInt(),
+      params.maxAsset.toBigInt(),
+      params.maxDebt.toBigInt(),
+      params.deadline.toBigInt(),
+    ]);
+  }
+
+  async liquidityGivenCollateralETHAsset(
+    params: LiquidityGivenCollateralETHAsset,
+    txnParams: TransactionParams
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenCollateralETHAsset(
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.collateralIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { value: txnParams.value.toBigInt() }
+    );
+  }
+
+  async liquidityGivenCollateralETHCollateral(
+    params: LiquidityGivenCollateralETHCollateral,
+    txnParams: TransactionParams
+  ): Promise<ContractTransaction> {
+    return this.convContract.liquidityGivenCollateralETHCollateral(
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.minLiquidity.toBigInt(),
+        params.maxAsset.toBigInt(),
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
@@ -639,7 +751,7 @@ interface NewLiquidityETHCollateral {
   deadline: Uint256;
 }
 
-interface AddLiquidity {
+interface LiquidityGivenAsset {
   asset: ERC20Token;
   collateral: ERC20Token;
   maturity: Uint256;
@@ -652,7 +764,7 @@ interface AddLiquidity {
   deadline: Uint256;
 }
 
-interface AddLiquidityETHAsset {
+interface LiquidityGivenAssetETHAsset {
   collateral: ERC20Token;
   maturity: Uint256;
   liquidityTo: string;
@@ -663,13 +775,83 @@ interface AddLiquidityETHAsset {
   deadline: Uint256;
 }
 
-interface AddLiquidityETHCollateral {
+interface LiquidityGivenAssetETHCollateral {
   asset: ERC20Token;
   maturity: Uint256;
   liquidityTo: string;
   dueTo: string;
   assetIn: Uint112;
   minLiquidity: Uint256;
+  maxDebt: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebt {
+  asset: ERC20Token;
+  collateral: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebtETHAsset {
+  collateral: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebtETHCollateral {
+  asset: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateral {
+  asset: ERC20Token;
+  collateral: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  collateralIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxDebt: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateralETHAsset {
+  collateral: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  collateralIn: Uint112;
+  minLiquidity: Uint256;
+  maxDebt: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateralETHCollateral {
+  asset: ERC20Token;
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }

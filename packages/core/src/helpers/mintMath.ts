@@ -2,7 +2,7 @@ import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112 } from '../uint';
 import { mulDiv } from './fullMath';
-import { shiftRightUp, cbrt, divUp } from './math';
+import { shiftRightUp } from './math';
 
 export function givenNew(
   maturity: Uint256,
@@ -140,7 +140,7 @@ export function mint(
   let liquidityOut: Uint256;
 
   if (totalLiquidity.toBigInt() === 0n) {
-    const liquidityTotal = getLiquidityTotal1(xIncrease, yIncrease, zIncrease);
+    const liquidityTotal = getLiquidityTotal1(xIncrease);
     liquidityOut = getLiquidity(maturity, liquidityTotal, protocolFee, now);
   } else {
     const liquidityTotal = getLiquidityTotal2(
@@ -154,26 +154,15 @@ export function mint(
   }
 
   const debt = getDebt(maturity, xIncrease, yIncrease, now);
-  const collateral = getCollateral(
-    maturity,
-    xIncrease,
-    yIncrease,
-    zIncrease,
-    now
-  );
+  const collateral = getCollateral(maturity, zIncrease, now);
   const dueOut = { debt, collateral };
 
   return { liquidityOut, dueOut };
 }
 
-function getLiquidityTotal1(
-  xIncrease: Uint112,
-  yIncrease: Uint112,
-  zIncrease: Uint112
-): Uint256 {
-  const liquidityTotal = new Uint256(yIncrease).mul(zIncrease);
-  liquidityTotal.set(cbrt(liquidityTotal));
-  liquidityTotal.mulAssign(cbrt(new Uint256(xIncrease)));
+function getLiquidityTotal1(xIncrease: Uint112): Uint256 {
+  const liquidityTotal = new Uint256(xIncrease);
+  liquidityTotal.shiftLeftAssign(16);
 
   return liquidityTotal;
 }
@@ -239,18 +228,13 @@ function getDebt(
 
 function getCollateral(
   maturity: Uint256,
-  xIncrease: Uint112,
-  yIncrease: Uint112,
   zIncrease: Uint112,
   now: Uint256
 ): Uint112 {
   const _collateralIn = new Uint256(maturity);
   _collateralIn.subAssign(now);
-  _collateralIn.mulAssign(yIncrease);
   _collateralIn.mulAssign(zIncrease);
-  const denominator = new Uint256(xIncrease);
-  denominator.shiftLeftAssign(32);
-  _collateralIn.set(divUp(_collateralIn, denominator));
+  _collateralIn.set(shiftRightUp(_collateralIn, new Uint256(25)));
   _collateralIn.addAssign(zIncrease);
   const collateralIn = new Uint112(_collateralIn);
 

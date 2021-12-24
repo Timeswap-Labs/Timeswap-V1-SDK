@@ -18,7 +18,7 @@ export class Pool {
     debtIn: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     return Pair.newLiquidity(
       state,
       this.maturity,
@@ -31,17 +31,49 @@ export class Pool {
     );
   }
 
-  addLiquidity(
+  liquidityGivenAsset(
     state: CP,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     now: Uint256
-  ): LiquidityReturn {
-    return Pair.addLiquidity(
+  ): LiquidityReturn1 {
+    return Pair.liquidityGivenAsset(
       state,
       this.maturity,
       totalLiquidity,
       assetIn,
+      now,
+      this.pair.protocolFee
+    );
+  }
+
+  liquidityGivenDebt(
+    state: CP,
+    totalLiquidity: Uint256,
+    debtIn: Uint112,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return Pair.liquidityGivenDebt(
+      state,
+      this.maturity,
+      totalLiquidity,
+      debtIn,
+      now,
+      this.pair.protocolFee
+    );
+  }
+
+  liquidityGivenCollateral(
+    state: CP,
+    totalLiquidity: Uint256,
+    collateralIn: Uint112,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return Pair.liquidityGivenCollateral(
+      state,
+      this.maturity,
+      totalLiquidity,
+      collateralIn,
       now,
       this.pair.protocolFee
     );
@@ -157,11 +189,15 @@ export class Pool {
   }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: Due;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {

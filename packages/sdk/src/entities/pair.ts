@@ -259,7 +259,7 @@ export class Pair {
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     return PairCore.newLiquidity(
       state,
       maturity,
@@ -272,19 +272,55 @@ export class Pair {
     );
   }
 
-  calculateAddLiquidity(
+  calculateLiquidityGivenAsset(
     state: CP,
     protocolFee: Uint16,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn {
-    return PairCore.addLiquidity(
+  ): LiquidityReturn1 {
+    return PairCore.liquidityGivenAsset(
       state,
       maturity,
       totalLiquidity,
       assetIn,
+      now,
+      protocolFee
+    );
+  }
+
+  calculateLiquidityGivenDebt(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    debtIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return PairCore.liquidityGivenDebt(
+      state,
+      maturity,
+      totalLiquidity,
+      debtIn,
+      now,
+      protocolFee
+    );
+  }
+
+  calculateLiquidityGivenCollateral(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    collateralIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return PairCore.liquidityGivenCollateral(
+      state,
+      maturity,
+      totalLiquidity,
+      collateralIn,
       now,
       protocolFee
     );
@@ -432,15 +468,12 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn: params.assetIn,
-        collateralIn: params.collateralIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.newLiquidityETHAsset(
         {
           ...params,
           collateral: this.collateral,
-          collateralIn: params.collateralIn,
         },
         { value: params.assetIn }
       );
@@ -449,7 +482,6 @@ export class PairSigner extends Pair {
         {
           ...params,
           asset: this.asset,
-          assetIn: params.assetIn,
         },
         { value: params.collateralIn }
       );
@@ -458,35 +490,99 @@ export class PairSigner extends Pair {
     }
   }
 
-  async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
+  async liquidityGivenAsset(
+    params: LiquidityGivenAsset
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.addLiquidity({
+      return this.convSigner.liquidityGivenAsset({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn: params.assetIn,
-        maxCollateral: params.maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.addLiquidityETHAsset(
+      return this.convSigner.liquidityGivenAssetETHAsset(
         {
           ...params,
           collateral: this.collateral,
-          maxCollateral: params.maxCollateral,
         },
         { value: params.assetIn }
       );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.addLiquidityETHCollateral(
+      return this.convSigner.liquidityGivenAssetETHCollateral(
         {
           ...params,
           asset: this.asset,
-          assetIn: params.assetIn,
         },
         { value: params.maxCollateral }
+      );
+    } else {
+      throw 'Unreachable';
+    }
+  }
+
+  async liquidityGivenDebt(
+    params: LiquidityGivenDebt
+  ): Promise<ContractTransaction> {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      return this.convSigner.liquidityGivenDebt({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenDebtETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.maxAsset }
+      );
+    } else if (this.asset instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenDebtETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.maxCollateral }
+      );
+    } else {
+      throw 'Unreachable';
+    }
+  }
+
+  async liquidityGivenCollateral(
+    params: LiquidityGivenCollateral
+  ): Promise<ContractTransaction> {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      return this.convSigner.liquidityGivenCollateral({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenCollateralETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.maxAsset }
+      );
+    } else if (this.asset instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenCollateralETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.collateralIn }
       );
     } else {
       throw 'Unreachable';
@@ -527,7 +623,6 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn: params.assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenBondETHAsset(
@@ -541,7 +636,6 @@ export class PairSigner extends Pair {
       return this.convSigner.lendGivenBondETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn: params.assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -559,7 +653,6 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn: params.assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenInsuranceETHAsset(
@@ -573,7 +666,6 @@ export class PairSigner extends Pair {
       return this.convSigner.lendGivenInsuranceETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn: params.assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -591,7 +683,6 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn: params.assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenPercentETHAsset(
@@ -605,7 +696,6 @@ export class PairSigner extends Pair {
       return this.convSigner.lendGivenPercentETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn: params.assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -646,13 +736,11 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        maxCollateral: params.maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.borrowGivenDebtETHAsset({
         ...params,
         collateral: this.collateral,
-        maxCollateral: params.maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenDebtETHCollateral(
@@ -678,13 +766,11 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        collateralIn: params.collateralIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.borrowGivenCollateralETHAsset({
         ...params,
         collateral: this.collateral,
-        collateralIn: params.collateralIn,
       });
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenCollateralETHCollateral(
@@ -710,13 +796,11 @@ export class PairSigner extends Pair {
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        maxCollateral: params.maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.borrowGivenPercentETHAsset({
         ...params,
         collateral: this.collateral,
-        maxCollateral: params.maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenPercentETHCollateral(
@@ -765,11 +849,15 @@ export class PairSigner extends Pair {
   }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: DueCalculated;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {
@@ -812,7 +900,7 @@ interface NewLiquidity {
   deadline: Uint256;
 }
 
-interface AddLiquidity {
+interface LiquidityGivenAsset {
   maturity: Uint256;
   liquidityTo: string;
   dueTo: string;
@@ -820,6 +908,28 @@ interface AddLiquidity {
   minLiquidity: Uint256;
   maxDebt: Uint112;
   maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebt {
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateral {
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  collateralIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxDebt: Uint112;
   deadline: Uint256;
 }
 

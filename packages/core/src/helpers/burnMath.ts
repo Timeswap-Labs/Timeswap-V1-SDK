@@ -1,6 +1,7 @@
 import { Claims, Tokens } from '../entities';
 import { Uint256, Uint128 } from '../uint';
 import { mulDiv } from './fullMath';
+import { divUp } from './math';
 
 export function burn(
   reserves: Tokens,
@@ -26,9 +27,8 @@ function getAsset(
   liquidityIn: Uint256
 ): Uint128 {
   const assetOut = new Uint128(0);
-  const assetReserve = new Uint256(reserves.asset);
-  if (assetReserve.toBigInt() <= totalClaims.bond.toBigInt()) return assetOut;
-  const _assetOut = new Uint256(assetReserve);
+  if (reserves.asset.lte(totalClaims.bond)) return assetOut;
+  const _assetOut = new Uint256(reserves.asset);
   _assetOut.subAssign(totalClaims.bond);
   _assetOut.set(mulDiv(_assetOut, liquidityIn, totalLiquidity));
   assetOut.set(_assetOut);
@@ -42,26 +42,25 @@ function getCollateral(
   liquidityIn: Uint256
 ): Uint128 {
   const collateralOut = new Uint128(0);
-  const assetReserve = new Uint256(reserves.asset);
   const _collateralOut = new Uint256(reserves.collateral);
-  if (assetReserve.toBigInt() >= totalClaims.bond.toBigInt()) {
+  if (reserves.asset.gte(totalClaims.bond)) {
     _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
     collateralOut.set(_collateralOut);
     return collateralOut;
   }
-  const _reduce = new Uint256(totalClaims.bond);
-  _reduce.subAssign(assetReserve);
-  _reduce.mulAssign(totalClaims.insurance);
+  const deficit = new Uint256(totalClaims.bond);
+  deficit.subAssign(reserves.asset);
   if (
-    reserves.collateral.toBigInt() * totalClaims.bond.toBigInt() <=
-    _reduce.toBigInt()
+    new Uint256(reserves.collateral)
+      .mul(totalClaims.bond)
+      .lte(deficit.mul(totalClaims.insurance))
   )
     return collateralOut;
-  _collateralOut.mulAssign(totalClaims.bond);
-  _collateralOut.subAssign(_reduce);
-  _collateralOut.set(
-    mulDiv(_collateralOut, liquidityIn, totalLiquidity.mul(totalClaims.bond))
-  );
+  const subtrahend = new Uint256(deficit);
+  subtrahend.mulAssign(totalClaims.insurance);
+  subtrahend.set(divUp(subtrahend, new Uint256(totalClaims.bond)));
+  _collateralOut.subAssign(subtrahend);
+  _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
   collateralOut.set(_collateralOut);
   return collateralOut;
 }

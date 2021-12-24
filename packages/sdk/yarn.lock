@@ -1414,10 +1414,10 @@
     webpack "^4.44.1"
     webpack-bundle-analyzer "^4.4.2"
 
-"@timeswap-labs/timeswap-v1-sdk-core@0.1.21":
-  version "0.1.21"
-  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.21/349223dbff2c613208092d3a67597a4d6606f7360007e42542430055a817102e#655e8fa209cd6b3221f76b16a50457c31e4409cc"
-  integrity sha512-LWxF3OBtFKlg0tpK0TspEKn2Y/nSo1xHOth9gm/ZNFWmE3VoHc6eyqceiZmFc4923CldOEEZo8R5/VprA7jyrg==
+"@timeswap-labs/timeswap-v1-sdk-core@0.1.22":
+  version "0.1.22"
+  resolved "https://npm.pkg.github.com/download/@timeswap-labs/timeswap-v1-sdk-core/0.1.22/afc04bdb0262d6824e30884d45b07551e80f3b63183cde3802e1b1a41eb85b7a#1f73f52e3594bf455b399939e907894fc659db17"
+  integrity sha512-fHnOhEZBL3CTm6Vx/yuugcS4WLnjpp8VHDYseiZQMtmKB68JZq3eKm39oauyPfuj5gz9TgmfFquOEc5jnjFArg==
   dependencies:
     "@ethersproject/address" "^5.5.0"
     tiny-invariant "^1.1.0"

@@ -52,7 +52,7 @@ export class Pair {
     collateralIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     const { yIncrease, zIncrease } = givenNew(
       maturity,
       assetIn,
@@ -82,7 +82,7 @@ export class Pair {
     assetIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     const { yIncrease, zIncrease } = givenAsset(state, assetIn);
 
     const { liquidityOut, dueOut } = mint(
@@ -106,7 +106,7 @@ export class Pair {
     debtIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
+  ): LiquidityReturn2 {
     const { xIncrease, yIncrease, zIncrease } = givenDebt(
       state,
       maturity,
@@ -125,7 +125,7 @@ export class Pair {
       now
     );
 
-    return { liquidityOut, dueOut, yIncrease, zIncrease };
+    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
   }
 
   static liquidityGivenCollateral(
@@ -135,7 +135,7 @@ export class Pair {
     collateralIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
+  ): LiquidityReturn2 {
     const { xIncrease, yIncrease, zIncrease } = givenCollateral(
       state,
       maturity,
@@ -154,7 +154,7 @@ export class Pair {
       now
     );
 
-    return { liquidityOut, dueOut, yIncrease, zIncrease };
+    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
   }
 
   static lendGivenBond(
@@ -351,11 +351,15 @@ export class Pair {
   }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: Due;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {
