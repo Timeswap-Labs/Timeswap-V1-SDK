@@ -21,14 +21,10 @@ export function givenNew(
   const yIncrease = new Uint112(_yIncrease);
 
   const _zIncrease = new Uint256(collateralIn);
-  _zIncrease.mulAssign(assetIn);
-  _zIncrease.shiftLeftAssign(32);
+  _zIncrease.shiftLeftAssign(25);
   const denominator = new Uint256(maturity);
   denominator.subAssign(now);
-  denominator.mulAssign(yIncrease);
-  const addend = new Uint256(assetIn);
-  addend.shiftLeftAssign(32);
-  denominator.addAssign(addend);
+  denominator.addAssign(0x2000000n);
   _zIncrease.divAssign(denominator);
   const zIncrease = new Uint112(_zIncrease);
 
