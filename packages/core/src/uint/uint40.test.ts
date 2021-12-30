@@ -1,11 +1,9 @@
 import { Uint40 } from './uint40';
 
-const MAX_UINT_40 = 2n ** 40n - 1n;
-
 describe('Uint40 tests', () => {
   it('Overflow', () => {
-    const num = new Uint40(MAX_UINT_40);
-    expect(num.value).toEqual(MAX_UINT_40);
+    const num = new Uint40(Uint40.maxValue);
+    expect(num.toBigInt()).toEqual(Uint40.maxValue);
 
     expect(() => {
       num.addAssign(1);
@@ -14,7 +12,7 @@ describe('Uint40 tests', () => {
 
   it('Underflow', () => {
     const num = new Uint40(0);
-    expect(num.value).toEqual(0n);
+    expect(num.toBigInt()).toEqual(0n);
 
     expect(() => {
       num.subAssign(1);

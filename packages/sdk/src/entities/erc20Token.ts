@@ -4,12 +4,11 @@ import {
   Uint256,
   ERC20Token as ERC20Core,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { Erc20 } from '../typechain/abi';
-import { Erc20__factory } from '../typechain/abi';
-import { ContractTransaction } from 'ethers';
+import { ContractTransaction, Contract } from '@ethersproject/contracts';
+import erc20abi from '../abi/erc20';
 
 export class ERC20Token extends ERC20Core {
-  protected erc20Contract: Erc20;
+  protected erc20Contract: Contract;
 
   constructor(
     providerOrSigner: Provider | Signer,
@@ -20,7 +19,7 @@ export class ERC20Token extends ERC20Core {
     name?: string
   ) {
     super(chainID, decimals, address, symbol, name);
-    this.erc20Contract = Erc20__factory.connect(address, providerOrSigner);
+    this.erc20Contract = new Contract(address, erc20abi, providerOrSigner);
   }
 
   connect(providerOrSigner: Provider | Signer): this {
@@ -53,7 +52,7 @@ export class ERC20Token extends ERC20Core {
     return this.erc20Contract.signer;
   }
 
-  contract(): Erc20 {
+  contract(): Contract {
     return this.erc20Contract;
   }
 
@@ -90,14 +89,14 @@ export class ERC20TokenSigner extends ERC20Token {
     spender: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.approve(spender, amount.value);
+    return this.erc20Contract.approve(spender, amount.toBigInt());
   }
 
   async transfer(
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transfer(recipient, amount.value);
+    return this.erc20Contract.transfer(recipient, amount.toBigInt());
   }
 
   async transferFrom(
@@ -105,6 +104,10 @@ export class ERC20TokenSigner extends ERC20Token {
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transferFrom(sender, recipient, amount.value);
+    return this.erc20Contract.transferFrom(
+      sender,
+      recipient,
+      amount.toBigInt()
+    );
   }
 }

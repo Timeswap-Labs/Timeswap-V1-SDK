@@ -1,5 +1,5 @@
 import { Signer } from '@ethersproject/abstract-signer';
-import { ContractTransaction } from '@ethersproject/contracts';
+import { Contract, ContractTransaction } from '@ethersproject/contracts';
 import { Provider } from '@ethersproject/abstract-provider';
 import invariant from 'tiny-invariant';
 import {
@@ -16,12 +16,9 @@ import {
   CP,
   Uint120,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
-import type { TimeswapPair, TimeswapConvenience } from '../typechain/timeswap';
-import {
-  TimeswapFactory__factory,
-  TimeswapPair__factory,
-} from '../typechain/timeswap';
 import { Conv, ConvSigner } from './conv';
+import pairAbi from '../abi/pair';
+import factoryAbi from '../abi/factory';
 
 export class Pair {
   protected conv: Conv;
@@ -29,7 +26,7 @@ export class Pair {
   readonly asset: NativeToken | ERC20Token;
   readonly collateral: NativeToken | ERC20Token;
 
-  protected pair?: TimeswapPair;
+  protected pair?: Contract;
 
   constructor(
     providerOrSigner: Provider | Signer,
@@ -46,7 +43,7 @@ export class Pair {
     this.collateral = collateral;
 
     if (pairAddress) {
-      this.pair = TimeswapPair__factory.connect(pairAddress, providerOrSigner);
+      this.pair = new Contract(pairAddress, pairAbi, providerOrSigner);
     }
   }
 
@@ -86,15 +83,20 @@ export class Pair {
     return this.conv.signer();
   }
 
-  contract(): TimeswapConvenience {
+  contract(): Contract | undefined {
+    return this.pair;
+  }
+
+  convContract(): Contract {
     return this.conv.contract();
   }
 
   async initPair() {
     if (!this.pair) {
       const factory = await this.conv.factory();
-      const factoryContract = TimeswapFactory__factory.connect(
+      const factoryContract = new Contract(
         factory,
+        factoryAbi,
         this.conv.provider()
       );
 
@@ -109,7 +111,7 @@ export class Pair {
       const collateral = await getTokenAddress(this.collateral);
 
       const pair = await factoryContract.getPair(asset, collateral);
-      this.pair = TimeswapPair__factory.connect(pair, this.conv.provider());
+      this.pair = new Contract(pair, pairAbi, this.conv.provider());
     }
   }
 
@@ -137,74 +139,79 @@ export class Pair {
 
   async getConstantProduct(maturity: Uint256): Promise<CP> {
     await this.initPair();
-    const state = await this.pair!.constantProduct(maturity.value);
+    const state = await this.pair!.constantProduct(maturity.toBigInt());
 
-    const x = new Uint112(state.x.toString());
-    const y = new Uint112(state.y.toString());
-    const z = new Uint112(state.z.toString());
+    const x = new Uint112(state[0].toString());
+    const y = new Uint112(state[1].toString());
+    const z = new Uint112(state[2].toString());
 
     return { x, y, z };
   }
 
   async getTotalReserves(maturity: Uint256): Promise<Tokens> {
     await this.initPair();
-    const tokens = await this.pair!.totalReserves(maturity.value);
+    const tokens = await this.pair!.totalReserves(maturity.toBigInt());
 
-    const asset = new Uint128(tokens.asset.toString());
-    const collateral = new Uint128(tokens.collateral.toString());
+    const asset = new Uint128(tokens[0].toString());
+    const collateral = new Uint128(tokens[1].toString());
 
     return { asset, collateral };
   }
 
   async getTotalLiquidity(maturity: Uint256): Promise<Uint256> {
     await this.initPair();
-    const totalLiquidity = await this.pair!.totalLiquidity(maturity.value);
+    const totalLiquidity = await this.pair!.totalLiquidity(maturity.toBigInt());
 
     return new Uint256(totalLiquidity.toString());
   }
 
   async getLiquidityOf(maturity: Uint256, address: string): Promise<Uint256> {
     await this.initPair();
-    const liquidityOf = await this.pair!.liquidityOf(maturity.value, address);
+    const liquidityOf = await this.pair!.liquidityOf(
+      maturity.toBigInt(),
+      address
+    );
 
     return new Uint256(liquidityOf.toString());
   }
 
   async getTotalClaims(maturity: Uint256): Promise<Claims> {
     await this.initPair();
-    const claims = await this.pair!.totalClaims(maturity.value);
+    const claims = await this.pair!.totalClaims(maturity.toBigInt());
 
-    const bond = new Uint128(claims.bond.toString());
-    const insurance = new Uint128(claims.insurance.toString());
+    const bond = new Uint128(claims[0].toString());
+    const insurance = new Uint128(claims[1].toString());
 
     return { bond, insurance };
   }
 
   async getClaimsOf(maturity: Uint256, address: string): Promise<Claims> {
     await this.initPair();
-    const claims = await this.pair!.claimsOf(maturity.value, address);
+    const claims = await this.pair!.claimsOf(maturity.toBigInt(), address);
 
-    const bond = new Uint128(claims.bond.toString());
-    const insurance = new Uint128(claims.insurance.toString());
+    const bond = new Uint128(claims[0].toString());
+    const insurance = new Uint128(claims[1].toString());
 
     return { bond, insurance };
   }
 
   async getTotalDebtCreated(maturity: Uint256): Promise<Uint120> {
     await this.initPair();
-    const totalDebtCreated = await this.pair!.totalDebtCreated(maturity.value);
+    const totalDebtCreated = await this.pair!.totalDebtCreated(
+      maturity.toBigInt()
+    );
 
     return new Uint120(totalDebtCreated.toString());
   }
 
   async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
     await this.initPair();
-    const dues = await this.pair!.duesOf(maturity.value, address);
+    const dues: any[] = await this.pair!.duesOf(maturity.toBigInt(), address);
 
-    return dues.map((due) => {
-      const debt = new Uint112(due.debt.toString());
-      const collateral = new Uint112(due.collateral.toString());
-      const startBlock = new Uint32(due.startBlock);
+    return dues.map(due => {
+      const debt = new Uint112(due[0].toString());
+      const collateral = new Uint112(due[1].toString());
+      const startBlock = new Uint32(due[2]);
 
       return { debt, collateral, startBlock };
     });
@@ -213,23 +220,34 @@ export class Pair {
   async getNative(maturity: Uint256): Promise<Native> {
     const asset = this.asset;
     const collateral = this.collateral;
-    invariant(asset instanceof ERC20Token, 'asset is not ERC20');
-    invariant(collateral instanceof ERC20Token, 'collateral is not ERC20');
 
-    return this.conv.getNative(asset, collateral, maturity);
+    if (asset instanceof NativeToken) {
+      const weth = new ERC20Token(asset.chainID, 18, await this.conv.weth());
+      return this.conv.getNative(weth, collateral as ERC20Token, maturity);
+    } else if (collateral instanceof NativeToken) {
+      const weth = new ERC20Token(
+        collateral.chainID,
+        18,
+        await this.conv.weth()
+      );
+      return this.conv.getNative(asset, weth, maturity);
+    } else {
+      return this.conv.getNative(asset, collateral, maturity);
+    }
   }
 
   calculateApr(state: CP): number {
     const SECONDS = 31556926n;
-    const temp = (state.y.value * SECONDS * 10000n) / (state.x.value << 32n);
+    const temp =
+      (state.y.toBigInt() * SECONDS * 10000n) / (state.x.toBigInt() << 32n);
     const apr = Number(temp) / 10000;
     return apr;
   }
 
-  calculateCf(state: CP): Uint112 {
+  calculateCdp(state: CP): bigint {
     let temp = 1n;
-    for (let i = 0; i < this.collateral.decimals; i++) temp *= 10n;
-    return new Uint112((state.x.value * temp) / state.y.value);
+    for (let i = 0; i < this.asset.decimals; i++) temp *= 10n;
+    return (state.z.toBigInt() * temp) / state.x.toBigInt();
   }
 
   calculateNewLiquidity(
@@ -241,7 +259,7 @@ export class Pair {
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     return PairCore.newLiquidity(
       state,
       maturity,
@@ -254,19 +272,55 @@ export class Pair {
     );
   }
 
-  calculateAddLiquidity(
+  calculateLiquidityGivenAsset(
     state: CP,
     protocolFee: Uint16,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn {
-    return PairCore.addLiquidity(
+  ): LiquidityReturn1 {
+    return PairCore.liquidityGivenAsset(
       state,
       maturity,
       totalLiquidity,
       assetIn,
+      now,
+      protocolFee
+    );
+  }
+
+  calculateLiquidityGivenDebt(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    debtIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return PairCore.liquidityGivenDebt(
+      state,
+      maturity,
+      totalLiquidity,
+      debtIn,
+      now,
+      protocolFee
+    );
+  }
+
+  calculateLiquidityGivenCollateral(
+    state: CP,
+    protocolFee: Uint16,
+    totalLiquidity: Uint256,
+    collateralIn: Uint112,
+    maturity: Uint256,
+    now: Uint256
+  ): LiquidityReturn2 {
+    return PairCore.liquidityGivenCollateral(
+      state,
+      maturity,
+      totalLiquidity,
+      collateralIn,
       now,
       protocolFee
     );
@@ -372,6 +426,23 @@ export class Pair {
       fee
     );
   }
+
+  calculateWithdraw(
+    reserves: Tokens,
+    totalClaims: Claims,
+    claimsIn: Claims
+  ): Tokens {
+    return PairCore.withdraw(reserves, totalClaims, claimsIn);
+  }
+
+  calculateBurn(
+    reserves: Tokens,
+    totalClaims: Claims,
+    totalLiquidity: Uint256,
+    liquidityIn: Uint256
+  ): Tokens {
+    return PairCore.burn(reserves, totalClaims, totalLiquidity, liquidityIn);
+  }
 }
 
 export class PairSigner extends Pair {
@@ -393,74 +464,126 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { assetIn, collateralIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-      invariant(collateralIn, 'collateralIn is undefined');
-
       return this.convSigner.newLiquidity({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn,
-        collateralIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const { collateralIn } = params;
-      invariant(collateralIn, 'collateralIn is undefined');
-
-      return this.convSigner.newLiquidityETHAsset({
-        ...params,
-        collateral: this.collateral,
-        collateralIn,
-      });
+      return this.convSigner.newLiquidityETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.assetIn }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
-      return this.convSigner.newLiquidityETHCollateral({
-        ...params,
-        asset: this.asset,
-        assetIn,
-      });
+      return this.convSigner.newLiquidityETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.collateralIn }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async addLiquidity(params: AddLiquidity): Promise<ContractTransaction> {
+  async liquidityGivenAsset(
+    params: LiquidityGivenAsset
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { assetIn, maxCollateral } = params;
-      invariant(assetIn, 'assetIn is undefined');
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
-      return this.convSigner.addLiquidity({
+      return this.convSigner.liquidityGivenAsset({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn,
-        maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const { maxCollateral } = params;
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
-      return this.convSigner.addLiquidityETHAsset({
-        ...params,
-        collateral: this.collateral,
-        maxCollateral,
-      });
+      return this.convSigner.liquidityGivenAssetETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.assetIn }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
+      return this.convSigner.liquidityGivenAssetETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.maxCollateral }
+      );
+    } else {
+      throw 'Unreachable';
+    }
+  }
 
-      return this.convSigner.addLiquidityETHCollateral({
+  async liquidityGivenDebt(
+    params: LiquidityGivenDebt
+  ): Promise<ContractTransaction> {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      return this.convSigner.liquidityGivenDebt({
         ...params,
         asset: this.asset,
-        assetIn,
+        collateral: this.collateral,
       });
+    } else if (this.collateral instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenDebtETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.maxAsset }
+      );
+    } else if (this.asset instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenDebtETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.maxCollateral }
+      );
+    } else {
+      throw 'Unreachable';
+    }
+  }
+
+  async liquidityGivenCollateral(
+    params: LiquidityGivenCollateral
+  ): Promise<ContractTransaction> {
+    if (
+      this.asset instanceof ERC20Token &&
+      this.collateral instanceof ERC20Token
+    ) {
+      return this.convSigner.liquidityGivenCollateral({
+        ...params,
+        asset: this.asset,
+        collateral: this.collateral,
+      });
+    } else if (this.collateral instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenCollateralETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.maxAsset }
+      );
+    } else if (this.asset instanceof ERC20Token) {
+      return this.convSigner.liquidityGivenCollateralETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.collateralIn }
+      );
     } else {
       throw 'Unreachable';
     }
@@ -496,28 +619,23 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenBond({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.lendGivenBondETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenBondETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.assetIn }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenBondETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -531,28 +649,23 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenInsurance({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.lendGivenInsuranceETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenInsuranceETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.assetIn }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenInsuranceETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -566,28 +679,23 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenPercent({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        assetIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.lendGivenPercentETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenPercentETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { value: params.assetIn }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      const { assetIn } = params;
-      invariant(assetIn, 'assetIn is undefined');
-
       return this.convSigner.lendGivenPercentETHCollateral({
         ...params,
         asset: this.asset,
-        assetIn,
       });
     } else {
       throw 'Unreachable';
@@ -624,29 +732,24 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { maxCollateral } = params;
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
       return this.convSigner.borrowGivenDebt({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const { maxCollateral } = params;
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
       return this.convSigner.borrowGivenDebtETHAsset({
         ...params,
         collateral: this.collateral,
-        maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.borrowGivenDebtETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.borrowGivenDebtETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.maxCollateral }
+      );
     } else {
       throw 'Unreachable';
     }
@@ -659,29 +762,24 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { collateralIn } = params;
-      invariant(collateralIn, 'collateralIn is undefined');
-
       return this.convSigner.borrowGivenCollateral({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        collateralIn,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const { collateralIn } = params;
-      invariant(collateralIn, 'collateralIn is undefined');
-
       return this.convSigner.borrowGivenCollateralETHAsset({
         ...params,
         collateral: this.collateral,
-        collateralIn,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.borrowGivenCollateralETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.borrowGivenCollateralETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.collateralIn }
+      );
     } else {
       throw 'Unreachable';
     }
@@ -694,29 +792,24 @@ export class PairSigner extends Pair {
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      const { maxCollateral } = params;
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
       return this.convSigner.borrowGivenPercent({
         ...params,
         asset: this.asset,
         collateral: this.collateral,
-        maxCollateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      const { maxCollateral } = params;
-      invariant(maxCollateral, 'maxCollateral is undefined');
-
       return this.convSigner.borrowGivenPercentETHAsset({
         ...params,
         collateral: this.collateral,
-        maxCollateral,
       });
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.borrowGivenPercentETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.borrowGivenPercentETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { value: params.maxCollateral }
+      );
     } else {
       throw 'Unreachable';
     }
@@ -733,10 +826,18 @@ export class PairSigner extends Pair {
         collateral: this.collateral,
       });
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.repayETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.repayETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        {
+          value: params.maxAssetsIn.reduce(
+            (sum, x) => sum.add(x),
+            new Uint112(0)
+          ),
+        }
+      );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.repayETHCollateral({
         ...params,
@@ -748,11 +849,15 @@ export class PairSigner extends Pair {
   }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: DueCalculated;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {
@@ -789,20 +894,42 @@ interface NewLiquidity {
   maturity: Uint256;
   liquidityTo: string;
   dueTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   debtIn: Uint112;
-  collateralIn?: Uint112;
+  collateralIn: Uint112;
   deadline: Uint256;
 }
 
-interface AddLiquidity {
+interface LiquidityGivenAsset {
   maturity: Uint256;
   liquidityTo: string;
   dueTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   minLiquidity: Uint256;
   maxDebt: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenDebt {
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  debtIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxCollateral: Uint112;
+  deadline: Uint256;
+}
+
+interface LiquidityGivenCollateral {
+  maturity: Uint256;
+  liquidityTo: string;
+  dueTo: string;
+  collateralIn: Uint112;
+  minLiquidity: Uint256;
+  maxAsset: Uint112;
+  maxDebt: Uint112;
   deadline: Uint256;
 }
 
@@ -817,7 +944,7 @@ interface LendGivenBond {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   bondOut: Uint128;
   minInsurance: Uint128;
   deadline: Uint256;
@@ -827,7 +954,7 @@ interface LendGivenInsurance {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   insuranceOut: Uint128;
   minBond: Uint128;
   deadline: Uint256;
@@ -837,7 +964,7 @@ interface LendGivenPercent {
   maturity: Uint256;
   bondTo: string;
   insuranceTo: string;
-  assetIn?: Uint112;
+  assetIn: Uint112;
   percent: Uint40;
   minBond: Uint128;
   minInsurance: Uint128;
@@ -862,7 +989,7 @@ interface BorrowGivenDebt {
   dueTo: string;
   assetOut: Uint112;
   debtIn: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
   deadline: Uint256;
 }
 
@@ -871,7 +998,7 @@ interface BorrowGivenCollateral {
   assetTo: string;
   dueTo: string;
   assetOut: Uint112;
-  collateralIn?: Uint112;
+  collateralIn: Uint112;
   maxDebt: Uint112;
   deadline: Uint256;
 }
@@ -883,7 +1010,7 @@ interface BorrowGivenPercent {
   assetOut: Uint112;
   percent: Uint40;
   maxDebt: Uint112;
-  maxCollateral?: Uint112;
+  maxCollateral: Uint112;
   deadline: Uint256;
 }
 

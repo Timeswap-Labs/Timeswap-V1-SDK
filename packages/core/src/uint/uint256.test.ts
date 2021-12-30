@@ -1,11 +1,9 @@
 import { Uint256 } from './uint256';
 
-const MAX_UINT_256 = 2n ** 256n - 1n;
-
 describe('Uint256 tests', () => {
   it('Overflow', () => {
-    const num = new Uint256(MAX_UINT_256);
-    expect(num.value).toEqual(MAX_UINT_256);
+    const num = new Uint256(Uint256.maxValue);
+    expect(num.toBigInt()).toEqual(Uint256.maxValue);
 
     expect(() => {
       num.addAssign(1);
@@ -14,7 +12,7 @@ describe('Uint256 tests', () => {
 
   it('Underflow', () => {
     const num = new Uint256(0);
-    expect(num.value).toEqual(0n);
+    expect(num.toBigInt()).toEqual(0n);
 
     expect(() => {
       num.subAssign(1);

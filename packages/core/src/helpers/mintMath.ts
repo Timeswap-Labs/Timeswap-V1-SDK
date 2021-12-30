@@ -1,8 +1,8 @@
 import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint16, Uint256, Uint112 } from '../uint';
-import { mulDiv, mulDivUp } from './fullMath';
-import { shiftUp } from './math';
+import { mulDiv } from './fullMath';
+import { shiftRightUp } from './math';
 
 export function givenNew(
   maturity: Uint256,
@@ -10,27 +10,34 @@ export function givenNew(
   debtIn: Uint112,
   collateralIn: Uint112,
   now: Uint256
-): MintResult {
+): {
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
   const _yIncrease = new Uint256(debtIn);
   _yIncrease.subAssign(assetIn);
   _yIncrease.shiftLeftAssign(32);
   _yIncrease.divAssign(maturity.sub(now));
   const yIncrease = new Uint112(_yIncrease);
 
+  const _zIncrease = new Uint256(collateralIn);
+  _zIncrease.shiftLeftAssign(25);
   const denominator = new Uint256(maturity);
   denominator.subAssign(now);
-  denominator.mulAssign(yIncrease);
-  denominator.addAssign(new Uint256(assetIn).shiftLeft(33));
-  const _zIncrease = new Uint256(collateralIn);
-  _zIncrease.mulAssign(assetIn);
-  _zIncrease.shiftLeftAssign(32);
+  denominator.addAssign(0x2000000n);
   _zIncrease.divAssign(denominator);
   const zIncrease = new Uint112(_zIncrease);
 
   return { yIncrease, zIncrease };
 }
 
-export function givenAdd(cp: CP, assetIn: Uint112): MintResult {
+export function givenAsset(
+  cp: CP,
+  assetIn: Uint112
+): {
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
   const _yIncrease = new Uint256(cp.y);
   _yIncrease.mulAssign(assetIn);
   _yIncrease.divAssign(cp.x);
@@ -42,6 +49,72 @@ export function givenAdd(cp: CP, assetIn: Uint112): MintResult {
   const zIncrease = new Uint112(_zIncrease);
 
   return { yIncrease, zIncrease };
+}
+
+export function givenDebt(
+  cp: CP,
+  maturity: Uint256,
+  debtIn: Uint112,
+  now: Uint256
+): {
+  xIncrease: Uint112;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
+  const _yIncrease = new Uint256(debtIn);
+  _yIncrease.mulAssign(cp.y);
+  _yIncrease.shiftLeftAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.mulAssign(cp.y);
+  const addend = new Uint256(cp.x);
+  addend.shiftLeftAssign(32);
+  denominator.addAssign(addend);
+  _yIncrease.divAssign(denominator);
+  const yIncrease = new Uint112(_yIncrease);
+
+  const _xIncrease = new Uint256(cp.x);
+  _xIncrease.mulAssign(_yIncrease);
+  _xIncrease.divAssign(cp.y);
+  const xIncrease = new Uint112(_xIncrease);
+
+  const _zIncrease = new Uint256(cp.z);
+  _zIncrease.mulAssign(_yIncrease);
+  _zIncrease.divAssign(cp.y);
+  const zIncrease = new Uint112(_zIncrease);
+
+  return { xIncrease, yIncrease, zIncrease };
+}
+
+export function givenCollateral(
+  cp: CP,
+  maturity: Uint256,
+  collateralIn: Uint112,
+  now: Uint256
+): {
+  xIncrease: Uint112;
+  yIncrease: Uint112;
+  zIncrease: Uint112;
+} {
+  const _zIncrease = new Uint256(collateralIn);
+  _zIncrease.shiftLeftAssign(25);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  denominator.addAssign(0x2000000);
+  _zIncrease.divAssign(denominator);
+  const zIncrease = new Uint112(_zIncrease);
+
+  const _xIncrease = new Uint256(cp.x);
+  _xIncrease.mulAssign(_zIncrease);
+  _xIncrease.divAssign(cp.z);
+  const xIncrease = new Uint112(_xIncrease);
+
+  const _yIncrease = new Uint256(cp.y);
+  _yIncrease.mulAssign(_zIncrease);
+  _yIncrease.divAssign(cp.z);
+  const yIncrease = new Uint112(_yIncrease);
+
+  return { xIncrease, yIncrease, zIncrease };
 }
 
 export function mint(
@@ -57,11 +130,12 @@ export function mint(
   liquidityOut: Uint256;
   dueOut: Due;
 } {
-  invariant(now.value < maturity.value, 'Expired');
+  invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
+  invariant(maturity.sub(now).lt(0x100000000), 'Duration overflow');
 
   let liquidityOut: Uint256;
 
-  if (totalLiquidity.value === 0n) {
+  if (totalLiquidity.toBigInt() === 0n) {
     const liquidityTotal = getLiquidityTotal1(xIncrease);
     liquidityOut = getLiquidity(maturity, liquidityTotal, protocolFee, now);
   } else {
@@ -76,13 +150,7 @@ export function mint(
   }
 
   const debt = getDebt(maturity, xIncrease, yIncrease, now);
-  const collateral = getCollateral(
-    maturity,
-    xIncrease,
-    yIncrease,
-    zIncrease,
-    now
-  );
+  const collateral = getCollateral(maturity, zIncrease, now);
   const dueOut = { debt, collateral };
 
   return { liquidityOut, dueOut };
@@ -90,7 +158,7 @@ export function mint(
 
 function getLiquidityTotal1(xIncrease: Uint112): Uint256 {
   const liquidityTotal = new Uint256(xIncrease);
-  liquidityTotal.shiftLeftAssign(56);
+  liquidityTotal.shiftLeftAssign(16);
 
   return liquidityTotal;
 }
@@ -147,7 +215,7 @@ function getDebt(
   const _debtIn = new Uint256(maturity);
   _debtIn.subAssign(now);
   _debtIn.mulAssign(yIncrease);
-  _debtIn.set(shiftUp(_debtIn, new Uint256(32)));
+  _debtIn.set(shiftRightUp(_debtIn, new Uint256(32)));
   _debtIn.addAssign(xIncrease);
   const debtIn = new Uint112(_debtIn);
 
@@ -156,35 +224,24 @@ function getDebt(
 
 function getCollateral(
   maturity: Uint256,
-  xIncrease: Uint112,
-  yIncrease: Uint112,
   zIncrease: Uint112,
   now: Uint256
 ): Uint112 {
   const _collateralIn = new Uint256(maturity);
   _collateralIn.subAssign(now);
-  _collateralIn.mulAssign(yIncrease);
-  _collateralIn.addAssign(new Uint256(xIncrease).shiftLeft(33));
-  _collateralIn.set(
-    mulDivUp(
-      _collateralIn,
-      new Uint256(zIncrease),
-      new Uint256(xIncrease).shiftLeft(32)
-    )
-  );
+  _collateralIn.mulAssign(zIncrease);
+  _collateralIn.set(shiftRightUp(_collateralIn, new Uint256(25)));
+  _collateralIn.addAssign(zIncrease);
   const collateralIn = new Uint112(_collateralIn);
 
   return collateralIn;
 }
 
-export interface MintResult {
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
 export default {
   givenNew,
-  givenAdd,
+  givenAsset,
+  givenDebt,
+  givenCollateral,
   mint,
   getLiquidityTotal1,
   getLiquidityTotal2,

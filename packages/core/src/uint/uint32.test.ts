@@ -1,11 +1,9 @@
 import { Uint32 } from './uint32';
 
-const MAX_UINT_32 = 2n ** 32n - 1n;
-
 describe('Uint32 tests', () => {
   it('Overflow', () => {
-    const num = new Uint32(MAX_UINT_32);
-    expect(num.value).toEqual(MAX_UINT_32);
+    const num = new Uint32(Uint32.maxValue);
+    expect(num.toBigInt()).toEqual(Uint32.maxValue);
 
     expect(() => {
       num.addAssign(1);
@@ -14,7 +12,7 @@ describe('Uint32 tests', () => {
 
   it('Underflow', () => {
     const num = new Uint32(0);
-    expect(num.value).toEqual(0n);
+    expect(num.toBigInt()).toEqual(0n);
 
     expect(() => {
       num.subAssign(1);

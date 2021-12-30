@@ -1,5 +1,5 @@
 import { ERC20Token } from './erc20Token';
-import { CP, Due, Claims } from './interface';
+import { CP, Due, Claims, Tokens } from './interface';
 import { Uint16, Uint256, Uint112, Uint128, Uint40 } from '../uint';
 import {
   givenBond,
@@ -9,11 +9,19 @@ import {
 } from '../helpers/lendMath';
 import {
   borrow,
-  givenCollateral,
+  givenCollateral as givenCollateralBorrow,
   givenPercent as givenPercentBorrow,
-  givenDebt,
+  givenDebt as givenDebtBorrow,
 } from '../helpers/borrowMath';
-import { givenAdd, givenNew, mint } from '../helpers/mintMath';
+import {
+  givenAsset,
+  givenCollateral,
+  givenDebt,
+  givenNew,
+  mint,
+} from '../helpers/mintMath';
+import { withdraw } from '../helpers/withdrawMath';
+import { burn } from '../helpers/burnMath';
 
 export class Pair {
   public readonly asset: ERC20Token;
@@ -44,7 +52,7 @@ export class Pair {
     collateralIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
+  ): LiquidityReturn1 {
     const { yIncrease, zIncrease } = givenNew(
       maturity,
       assetIn,
@@ -67,15 +75,15 @@ export class Pair {
     return { liquidityOut, dueOut, yIncrease, zIncrease };
   }
 
-  static addLiquidity(
+  static liquidityGivenAsset(
     state: CP,
     maturity: Uint256,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     now: Uint256,
     protocolFee: Uint16
-  ): LiquidityReturn {
-    const { yIncrease, zIncrease } = givenAdd(state, assetIn);
+  ): LiquidityReturn1 {
+    const { yIncrease, zIncrease } = givenAsset(state, assetIn);
 
     const { liquidityOut, dueOut } = mint(
       protocolFee,
@@ -89,6 +97,64 @@ export class Pair {
     );
 
     return { liquidityOut, dueOut, yIncrease, zIncrease };
+  }
+
+  static liquidityGivenDebt(
+    state: CP,
+    maturity: Uint256,
+    totalLiquidity: Uint256,
+    debtIn: Uint112,
+    now: Uint256,
+    protocolFee: Uint16
+  ): LiquidityReturn2 {
+    const { xIncrease, yIncrease, zIncrease } = givenDebt(
+      state,
+      maturity,
+      debtIn,
+      now
+    );
+
+    const { liquidityOut, dueOut } = mint(
+      protocolFee,
+      state,
+      totalLiquidity,
+      maturity,
+      xIncrease,
+      yIncrease,
+      zIncrease,
+      now
+    );
+
+    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
+  }
+
+  static liquidityGivenCollateral(
+    state: CP,
+    maturity: Uint256,
+    totalLiquidity: Uint256,
+    collateralIn: Uint112,
+    now: Uint256,
+    protocolFee: Uint16
+  ): LiquidityReturn2 {
+    const { xIncrease, yIncrease, zIncrease } = givenCollateral(
+      state,
+      maturity,
+      collateralIn,
+      now
+    );
+
+    const { liquidityOut, dueOut } = mint(
+      protocolFee,
+      state,
+      totalLiquidity,
+      maturity,
+      xIncrease,
+      yIncrease,
+      zIncrease,
+      now
+    );
+
+    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
   }
 
   static lendGivenBond(
@@ -187,7 +253,7 @@ export class Pair {
     now: Uint256,
     fee: Uint16
   ): BorrowReturn {
-    const { yIncrease, zIncrease } = givenDebt(
+    const { yIncrease, zIncrease } = givenDebtBorrow(
       fee,
       state,
       maturity,
@@ -217,7 +283,7 @@ export class Pair {
     now: Uint256,
     fee: Uint16
   ): BorrowReturn {
-    const { yIncrease, zIncrease } = givenCollateral(
+    const { yIncrease, zIncrease } = givenCollateralBorrow(
       fee,
       state,
       maturity,
@@ -266,13 +332,34 @@ export class Pair {
 
     return { due, yIncrease, zIncrease };
   }
+
+  static withdraw(
+    reserves: Tokens,
+    totalClaims: Claims,
+    claimsIn: Claims
+  ): Tokens {
+    return withdraw(reserves, totalClaims, claimsIn);
+  }
+
+  static burn(
+    reserves: Tokens,
+    totalClaims: Claims,
+    totalLiquidity: Uint256,
+    liquidityIn: Uint256
+  ): Tokens {
+    return burn(reserves, totalClaims, totalLiquidity, liquidityIn);
+  }
 }
 
-interface LiquidityReturn {
+interface LiquidityReturn1 {
   liquidityOut: Uint256;
   dueOut: Due;
   yIncrease: Uint112;
   zIncrease: Uint112;
+}
+
+interface LiquidityReturn2 extends LiquidityReturn1 {
+  xIncrease: Uint112;
 }
 
 interface LendReturn {
