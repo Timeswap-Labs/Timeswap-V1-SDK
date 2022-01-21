@@ -1,3 +1,4 @@
+export * from './uint';
 export * from './uint16';
 export * from './uint32';
 export * from './uint40';

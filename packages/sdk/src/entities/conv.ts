@@ -15,7 +15,14 @@ import convenienceAbi from '../abi/convenience';
 export class Conv {
   protected convContract: Contract;
 
-  constructor(providerOrSigner: Provider | Signer, address?: string) {
+  readonly chainID: number;
+
+  constructor(
+    providerOrSigner: Provider | Signer,
+    chainID: number,
+    address?: string
+  ) {
+    this.chainID = chainID;
     if (address) {
       this.convContract = new Contract(
         address,
@@ -24,7 +31,7 @@ export class Conv {
       );
     } else {
       this.convContract = new Contract(
-        CONVENIENCE,
+        CONVENIENCE[this.chainID],
         convenienceAbi,
         providerOrSigner
       );
@@ -40,7 +47,7 @@ export class Conv {
   }
 
   upgrade(signer: Signer): ConvSigner {
-    return new ConvSigner(signer, this.convContract.address);
+    return new ConvSigner(signer, this.chainID, this.convContract.address);
   }
 
   provider(): Provider {

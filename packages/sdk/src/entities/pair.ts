@@ -23,6 +23,7 @@ import factoryAbi from '../abi/factory';
 export class Pair {
   protected conv: Conv;
 
+  readonly chainID: number;
   readonly asset: NativeToken | ERC20Token;
   readonly collateral: NativeToken | ERC20Token;
 
@@ -30,15 +31,17 @@ export class Pair {
 
   constructor(
     providerOrSigner: Provider | Signer,
+    chainID: number,
     asset: NativeToken | ERC20Token,
     collateral: NativeToken | ERC20Token,
     convAddress?: string,
     pairAddress?: string
   ) {
-    this.conv = new Conv(providerOrSigner, convAddress);
+    this.conv = new Conv(providerOrSigner, chainID, convAddress);
 
     invariant(!(asset.isNative && collateral.isNative), 'Invalid Tokens');
 
+    this.chainID = chainID;
     this.asset = asset;
     this.collateral = collateral;
 
@@ -68,6 +71,7 @@ export class Pair {
   upgrade(signer: Signer): PairSigner {
     return new PairSigner(
       signer,
+      this.chainID,
       this.asset,
       this.collateral,
       this.conv.address(),
@@ -237,17 +241,11 @@ export class Pair {
   }
 
   calculateApr(state: CP): number {
-    const SECONDS = 31556926n;
-    const temp =
-      (state.y.toBigInt() * SECONDS * 10000n) / (state.x.toBigInt() << 32n);
-    const apr = Number(temp) / 10000;
-    return apr;
+    return PairCore.calculateApr(state);
   }
 
   calculateCdp(state: CP): bigint {
-    let temp = 1n;
-    for (let i = 0; i < this.asset.decimals; i++) temp *= 10n;
-    return (state.z.toBigInt() * temp) / state.x.toBigInt();
+    return PairCore.calculateCdp(state, this.asset.decimals);
   }
 
   calculateNewLiquidity(
@@ -260,7 +258,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LiquidityReturn1 {
-    return PairCore.newLiquidity(
+    return PairCore.calculateNewLiquidity(
       state,
       maturity,
       totalLiquidity,
@@ -280,7 +278,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LiquidityReturn1 {
-    return PairCore.liquidityGivenAsset(
+    return PairCore.calculateLiquidityGivenAsset(
       state,
       maturity,
       totalLiquidity,
@@ -298,7 +296,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LiquidityReturn2 {
-    return PairCore.liquidityGivenDebt(
+    return PairCore.calculateLiquidityGivenDebt(
       state,
       maturity,
       totalLiquidity,
@@ -316,7 +314,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LiquidityReturn2 {
-    return PairCore.liquidityGivenCollateral(
+    return PairCore.calculateLiquidityGivenCollateral(
       state,
       maturity,
       totalLiquidity,
@@ -334,7 +332,14 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LendReturn {
-    return PairCore.lendGivenBond(state, maturity, assetIn, bondOut, now, fee);
+    return PairCore.calculateLendGivenBond(
+      state,
+      maturity,
+      assetIn,
+      bondOut,
+      now,
+      fee
+    );
   }
 
   calculateLendGivenInsurance(
@@ -345,7 +350,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LendReturn {
-    return PairCore.lendGivenInsurance(
+    return PairCore.calculateLendGivenInsurance(
       state,
       maturity,
       assetIn,
@@ -363,7 +368,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): LendReturn {
-    return PairCore.lendGivenPercent(
+    return PairCore.calculateLendGivenPercent(
       state,
       maturity,
       assetIn,
@@ -381,7 +386,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): BorrowReturn {
-    return PairCore.borrowGivenDebt(
+    return PairCore.calculateBorrowGivenDebt(
       state,
       maturity,
       assetOut,
@@ -399,7 +404,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): BorrowReturn {
-    return PairCore.borrowGivenCollateral(
+    return PairCore.calculateBorrowGivenCollateral(
       state,
       maturity,
       assetOut,
@@ -417,7 +422,7 @@ export class Pair {
     maturity: Uint256,
     now: Uint256
   ): BorrowReturn {
-    return PairCore.borrowGivenPercent(
+    return PairCore.calculateBorrowGivenPercent(
       state,
       maturity,
       assetOut,
@@ -432,7 +437,7 @@ export class Pair {
     totalClaims: Claims,
     claimsIn: Claims
   ): Tokens {
-    return PairCore.withdraw(reserves, totalClaims, claimsIn);
+    return PairCore.calculateWithdraw(reserves, totalClaims, claimsIn);
   }
 
   calculateBurn(
@@ -441,7 +446,12 @@ export class Pair {
     totalLiquidity: Uint256,
     liquidityIn: Uint256
   ): Tokens {
-    return PairCore.burn(reserves, totalClaims, totalLiquidity, liquidityIn);
+    return PairCore.calculateBurn(
+      reserves,
+      totalClaims,
+      totalLiquidity,
+      liquidityIn
+    );
   }
 }
 
@@ -450,12 +460,13 @@ export class PairSigner extends Pair {
 
   constructor(
     signer: Signer,
+    chainID: number,
     asset: NativeToken | ERC20Token,
     collateral: NativeToken | ERC20Token,
     convAddress?: string,
     pairAddress?: string
   ) {
-    super(signer, asset, collateral, convAddress, pairAddress);
+    super(signer, chainID, asset, collateral, convAddress, pairAddress);
     this.convSigner = this.conv.upgrade(signer);
   }
 

@@ -1,14 +1,38 @@
+import { ERC20Token } from './erc20Token';
+import { NativeToken } from './nativeToken';
 import { Pair } from './pair';
 import { CP, Claims, Due, Tokens } from './interface';
-import { Uint256, Uint112, Uint128, Uint40 } from '../uint';
+import { Uint256, Uint112, Uint128, Uint40, Uint16, Uint } from '../uint';
 
 export class Pool {
-  pair: Pair;
+  asset: NativeToken | ERC20Token;
+  collateral: NativeToken | ERC20Token;
   maturity: Uint256;
 
-  constructor(pair: Pair, maturity: Uint256) {
-    this.pair = pair;
+  fee: Uint16;
+  protocolFee: Uint16;
+
+  constructor(
+    asset: ERC20Token | NativeToken,
+    collateral: ERC20Token | NativeToken,
+    maturity: string | number | bigint | boolean | Uint,
+    fee: string | number | bigint | boolean | Uint,
+    protocolFee: string | number | bigint | boolean | Uint
+  ) {
+    this.asset = asset;
+    this.collateral = collateral;
     this.maturity = new Uint256(maturity);
+
+    this.fee = new Uint16(fee);
+    this.protocolFee = new Uint16(protocolFee);
+  }
+
+  calculateApr(state: CP): number {
+    return Pair.calculateApr(state);
+  }
+
+  calculateCdp(state: CP): bigint {
+    return Pair.calculateCdp(state, this.asset.decimals);
   }
 
   newLiquidity(
@@ -19,7 +43,7 @@ export class Pool {
     collateralIn: Uint112,
     now: Uint256
   ): LiquidityReturn1 {
-    return Pair.newLiquidity(
+    return Pair.calculateNewLiquidity(
       state,
       this.maturity,
       totalLiquidity,
@@ -27,7 +51,7 @@ export class Pool {
       debtIn,
       collateralIn,
       now,
-      this.pair.protocolFee
+      this.protocolFee
     );
   }
 
@@ -37,13 +61,13 @@ export class Pool {
     assetIn: Uint112,
     now: Uint256
   ): LiquidityReturn1 {
-    return Pair.liquidityGivenAsset(
+    return Pair.calculateLiquidityGivenAsset(
       state,
       this.maturity,
       totalLiquidity,
       assetIn,
       now,
-      this.pair.protocolFee
+      this.protocolFee
     );
   }
 
@@ -53,13 +77,13 @@ export class Pool {
     debtIn: Uint112,
     now: Uint256
   ): LiquidityReturn2 {
-    return Pair.liquidityGivenDebt(
+    return Pair.calculateLiquidityGivenDebt(
       state,
       this.maturity,
       totalLiquidity,
       debtIn,
       now,
-      this.pair.protocolFee
+      this.protocolFee
     );
   }
 
@@ -69,13 +93,13 @@ export class Pool {
     collateralIn: Uint112,
     now: Uint256
   ): LiquidityReturn2 {
-    return Pair.liquidityGivenCollateral(
+    return Pair.calculateLiquidityGivenCollateral(
       state,
       this.maturity,
       totalLiquidity,
       collateralIn,
       now,
-      this.pair.protocolFee
+      this.protocolFee
     );
   }
 
@@ -85,13 +109,13 @@ export class Pool {
     bondOut: Uint128,
     now: Uint256
   ): LendReturn {
-    return Pair.lendGivenBond(
+    return Pair.calculateLendGivenBond(
       state,
       this.maturity,
       assetIn,
       bondOut,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
@@ -101,13 +125,13 @@ export class Pool {
     insuranceOut: Uint128,
     now: Uint256
   ): LendReturn {
-    return Pair.lendGivenInsurance(
+    return Pair.calculateLendGivenInsurance(
       state,
       this.maturity,
       assetIn,
       insuranceOut,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
@@ -117,13 +141,13 @@ export class Pool {
     percent: Uint40,
     now: Uint256
   ): LendReturn {
-    return Pair.lendGivenPercent(
+    return Pair.calculateLendGivenPercent(
       state,
       this.maturity,
       assetIn,
       percent,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
@@ -133,13 +157,13 @@ export class Pool {
     debtIn: Uint112,
     now: Uint256
   ): BorrowReturn {
-    return Pair.borrowGivenDebt(
+    return Pair.calculateBorrowGivenDebt(
       state,
       this.maturity,
       assetOut,
       debtIn,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
@@ -149,13 +173,13 @@ export class Pool {
     collateralIn: Uint112,
     now: Uint256
   ): BorrowReturn {
-    return Pair.borrowGivenCollateral(
+    return Pair.calculateBorrowGivenCollateral(
       state,
       this.maturity,
       assetOut,
       collateralIn,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
@@ -165,18 +189,18 @@ export class Pool {
     percent: Uint40,
     now: Uint256
   ): BorrowReturn {
-    return Pair.borrowGivenPercent(
+    return Pair.calculateBorrowGivenPercent(
       state,
       this.maturity,
       assetOut,
       percent,
       now,
-      this.pair.fee
+      this.fee
     );
   }
 
   withdraw(reserves: Tokens, totalClaims: Claims, claimsIn: Claims): Tokens {
-    return Pair.withdraw(reserves, totalClaims, claimsIn);
+    return Pair.calculateWithdraw(reserves, totalClaims, claimsIn);
   }
 
   burn(
@@ -185,7 +209,12 @@ export class Pool {
     totalLiquidity: Uint256,
     liquidityIn: Uint256
   ): Tokens {
-    return Pair.burn(reserves, totalClaims, totalLiquidity, liquidityIn);
+    return Pair.calculateBurn(
+      reserves,
+      totalClaims,
+      totalLiquidity,
+      liquidityIn
+    );
   }
 }
 

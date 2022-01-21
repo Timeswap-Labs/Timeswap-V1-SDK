@@ -1,4 +1,3 @@
-import { ERC20Token } from './erc20Token';
 import { CP, Due, Claims, Tokens } from './interface';
 import { Uint16, Uint256, Uint112, Uint128, Uint40 } from '../uint';
 import {
@@ -24,26 +23,21 @@ import { withdraw } from '../helpers/withdrawMath';
 import { burn } from '../helpers/burnMath';
 
 export class Pair {
-  public readonly asset: ERC20Token;
-  public readonly collateral: ERC20Token;
-
-  public readonly fee: Uint16;
-  public readonly protocolFee: Uint16;
-
-  constructor(
-    asset: ERC20Token,
-    collateral: ERC20Token,
-    fee: Uint16,
-    protocolFee: Uint16
-  ) {
-    this.asset = asset;
-    this.collateral = collateral;
-
-    this.fee = new Uint16(fee);
-    this.protocolFee = new Uint16(protocolFee);
+  static calculateApr(state: CP): number {
+    const SECONDS = 31556926n;
+    const temp =
+      (state.y.toBigInt() * SECONDS * 10000n) / (state.x.toBigInt() << 32n);
+    const apr = Number(temp) / 10000;
+    return apr;
   }
 
-  static newLiquidity(
+  static calculateCdp(state: CP, assetDecimals: number): bigint {
+    let temp = 1n;
+    for (let i = 0; i < assetDecimals; i++) temp *= 10n;
+    return (state.z.toBigInt() * temp) / state.x.toBigInt();
+  }
+
+  static calculateNewLiquidity(
     state: CP,
     maturity: Uint256,
     totalLiquidity: Uint256,
@@ -75,7 +69,7 @@ export class Pair {
     return { liquidityOut, dueOut, yIncrease, zIncrease };
   }
 
-  static liquidityGivenAsset(
+  static calculateLiquidityGivenAsset(
     state: CP,
     maturity: Uint256,
     totalLiquidity: Uint256,
@@ -99,7 +93,7 @@ export class Pair {
     return { liquidityOut, dueOut, yIncrease, zIncrease };
   }
 
-  static liquidityGivenDebt(
+  static calculateLiquidityGivenDebt(
     state: CP,
     maturity: Uint256,
     totalLiquidity: Uint256,
@@ -128,7 +122,7 @@ export class Pair {
     return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
   }
 
-  static liquidityGivenCollateral(
+  static calculateLiquidityGivenCollateral(
     state: CP,
     maturity: Uint256,
     totalLiquidity: Uint256,
@@ -157,7 +151,7 @@ export class Pair {
     return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
   }
 
-  static lendGivenBond(
+  static calculateLendGivenBond(
     state: CP,
     maturity: Uint256,
     assetIn: Uint112,
@@ -187,7 +181,7 @@ export class Pair {
     return { claims, yDecrease, zDecrease };
   }
 
-  static lendGivenInsurance(
+  static calculateLendGivenInsurance(
     state: CP,
     maturity: Uint256,
     assetIn: Uint112,
@@ -217,7 +211,7 @@ export class Pair {
     return { claims, yDecrease, zDecrease };
   }
 
-  static lendGivenPercent(
+  static calculateLendGivenPercent(
     state: CP,
     maturity: Uint256,
     assetIn: Uint112,
@@ -245,7 +239,7 @@ export class Pair {
     return { claims, yDecrease, zDecrease };
   }
 
-  static borrowGivenDebt(
+  static calculateBorrowGivenDebt(
     state: CP,
     maturity: Uint256,
     assetOut: Uint112,
@@ -275,7 +269,7 @@ export class Pair {
     return { due, yIncrease, zIncrease };
   }
 
-  static borrowGivenCollateral(
+  static calculateBorrowGivenCollateral(
     state: CP,
     maturity: Uint256,
     assetOut: Uint112,
@@ -305,7 +299,7 @@ export class Pair {
     return { due, yIncrease, zIncrease };
   }
 
-  static borrowGivenPercent(
+  static calculateBorrowGivenPercent(
     state: CP,
     maturity: Uint256,
     assetOut: Uint112,
@@ -333,7 +327,7 @@ export class Pair {
     return { due, yIncrease, zIncrease };
   }
 
-  static withdraw(
+  static calculateWithdraw(
     reserves: Tokens,
     totalClaims: Claims,
     claimsIn: Claims
@@ -341,7 +335,7 @@ export class Pair {
     return withdraw(reserves, totalClaims, claimsIn);
   }
 
-  static burn(
+  static calculateBurn(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
