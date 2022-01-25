@@ -83,9 +83,11 @@ export class Conv {
 
     return {
       liquidity: native[0],
-      bond: native[1],
-      insurance: native[2],
-      collateralizedDebt: native[3],
+      bondInterest: native[1],
+      bondPrincipal: native[2],
+      insuranceInterest: native[3],
+      insurancePrincipal: native[4],
+      collateralizedDebt: native[5],
     };
   }
 }
@@ -496,7 +498,12 @@ export class ConvSigner extends Conv {
       params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
+      [
+        params.claimsIn.bondPrincipal.toBigInt(),
+        params.claimsIn.bondInterest.toBigInt(),
+        params.claimsIn.insurancePrincipal.toBigInt(),
+        params.claimsIn.insuranceInterest.toBigInt(),
+      ],
     ]);
   }
 
@@ -506,7 +513,12 @@ export class ConvSigner extends Conv {
       params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
+      [
+        params.claimsIn.bondPrincipal.toBigInt(),
+        params.claimsIn.bondInterest.toBigInt(),
+        params.claimsIn.insurancePrincipal.toBigInt(),
+        params.claimsIn.insuranceInterest.toBigInt(),
+      ],
     ]);
   }
 
@@ -518,7 +530,12 @@ export class ConvSigner extends Conv {
       params.maturity.toBigInt(),
       params.assetTo,
       params.collateralTo,
-      [params.claimsIn.bond.toBigInt(), params.claimsIn.insurance.toBigInt()],
+      [
+        params.claimsIn.bondPrincipal.toBigInt(),
+        params.claimsIn.bondInterest.toBigInt(),
+        params.claimsIn.insurancePrincipal.toBigInt(),
+        params.claimsIn.insuranceInterest.toBigInt(),
+      ],
     ]);
   }
 
@@ -721,8 +738,10 @@ interface TransactionParams {
 
 interface Native {
   liquidity: string;
-  bond: string;
-  insurance: string;
+  bondInterest: string;
+  bondPrincipal: string;
+  insuranceInterest: string;
+  insurancePrincipal: string;
   collateralizedDebt: string;
 }
 
@@ -1015,8 +1034,10 @@ interface CollectETHCollateral {
 }
 
 interface Claims {
-  bond: Uint128;
-  insurance: Uint128;
+  bondPrincipal: Uint112;
+  bondInterest: Uint112;
+  insurancePrincipal: Uint112;
+  insuranceInterest: Uint112;
 }
 
 interface BorrowGivenDebt {

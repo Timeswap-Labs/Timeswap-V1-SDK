@@ -2,7 +2,6 @@ import borrowMath from './borrowMath';
 import lendMath from './lendMath';
 import mintMath from './mintMath';
 import withdrawMath from './withdrawMath';
-import payMath from './payMath';
 import burnMath from './burnMath';
 
 export * from './constantProduct';
@@ -15,6 +14,5 @@ export default {
   lendMath,
   mintMath,
   withdrawMath,
-  payMath,
   burnMath,
 };

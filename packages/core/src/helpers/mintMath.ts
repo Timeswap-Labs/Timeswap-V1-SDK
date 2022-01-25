@@ -135,7 +135,7 @@ export function mint(
 
   let liquidityOut: Uint256;
 
-  if (totalLiquidity.toBigInt() === 0n) {
+  if (totalLiquidity.eq(0)) {
     const liquidityTotal = getLiquidityTotal1(xIncrease);
     liquidityOut = getLiquidity(maturity, liquidityTotal, protocolFee, now);
   } else {
@@ -170,11 +170,18 @@ function getLiquidityTotal2(
   yIncrease: Uint112,
   zIncrease: Uint112
 ): Uint256 {
-  return min(
+  const liquidityTotal = min(
     mulDiv(totalLiquidity, new Uint256(xIncrease), new Uint256(state.x)),
-    mulDiv(totalLiquidity, new Uint256(yIncrease), new Uint256(state.y)),
     mulDiv(totalLiquidity, new Uint256(zIncrease), new Uint256(state.z))
   );
+  invariant(
+    mulDiv(totalLiquidity, new Uint256(yIncrease), new Uint256(state.y)).lte(
+      liquidityTotal
+    ),
+    'E214'
+  );
+
+  return liquidityTotal;
 }
 
 function getLiquidity(
@@ -196,13 +203,11 @@ function getLiquidity(
   return liquidityOut;
 }
 
-function min(x: Uint256, y: Uint256, z: Uint256): Uint256 {
-  if (x <= y && x <= z) {
+function min(x: Uint256, y: Uint256): Uint256 {
+  if (x.lte(y)) {
     return x;
-  } else if (y <= x && y <= z) {
-    return y;
   } else {
-    return z;
+    return y;
   }
 }
 

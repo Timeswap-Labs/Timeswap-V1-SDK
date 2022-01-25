@@ -27,9 +27,13 @@ function getAsset(
   liquidityIn: Uint256
 ): Uint128 {
   const assetOut = new Uint128(0);
-  if (reserves.asset.lte(totalClaims.bond)) return assetOut;
-  const _assetOut = new Uint256(reserves.asset);
-  _assetOut.subAssign(totalClaims.bond);
+  const totalAsset = new Uint256(reserves.asset);
+  const totalBond = new Uint256(totalClaims.bondPrincipal);
+  totalBond.addAssign(totalClaims.bondInterest);
+
+  if (totalAsset <= totalBond) return assetOut;
+  const _assetOut = new Uint256(totalAsset);
+  _assetOut.subAssign(totalBond);
   _assetOut.set(mulDiv(_assetOut, liquidityIn, totalLiquidity));
   assetOut.set(_assetOut);
   return assetOut;
@@ -42,23 +46,26 @@ function getCollateral(
   liquidityIn: Uint256
 ): Uint128 {
   const collateralOut = new Uint128(0);
-  const _collateralOut = new Uint256(reserves.collateral);
-  if (reserves.asset.gte(totalClaims.bond)) {
+  const totalAsset = new Uint256(reserves.asset);
+  const totalCollateral = new Uint256(reserves.collateral);
+  const totalBond = new Uint256(totalClaims.bondPrincipal);
+  totalBond.addAssign(totalClaims.bondInterest);
+
+  const _collateralOut = new Uint256(totalCollateral);
+  if (totalAsset.gte(totalBond)) {
     _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
     collateralOut.set(_collateralOut);
     return collateralOut;
   }
-  const deficit = new Uint256(totalClaims.bond);
-  deficit.subAssign(reserves.asset);
-  if (
-    new Uint256(reserves.collateral)
-      .mul(totalClaims.bond)
-      .lte(deficit.mul(totalClaims.insurance))
-  )
+  const deficit = new Uint256(totalBond);
+  deficit.subAssign(totalAsset);
+  const totalInsurance = new Uint256(totalClaims.insurancePrincipal);
+  totalInsurance.addAssign(totalClaims.insuranceInterest);
+  if (totalCollateral.mul(totalBond).lte(deficit.mul(totalInsurance)))
     return collateralOut;
   const subtrahend = new Uint256(deficit);
-  subtrahend.mulAssign(totalClaims.insurance);
-  subtrahend.set(divUp(subtrahend, new Uint256(totalClaims.bond)));
+  subtrahend.mulAssign(totalInsurance);
+  subtrahend.set(divUp(subtrahend, new Uint256(totalBond)));
   _collateralOut.subAssign(subtrahend);
   _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
   collateralOut.set(_collateralOut);

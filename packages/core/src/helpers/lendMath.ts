@@ -207,10 +207,13 @@ export function lend(
 
   check(state, xIncrease, yDecrease, zDecrease, fee);
 
-  const bond = getBond(maturity, xIncrease, yDecrease, now);
-  const insurance = getInsurance(maturity, state, xIncrease, zDecrease, now);
+  const bondPrincipal = new Uint112(xIncrease);
+  const bondInterest = getBondInterest(maturity, yDecrease, now);
 
-  return { bond, insurance };
+  const insurancePrincipal = getInsurancePrincipal(state, xIncrease);
+  const insuranceInterest = getInsuranceInterest(maturity, zDecrease, now);
+
+  return { bondPrincipal, bondInterest, insurancePrincipal, insuranceInterest };
 }
 
 function check(
@@ -246,40 +249,41 @@ function adjust(
   return adjusted;
 }
 
-function getBond(
+function getBondInterest(
   maturity: Uint256,
-  xIncrease: Uint112,
   yDecrease: Uint112,
   now: Uint256
-): Uint128 {
+): Uint112 {
   const _bondOut = new Uint256(maturity);
   _bondOut.subAssign(now);
   _bondOut.mulAssign(yDecrease);
   _bondOut.shiftRightAssign(32);
-  _bondOut.addAssign(xIncrease);
-  const bondOut = new Uint128(_bondOut);
+  const bondOut = new Uint112(_bondOut);
 
   return bondOut;
 }
 
-function getInsurance(
+function getInsurancePrincipal(state: CP, xIncrease: Uint112): Uint112 {
+  const _insuranceOut = new Uint256(state.z);
+  _insuranceOut.mulAssign(xIncrease);
+  const denominator = new Uint256(state.x);
+  denominator.addAssign(xIncrease);
+  _insuranceOut.divAssign(denominator);
+  const insuranceOut = new Uint112(_insuranceOut);
+
+  return insuranceOut;
+}
+
+function getInsuranceInterest(
   maturity: Uint256,
-  state: CP,
-  xIncrease: Uint112,
   zDecrease: Uint112,
   now: Uint256
-): Uint128 {
+): Uint112 {
   const _insuranceOut = new Uint256(maturity);
   _insuranceOut.subAssign(now);
   _insuranceOut.mulAssign(zDecrease);
   _insuranceOut.shiftRightAssign(25);
-  const minimum = new Uint256(state.z);
-  minimum.mulAssign(xIncrease);
-  const denominator = new Uint256(state.x);
-  denominator.addAssign(xIncrease);
-  minimum.divAssign(denominator);
-  _insuranceOut.addAssign(minimum);
-  const insuranceOut = new Uint128(_insuranceOut);
+  const insuranceOut = new Uint112(_insuranceOut);
 
   return insuranceOut;
 }
@@ -296,6 +300,7 @@ export default {
   lend,
   check,
   adjust,
-  getBond,
-  getInsurance,
+  getBondInterest,
+  getInsurancePrincipal,
+  getInsuranceInterest,
 };

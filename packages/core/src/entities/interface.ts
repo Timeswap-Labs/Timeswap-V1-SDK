@@ -7,8 +7,10 @@ export interface CP {
 }
 
 export interface Claims {
-  bond: Uint128;
-  insurance: Uint128;
+  bondPrincipal: Uint112;
+  bondInterest: Uint112;
+  insurancePrincipal: Uint112;
+  insuranceInterest: Uint112;
 }
 
 export interface Due {

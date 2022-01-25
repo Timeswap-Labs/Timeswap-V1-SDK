@@ -183,20 +183,34 @@ export class Pair {
     await this.initPair();
     const claims = await this.pair!.totalClaims(maturity.toBigInt());
 
-    const bond = new Uint128(claims[0].toString());
-    const insurance = new Uint128(claims[1].toString());
+    const bondPrincipal = new Uint112(claims[0].toString());
+    const bondInterest = new Uint112(claims[1].toString());
+    const insurancePrincipal = new Uint112(claims[2].toString());
+    const insuranceInterest = new Uint112(claims[3].toString());
 
-    return { bond, insurance };
+    return {
+      bondPrincipal,
+      bondInterest,
+      insurancePrincipal,
+      insuranceInterest,
+    };
   }
 
   async getClaimsOf(maturity: Uint256, address: string): Promise<Claims> {
     await this.initPair();
     const claims = await this.pair!.claimsOf(maturity.toBigInt(), address);
 
-    const bond = new Uint128(claims[0].toString());
-    const insurance = new Uint128(claims[1].toString());
+    const bondPrincipal = new Uint112(claims[0].toString());
+    const bondInterest = new Uint112(claims[1].toString());
+    const insurancePrincipal = new Uint112(claims[2].toString());
+    const insuranceInterest = new Uint112(claims[3].toString());
 
-    return { bond, insurance };
+    return {
+      bondPrincipal,
+      bondInterest,
+      insurancePrincipal,
+      insuranceInterest,
+    };
   }
 
   async getTotalDebtCreated(maturity: Uint256): Promise<Uint120> {
@@ -208,17 +222,33 @@ export class Pair {
     return new Uint120(totalDebtCreated.toString());
   }
 
-  async getDuesOf(maturity: Uint256, address: string): Promise<Due[]> {
+  async getTotalDuesOf(maturity: Uint256, address: string): Promise<Uint256> {
     await this.initPair();
-    const dues: any[] = await this.pair!.duesOf(maturity.toBigInt(), address);
+    const totalDues = await this.pair!.totalDuesOf(
+      maturity.toBigInt(),
+      address
+    );
 
-    return dues.map(due => {
-      const debt = new Uint112(due[0].toString());
-      const collateral = new Uint112(due[1].toString());
-      const startBlock = new Uint32(due[2]);
+    return new Uint256(totalDues.toString());
+  }
 
-      return { debt, collateral, startBlock };
-    });
+  async getDueOf(
+    maturity: Uint256,
+    address: string,
+    id: Uint256
+  ): Promise<Due> {
+    await this.initPair();
+    const due = await this.pair!.duesOf(
+      maturity.toBigInt(),
+      address,
+      id.toBigInt()
+    );
+
+    const debt = new Uint112(due[0].toString());
+    const collateral = new Uint112(due[1].toString());
+    const startBlock = new Uint32(due[2]);
+
+    return { debt, collateral, startBlock };
   }
 
   async getNative(maturity: Uint256): Promise<Native> {
@@ -896,8 +926,10 @@ interface Due {
 
 interface Native {
   liquidity: string;
-  bond: string;
-  insurance: string;
+  bondInterest: string;
+  bondPrincipal: string;
+  insuranceInterest: string;
+  insurancePrincipal: string;
   collateralizedDebt: string;
 }
 
@@ -990,8 +1022,10 @@ interface Collect {
 }
 
 interface Claims {
-  bond: Uint128;
-  insurance: Uint128;
+  bondPrincipal: Uint112;
+  bondInterest: Uint112;
+  insurancePrincipal: Uint112;
+  insuranceInterest: Uint112;
 }
 
 interface BorrowGivenDebt {

@@ -1,31 +1,25 @@
 import { Uint256 } from '../uint';
 
-export function sqrt(y: Uint256): Uint256 {
-  const z = new Uint256(0);
-
-  if (y.gt(3)) {
-    z.set(y);
-    const x = y.div(2).add(1);
-    while (x.lt(z)) {
-      z.set(x);
-      x.set(
-        y
-          .div(x)
-          .add(x)
-          .div(2)
-      );
-    }
-  } else if (y.ne(0)) {
-    z.set(1);
+export function sqrt(x: Uint256): Uint256 {
+  const z = x.add(1).div(2);
+  const y = new Uint256(x);
+  while (z.lt(y)) {
+    y.set(z);
+    z.set(
+      x
+        .div(z)
+        .add(z)
+        .div(2)
+    );
   }
 
-  return z;
+  return y;
 }
 
-export function sqrtUp(y: Uint256): Uint256 {
-  const z = sqrt(y);
-  if (z.mod(y).gt(0)) z.add(1);
-  return z;
+export function sqrtUp(x: Uint256): Uint256 {
+  const y = sqrt(x);
+  if (x.mod(y).gt(0)) y.add(1);
+  return y;
 }
 
 export default { sqrt, sqrtUp };

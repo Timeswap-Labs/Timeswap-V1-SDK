@@ -178,8 +178,12 @@ export class Pool {
     return this.pair.getClaimsOf(this.maturity, address);
   }
 
-  async getDuesOf(address: string): Promise<Due[]> {
-    return this.pair.getDuesOf(this.maturity, address);
+  async getTotalDuesOf(address: string): Promise<Uint256> {
+    return this.pair.getTotalDuesOf(this.maturity, address);
+  }
+
+  async getDueOf(address: string, id: Uint256): Promise<Due> {
+    return this.pair.getDueOf(this.maturity, address, id);
   }
 
   async getNative(): Promise<Native> {
@@ -576,8 +580,10 @@ interface Due {
 
 interface Native {
   liquidity: string;
-  bond: string;
-  insurance: string;
+  bondInterest: string;
+  bondPrincipal: string;
+  insuranceInterest: string;
+  insurancePrincipal: string;
   collateralizedDebt: string;
 }
 
@@ -661,8 +667,10 @@ interface Collect {
 }
 
 interface Claims {
-  bond: Uint128;
-  insurance: Uint128;
+  bondPrincipal: Uint112;
+  bondInterest: Uint112;
+  insurancePrincipal: Uint112;
+  insuranceInterest: Uint112;
 }
 
 interface BorrowGivenDebt {
