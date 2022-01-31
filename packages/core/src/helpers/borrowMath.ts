@@ -225,16 +225,21 @@ function check(
   const zAdjusted = adjust(state.z, zIncrease, feeBase);
   checkConstantProduct(state, xReserve, yAdjusted, zAdjusted);
 
-  const maximum = new Uint256(xDecrease);
-  maximum.mulAssign(state.y);
-  const minimum = new Uint256(maximum);
-  maximum.shiftLeftAssign(16);
-
   const denominator = new Uint256(xReserve);
   denominator.mulAssign(feeBase);
 
-  maximum.set(divUp(maximum, denominator));
-  invariant(yIncrease.lte(maximum), 'E214');
+  const yMax = new Uint256(xDecrease);
+  yMax.mulAssign(state.y);
+  const minimum = new Uint256(yMax);
+  yMax.shiftLeftAssign(16);
+  yMax.set(divUp(yMax, denominator));
+  invariant(yIncrease.lte(yMax), 'E214');
+
+  const zMax = new Uint256(xDecrease);
+  zMax.mulAssign(state.z);
+  zMax.shiftLeftAssign(16);
+  zMax.set(divUp(zMax, denominator));
+  invariant(zIncrease.lte(zMax), 'E215');
 
   minimum.shiftLeftAssign(12);
   minimum.set(divUp(minimum, denominator));

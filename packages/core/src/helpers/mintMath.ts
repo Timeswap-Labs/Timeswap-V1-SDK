@@ -170,15 +170,23 @@ function getLiquidityTotal2(
   yIncrease: Uint112,
   zIncrease: Uint112
 ): Uint256 {
-  const liquidityTotal = min(
-    mulDiv(totalLiquidity, new Uint256(xIncrease), new Uint256(state.x)),
-    mulDiv(totalLiquidity, new Uint256(zIncrease), new Uint256(state.z))
+  const liquidityTotal = mulDiv(
+    totalLiquidity,
+    new Uint256(xIncrease),
+    new Uint256(state.x)
   );
+
   invariant(
     mulDiv(totalLiquidity, new Uint256(yIncrease), new Uint256(state.y)).lte(
       liquidityTotal
     ),
     'E214'
+  );
+  invariant(
+    mulDiv(totalLiquidity, new Uint256(zIncrease), new Uint256(state.z)).lte(
+      liquidityTotal
+    ),
+    'E215'
   );
 
   return liquidityTotal;
@@ -201,14 +209,6 @@ function getLiquidity(
   );
 
   return liquidityOut;
-}
-
-function min(x: Uint256, y: Uint256): Uint256 {
-  if (x.lte(y)) {
-    return x;
-  } else {
-    return y;
-  }
 }
 
 function getDebt(
@@ -251,7 +251,6 @@ export default {
   getLiquidityTotal1,
   getLiquidityTotal2,
   getLiquidity,
-  min,
   getDebt,
   getCollateral,
 };
