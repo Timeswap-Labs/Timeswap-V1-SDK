@@ -12,7 +12,7 @@ export default [
   'function collectETHAsset((address,uint256,address,address,(uint128,uint128)))',
   'function collectETHCollateral((address,uint256,address,address,(uint128,uint128)))',
   'function factory() view returns (address)',
-  'function getNative(address,address,uint256) view returns ((address,address,address,address))',
+  'function getNative(address,address,uint256) view returns ((address,address,address,address,address,address))',
   'function lendGivenBond((address,address,uint256,address,address,uint112,uint128,uint128,uint256))',
   'function lendGivenBondETHAsset((address,uint256,address,address,uint128,uint128,uint256)) payable',
   'function lendGivenBondETHCollateral((address,uint256,address,address,uint112,uint128,uint128,uint256)) payable',
