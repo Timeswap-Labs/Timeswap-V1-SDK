@@ -18,7 +18,7 @@ export function sqrt(x: Uint256): Uint256 {
 
 export function sqrtUp(x: Uint256): Uint256 {
   const y = sqrt(x);
-  if (x.mod(y).gt(0)) y.add(1);
+  if (x.mod(y).ne(0)) y.add(1);
   return y;
 }
 

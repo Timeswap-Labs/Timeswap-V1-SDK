@@ -109,7 +109,7 @@ export function givenPercent(
   if (percent.lte(0x80000000)) {
     const yMid = new Uint256(cp.y);
     yMid.mulAssign(cp.y);
-    yMid.shiftLeftAssign(32); // This
+    yMid.shiftLeftAssign(32);
     const denominator = new Uint256(xAdjust);
     denominator.mulAssign(feeBase);
     denominator.mulAssign(feeBase);
