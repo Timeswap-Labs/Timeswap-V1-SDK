@@ -16,10 +16,10 @@ export function sqrt(x: Uint256): Uint256 {
   return y;
 }
 
-export function sqrtUp(x: Uint256): Uint256 {
-  const y = sqrt(x);
-  if (x.mod(y).ne(0)) y.add(1);
-  return y;
+export function sqrtUp(y: Uint256): Uint256 {
+  const z = sqrt(y);
+  if (z.mod(y).ne(0)) z.addAssign(1);
+  return z;
 }
 
 export default { sqrt, sqrtUp };
