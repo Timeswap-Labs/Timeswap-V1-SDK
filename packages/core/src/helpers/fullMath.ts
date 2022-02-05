@@ -11,6 +11,6 @@ export function mulDivUp(
 ): Uint256 {
   const z = mulDiv(a, b, denominator);
   const mulMod = (a.toBigInt() * b.toBigInt()) % denominator.toBigInt();
-  if (mulMod > 0n) return z.add(1);
-  else return z;
+  if (mulMod > 0n) z.addAssign(1);
+  return z;
 }

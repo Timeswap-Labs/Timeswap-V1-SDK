@@ -24,7 +24,7 @@ export function sqrt(y: Uint256): Uint256 {
 
 export function sqrtUp(y: Uint256): Uint256 {
   const z = sqrt(y);
-  if (z.mod(y).gt(0)) z.add(1);
+  if (z.mod(y).ne(0)) z.addAssign(1);
   return z;
 }
 
