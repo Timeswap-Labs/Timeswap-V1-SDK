@@ -238,7 +238,7 @@ export class Pair {
     id: Uint256
   ): Promise<Due> {
     await this.initPair();
-    const due = await this.pair!.duesOf(
+    const due = await this.pair!.dueOf(
       maturity.toBigInt(),
       address,
       id.toBigInt()

@@ -8,5 +8,6 @@ export default [
   'function totalClaims(uint256) view returns ((uint112,uint112,uint112,uint112))',
   'function claimsOf(uint256,address) view returns ((uint112,uint112,uint112,uint112)) ',
   'function totalDebtCreated(uint256) view returns (uint120)',
-  'function duesOf(uint256,address) view returns ((uint112,uint112,uint32)[])',
+  'function totalDuesOf(uint256,address) view returns (uint256)',
+  'function dueOf(uint256,address,uint256) view returns ((uint112,uint112,uint32))',
 ];
