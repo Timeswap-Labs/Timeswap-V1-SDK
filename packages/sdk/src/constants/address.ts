@@ -1,3 +1,3 @@
 export const CONVENIENCE: { [chainID: number]: string } = {
-  4: '0xe6B90a340b9bE649FaB924E15E160C202b5B761f',
+  4: '0x6bb008dc06B0Db1b3efCe0F7cB5901816224Da5d',
 };
