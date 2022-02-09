@@ -8,6 +8,6 @@ export function divUp(x: Uint256, y: Uint256): Uint256 {
 
 export function shiftRightUp(x: Uint256, y: Uint256): Uint256 {
   const z = x.shiftRight(y);
-  if (x !== z.shiftLeft(y)) z.addAssign(1);
+  if (x.ne(z.shiftLeft(y))) z.addAssign(1);
   return z;
 }
