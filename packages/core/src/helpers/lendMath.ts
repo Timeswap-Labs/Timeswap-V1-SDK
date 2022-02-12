@@ -203,7 +203,7 @@ export function lend(
   zDecrease: Uint112,
   now: Uint256
 ): Claims {
-  invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
+  invariant(now.lt(maturity), 'Expired');
 
   check(state, xIncrease, yDecrease, zDecrease, fee);
 
@@ -235,7 +235,7 @@ function check(
   const denominator = new Uint256(xReserve);
   denominator.mulAssign(feeBase);
   minimum.divAssign(denominator);
-  invariant(yDecrease.toBigInt() >= minimum.toBigInt(), 'Minimum');
+  invariant(yDecrease.gte(minimum), 'Minimum');
 }
 
 function adjust(

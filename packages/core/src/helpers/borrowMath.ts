@@ -202,7 +202,7 @@ export function borrow(
   zIncrease: Uint112,
   now: Uint256
 ): Due {
-  invariant(now.toBigInt() < maturity.toBigInt(), 'Expired');
+  invariant(now.lt(maturity), 'Expired');
 
   check(state, xDecrease, yIncrease, zIncrease, fee);
 

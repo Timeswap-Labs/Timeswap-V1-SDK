@@ -32,12 +32,12 @@ function getAsset(
   const totalAsset = new Uint256(reserves.asset);
   const totalBondPrincipal = new Uint256(totalClaims.bondPrincipal);
 
-  if (totalAsset >= totalBondPrincipal) {
+  if (totalAsset.gte(totalBondPrincipal)) {
     const assetOut = new Uint128(bondPrincipalIn);
     const remaining = new Uint256(totalAsset);
     remaining.subAssign(totalBondPrincipal);
     const totalBondInterest = new Uint256(totalClaims.bondInterest);
-    if (remaining >= totalBondInterest) {
+    if (remaining.gte(totalBondInterest)) {
       assetOut.addAssign(bondInterestIn);
       return assetOut;
     }
@@ -67,7 +67,7 @@ function getCollateral(
   const totalBond = new Uint256(totalClaims.bondPrincipal);
   totalBond.addAssign(totalClaims.bondInterest);
 
-  if (totalAsset >= totalBond) return collateralOut;
+  if (totalAsset.gte(totalBond)) return collateralOut;
   const deficit = new Uint256(totalBond);
   deficit.subAssign(totalAsset);
 
@@ -82,13 +82,13 @@ function getCollateral(
   const totalCollateral = new Uint256(reserves.collateral);
   totalCollateral.mulAssign(totalBond);
 
-  if (totalCollateral >= totalInsurancePrincipal) {
+  if (totalCollateral.gte(totalInsurancePrincipal)) {
     const _insuranceInterestIn = new Uint256(insuranceInterestIn);
     _insuranceInterestIn.mulAssign(deficit);
 
     const remaining = new Uint256(totalCollateral);
     remaining.subAssign(totalInsurancePrincipal);
-    if (remaining >= totalInsuranceInterest) {
+    if (remaining.gte(totalInsuranceInterest)) {
       const _collateralOut = new Uint256(_insuranceInterestIn);
       _collateralOut.addAssign(_insurancePrincipalIn);
       _collateralOut.divAssign(totalBond);

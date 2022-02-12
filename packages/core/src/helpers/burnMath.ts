@@ -31,7 +31,7 @@ function getAsset(
   const totalBond = new Uint256(totalClaims.bondPrincipal);
   totalBond.addAssign(totalClaims.bondInterest);
 
-  if (totalAsset <= totalBond) return assetOut;
+  if (totalAsset.lte(totalBond)) return assetOut;
   const _assetOut = new Uint256(totalAsset);
   _assetOut.subAssign(totalBond);
   _assetOut.set(mulDiv(_assetOut, liquidityIn, totalLiquidity));
