@@ -1,302 +1,225 @@
 import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
-import { Uint16, Uint256, Uint112, Uint40, Uint128 } from '../uint';
-import { checkConstantProduct } from './constantProduct';
+import { Uint16, Uint256, Uint112, Uint40 } from '../uint';
 import { mulDivUp } from './fullMath';
 import { divUp, shiftRightUp } from './math';
 import { sqrtUp } from './squareRoot';
+import timeswapMath from './timeswapMath';
+
+const BASE = new Uint256(0x10000000000);
 
 export function givenDebt(
   fee: Uint16,
+  protocolFee: Uint16,
   cp: CP,
   maturity: Uint256,
   assetOut: Uint112,
   debtIn: Uint112,
   now: Uint256
 ): BorrowResult {
-  const feeBase = new Uint256(0x10000).sub(fee);
+  const xDecrease = getX(maturity, assetOut, fee, protocolFee, now);
+
+  const xReserve = new Uint256(cp.x);
+  xReserve.subAssign(xDecrease);
 
   const _yIncrease = new Uint256(debtIn);
-  _yIncrease.subAssign(assetOut);
-  _yIncrease.shiftLeftAssign(32);
-  _yIncrease.divAssign(maturity.sub(now));
+  _yIncrease.subAssign(xDecrease);
+  _yIncrease.shlAssign(32);
+  const denominator = new Uint256(maturity);
+  denominator.subAssign(now);
+  _yIncrease.divAssign(denominator);
   const yIncrease = new Uint112(_yIncrease);
 
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.subAssign(assetOut);
+  const yReserve = new Uint256(cp.y);
+  yReserve.addAssign(_yIncrease);
 
-  const yAdjust = new Uint256(cp.y);
-  yAdjust.shiftLeftAssign(16);
-  yAdjust.addAssign(_yIncrease.mul(feeBase));
+  const zReserve = new Uint256(cp.x);
+  zReserve.mulAssign(cp.y);
+  denominator.set(xReserve);
+  denominator.mulAssign(yReserve);
+  zReserve.set(mulDivUp(zReserve, new Uint256(cp.z), denominator));
 
-  const _zIncrease = new Uint256(cp.x);
-  _zIncrease.mulAssign(cp.y);
-  _zIncrease.shiftLeftAssign(16);
-  const subtrahend = new Uint256(xAdjust);
-  subtrahend.mulAssign(yAdjust);
-  _zIncrease.subAssign(subtrahend);
-  const denominator = new Uint256(xAdjust);
-  denominator.mulAssign(yAdjust);
-  denominator.mulAssign(feeBase);
-  _zIncrease.set(
-    mulDivUp(_zIncrease, new Uint256(cp.z).shiftLeft(16), denominator)
-  );
+  const _zIncrease = new Uint256(zReserve);
+  _zIncrease.subAssign(cp.z);
   const zIncrease = new Uint112(_zIncrease);
 
-  return { yIncrease, zIncrease };
+  return { xDecrease, yIncrease, zIncrease };
 }
 
 export function givenCollateral(
   fee: Uint16,
+  protocolFee: Uint16,
   cp: CP,
   maturity: Uint256,
   assetOut: Uint112,
   collateralIn: Uint112,
   now: Uint256
 ): BorrowResult {
-  const feeBase = new Uint256(0x10000).sub(fee);
+  const xDecrease = getX(maturity, assetOut, fee, protocolFee, now);
 
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.subAssign(assetOut);
+  const xReserve = new Uint256(cp.x);
+  xReserve.subAssign(xDecrease);
 
   const _zIncrease = new Uint256(collateralIn);
-  _zIncrease.mulAssign(xAdjust);
+  _zIncrease.mulAssign(xReserve); // bug
   const subtrahend = new Uint256(cp.z);
-  subtrahend.mulAssign(assetOut);
+  subtrahend.mulAssign(xDecrease);
   _zIncrease.subAssign(subtrahend);
-  _zIncrease.shiftLeftAssign(25);
+  _zIncrease.shlAssign(25);
   const denominator = new Uint256(maturity);
   denominator.subAssign(now);
-  denominator.mulAssign(xAdjust);
+  denominator.mulAssign(xReserve);
   _zIncrease.divAssign(denominator);
   const zIncrease = new Uint112(_zIncrease);
 
-  const zAdjust = new Uint256(cp.z);
-  zAdjust.shiftLeftAssign(16);
-  zAdjust.addAssign(_zIncrease.mul(feeBase));
+  const zReserve = new Uint256(cp.z);
+  zReserve.addAssign(_zIncrease);
 
-  const _yIncrease = new Uint256(cp.x);
-  _yIncrease.mulAssign(cp.z);
-  _yIncrease.shiftLeftAssign(16);
-  subtrahend.set(xAdjust);
-  subtrahend.mulAssign(zAdjust);
-  _yIncrease.subAssign(subtrahend);
-  denominator.set(xAdjust);
-  denominator.mulAssign(zAdjust);
-  denominator.mulAssign(feeBase);
-  _yIncrease.set(
-    mulDivUp(_yIncrease, new Uint256(cp.y).shiftLeft(16), denominator)
-  );
+  const yReserve = new Uint256(cp.x);
+  yReserve.mulAssign(cp.z);
+  denominator.set(xReserve);
+  denominator.mulAssign(zReserve);
+  yReserve.set(mulDivUp(yReserve, new Uint256(cp.y), denominator));
+
+  const _yIncrease = new Uint256(yReserve);
+  _yIncrease.subAssign(cp.y);
   const yIncrease = new Uint112(_yIncrease);
 
-  return { yIncrease, zIncrease };
+  return { xDecrease, yIncrease, zIncrease };
 }
 
 export function givenPercent(
   fee: Uint16,
+  protocolFee: Uint16,
   cp: CP,
+  maturity: Uint256,
   assetOut: Uint112,
-  percent: Uint40
+  percent: Uint40,
+  now: Uint256
 ): BorrowResult {
-  const feeBase = new Uint256(0x10000).sub(fee);
-
-  const xAdjust = new Uint256(cp.x);
-  xAdjust.subAssign(assetOut);
-
   const yIncrease = new Uint112(0);
   const zIncrease = new Uint112(0);
+
+  const xDecrease = getX(maturity, assetOut, fee, protocolFee, now);
+
+  const xReserve = new Uint256(cp.x);
+  xReserve.subAssign(xDecrease);
 
   if (percent.lte(0x80000000)) {
     const yMid = new Uint256(cp.y);
     yMid.mulAssign(cp.y);
-    yMid.shiftLeftAssign(32);
-    const denominator = new Uint256(xAdjust);
-    denominator.mulAssign(feeBase);
-    denominator.mulAssign(feeBase);
-    yMid.set(mulDivUp(yMid, new Uint256(cp.x), denominator));
+    yMid.set(mulDivUp(yMid, new Uint256(cp.x), xReserve));
     yMid.set(sqrtUp(yMid));
-    const subtrahend = new Uint256(cp.y);
-    subtrahend.shiftLeftAssign(16);
-    subtrahend.divAssign(feeBase);
-    yMid.subAssign(subtrahend);
-
-    const yMin = new Uint256(assetOut);
-    yMin.mulAssign(cp.y);
-    yMin.shiftLeftAssign(12);
-    denominator.set(xAdjust);
-    denominator.mulAssign(feeBase);
-    yMin.set(divUp(yMin, denominator));
+    yMid.subAssign(cp.y);
 
     const _yIncrease = new Uint256(yMid);
-    _yIncrease.subAssign(yMin);
     _yIncrease.mulAssign(percent);
     _yIncrease.set(shiftRightUp(_yIncrease, new Uint256(31)));
-    _yIncrease.addAssign(yMin);
     yIncrease.set(_yIncrease);
 
-    const yAdjust = new Uint256(cp.y);
-    yAdjust.shiftLeftAssign(16);
-    yAdjust.addAssign(_yIncrease.mul(feeBase));
+    const yReserve = new Uint256(cp.y);
+    yReserve.addAssign(_yIncrease);
 
-    const _zIncrease = new Uint256(cp.x);
-    _zIncrease.mulAssign(cp.y);
-    _zIncrease.shiftLeftAssign(16);
-    subtrahend.set(xAdjust);
-    subtrahend.mulAssign(yAdjust);
-    _zIncrease.subAssign(subtrahend);
-    denominator.set(xAdjust);
-    denominator.mulAssign(yAdjust);
-    denominator.mulAssign(feeBase);
-    _zIncrease.set(
-      mulDivUp(_zIncrease, new Uint256(cp.z).shiftLeft(16), denominator)
-    );
+    const zReserve = new Uint256(cp.x);
+    zReserve.mulAssign(cp.y);
+    const denominator = new Uint256(xReserve);
+    denominator.mulAssign(yReserve);
+    zReserve.set(mulDivUp(zReserve, new Uint256(cp.z), denominator));
+
+    const _zIncrease = new Uint256(zReserve);
+    _zIncrease.subAssign(cp.z);
     zIncrease.set(_zIncrease);
   } else {
+    percent.set(new Uint40(0x100000000).sub(percent));
+
     const zMid = new Uint256(cp.z);
     zMid.mulAssign(cp.z);
-    zMid.shiftLeftAssign(32);
-    const denominator = new Uint256(xAdjust);
-    denominator.mulAssign(feeBase);
-    denominator.mulAssign(feeBase);
-    zMid.set(mulDivUp(zMid, new Uint256(cp.x), denominator));
+    zMid.set(mulDivUp(zMid, new Uint256(cp.x), xReserve));
     zMid.set(sqrtUp(zMid));
-    const subtrahend = new Uint256(cp.z);
-    subtrahend.shiftLeftAssign(16);
-    subtrahend.divAssign(feeBase);
-    zMid.subAssign(subtrahend);
-
-    percent.set(new Uint40(0x100000000).sub(percent));
+    zMid.subAssign(cp.z);
 
     const _zIncrease = new Uint256(zMid);
     _zIncrease.mulAssign(percent);
     _zIncrease.set(shiftRightUp(_zIncrease, new Uint256(31)));
     zIncrease.set(_zIncrease);
 
-    const zAdjust = new Uint256(cp.z);
-    zAdjust.shiftLeftAssign(16);
-    zAdjust.addAssign(_zIncrease.mul(feeBase));
-    const _yIncrease = new Uint256(cp.x);
-    _yIncrease.mulAssign(cp.z);
-    _yIncrease.shiftLeftAssign(16);
-    subtrahend.set(xAdjust);
-    subtrahend.mulAssign(zAdjust);
-    _yIncrease.subAssign(subtrahend);
-    denominator.set(xAdjust);
-    denominator.mulAssign(zAdjust);
-    denominator.mulAssign(feeBase);
-    _yIncrease.set(
-      mulDivUp(_yIncrease, new Uint256(cp.y).shiftLeft(16), denominator)
-    );
+    const zReserve = new Uint256(cp.z);
+    zReserve.addAssign(_zIncrease);
+
+    const yReserve = new Uint256(cp.x);
+    yReserve.mulAssign(cp.z);
+    const denominator = new Uint256(xReserve);
+    denominator.mulAssign(zReserve);
+    yReserve.set(mulDivUp(yReserve, new Uint256(cp.y), denominator));
+
+    const _yIncrease = new Uint256(yReserve);
+    _yIncrease.subAssign(cp.y);
     yIncrease.set(_yIncrease);
   }
 
-  return { yIncrease, zIncrease };
+  return { xDecrease, yIncrease, zIncrease };
 }
 
 export function borrow(
   fee: Uint16,
+  protocolFee: Uint16,
   state: CP,
   maturity: Uint256,
   xDecrease: Uint112,
   yIncrease: Uint112,
   zIncrease: Uint112,
   now: Uint256
-): Due {
-  invariant(now.lt(maturity), 'Expired');
+): { assetOut: Uint256; dueOut: Due } {
+  invariant(now.lt(maturity), 'E202');
+  invariant(xDecrease.ne(0), 'E205');
 
-  check(state, xDecrease, yIncrease, zIncrease, fee);
+  const {
+    dueOut,
+    feeStoredIncrease,
+    protocolFeeStoredIncrease,
+  } = timeswapMath.borrow(
+    maturity,
+    state,
+    xDecrease,
+    yIncrease,
+    zIncrease,
+    fee,
+    protocolFee,
+    now
+  );
 
-  const debt = getDebt(maturity, xDecrease, yIncrease, now);
-  const collateral = getCollateral(maturity, state, xDecrease, zIncrease, now);
+  const assetOut = new Uint256(xDecrease);
+  assetOut.subAssign(feeStoredIncrease);
+  assetOut.subAssign(protocolFeeStoredIncrease);
 
-  return { debt, collateral };
+  return { assetOut, dueOut };
 }
 
-function check(
-  state: CP,
-  xDecrease: Uint112,
-  yIncrease: Uint112,
-  zIncrease: Uint112,
-  fee: Uint16
-) {
-  const feeBase = new Uint128(0x10000).sub(fee);
-  const xReserve = state.x.sub(xDecrease);
-  const yAdjusted = adjust(state.y, yIncrease, feeBase);
-  const zAdjusted = adjust(state.z, zIncrease, feeBase);
-  checkConstantProduct(state, xReserve, yAdjusted, zAdjusted);
-
-  const denominator = new Uint256(xReserve);
-  denominator.mulAssign(feeBase);
-
-  const yMax = new Uint256(xDecrease);
-  yMax.mulAssign(state.y);
-  const minimum = new Uint256(yMax);
-  yMax.shiftLeftAssign(16);
-  yMax.set(divUp(yMax, denominator));
-  invariant(yIncrease.lte(yMax), 'E214');
-
-  const zMax = new Uint256(xDecrease);
-  zMax.mulAssign(state.z);
-  zMax.shiftLeftAssign(16);
-  zMax.set(divUp(zMax, denominator));
-  invariant(zIncrease.lte(zMax), 'E215');
-
-  minimum.shiftLeftAssign(12);
-  minimum.set(divUp(minimum, denominator));
-
-  invariant(yIncrease.gte(minimum), 'E302');
-}
-
-function adjust(
-  reserve: Uint112,
-  increase: Uint112,
-  feeBase: Uint128
-): Uint128 {
-  const adjusted = new Uint128(reserve);
-  adjusted.shiftLeftAssign(16);
-  adjusted.addAssign(feeBase.mul(increase));
-  return adjusted;
-}
-
-function getDebt(
+function getX(
   maturity: Uint256,
-  xDecrease: Uint112,
-  yIncrease: Uint112,
+  assetOut: Uint112,
+  fee: Uint16,
+  protocolFee: Uint16,
   now: Uint256
 ): Uint112 {
-  const _debtIn = new Uint256(maturity);
-  _debtIn.subAssign(now);
-  _debtIn.mulAssign(yIncrease);
-  _debtIn.set(shiftRightUp(_debtIn, new Uint256(32)));
-  _debtIn.addAssign(xDecrease);
-  const debtIn = new Uint112(_debtIn);
+  const totalFee = new Uint256(fee);
+  totalFee.addAssign(protocolFee);
 
-  return debtIn;
-}
+  const numerator = new Uint256(maturity);
+  numerator.subAssign(now);
+  numerator.mulAssign(totalFee);
+  numerator.addAssign(BASE);
 
-function getCollateral(
-  maturity: Uint256,
-  state: CP,
-  xDecrease: Uint112,
-  zIncrease: Uint112,
-  now: Uint256
-): Uint112 {
-  const _collateralIn = new Uint256(maturity);
-  _collateralIn.subAssign(now);
-  _collateralIn.mulAssign(zIncrease);
-  _collateralIn.set(shiftRightUp(_collateralIn, new Uint256(25)));
-  const minimum = new Uint256(state.z);
-  minimum.mulAssign(xDecrease);
-  const denominator = new Uint256(state.x);
-  denominator.subAssign(xDecrease);
-  minimum.set(divUp(minimum, denominator));
-  _collateralIn.addAssign(minimum);
-  const collateralIn = new Uint112(_collateralIn);
+  const _xDecrease = new Uint256(assetOut);
+  _xDecrease.mulAssign(numerator);
+  _xDecrease.set(divUp(_xDecrease, BASE));
+  const xDecrease = new Uint112(_xDecrease);
 
-  return collateralIn;
+  return xDecrease;
 }
 
 export interface BorrowResult {
+  xDecrease: Uint112;
   yIncrease: Uint112;
   zIncrease: Uint112;
 }
@@ -306,8 +229,4 @@ export default {
   givenCollateral,
   givenPercent,
   borrow,
-  check,
-  adjust,
-  getDebt,
-  getCollateral,
 };

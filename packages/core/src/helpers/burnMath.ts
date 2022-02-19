@@ -1,79 +1,32 @@
+import invariant from 'tiny-invariant';
 import { Claims, Tokens } from '../entities';
 import { Uint256, Uint128 } from '../uint';
-import { mulDiv } from './fullMath';
-import { divUp } from './math';
+import timeswapMath from './timeswapMath';
 
 export function burn(
+  feeStored: Uint256,
   reserves: Tokens,
   totalClaims: Claims,
   totalLiquidity: Uint256,
   liquidityIn: Uint256
-): Tokens {
-  const asset = getAsset(reserves, totalClaims, totalLiquidity, liquidityIn);
-  const collateral = getCollateral(
+): { assetOut: Uint256; collateralOut: Uint128 } {
+  // require(block.timestamp >= param.maturity, 'E203');
+  invariant(liquidityIn.ne(0), 'E205');
+
+  const { assetOut: _assetOut, collateralOut, feeOut } = timeswapMath.burn(
+    totalLiquidity,
+    feeStored,
     reserves,
     totalClaims,
-    totalLiquidity,
     liquidityIn
   );
 
-  return { asset, collateral };
-}
+  const assetOut = new Uint256(_assetOut);
+  assetOut.addAssign(feeOut);
 
-function getAsset(
-  reserves: Tokens,
-  totalClaims: Claims,
-  totalLiquidity: Uint256,
-  liquidityIn: Uint256
-): Uint128 {
-  const assetOut = new Uint128(0);
-  const totalAsset = new Uint256(reserves.asset);
-  const totalBond = new Uint256(totalClaims.bondPrincipal);
-  totalBond.addAssign(totalClaims.bondInterest);
-
-  if (totalAsset.lte(totalBond)) return assetOut;
-  const _assetOut = new Uint256(totalAsset);
-  _assetOut.subAssign(totalBond);
-  _assetOut.set(mulDiv(_assetOut, liquidityIn, totalLiquidity));
-  assetOut.set(_assetOut);
-  return assetOut;
-}
-
-function getCollateral(
-  reserves: Tokens,
-  totalClaims: Claims,
-  totalLiquidity: Uint256,
-  liquidityIn: Uint256
-): Uint128 {
-  const collateralOut = new Uint128(0);
-  const totalAsset = new Uint256(reserves.asset);
-  const totalCollateral = new Uint256(reserves.collateral);
-  const totalBond = new Uint256(totalClaims.bondPrincipal);
-  totalBond.addAssign(totalClaims.bondInterest);
-
-  const _collateralOut = new Uint256(totalCollateral);
-  if (totalAsset.gte(totalBond)) {
-    _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
-    collateralOut.set(_collateralOut);
-    return collateralOut;
-  }
-  const deficit = new Uint256(totalBond);
-  deficit.subAssign(totalAsset);
-  const totalInsurance = new Uint256(totalClaims.insurancePrincipal);
-  totalInsurance.addAssign(totalClaims.insuranceInterest);
-  if (totalCollateral.mul(totalBond).lte(deficit.mul(totalInsurance)))
-    return collateralOut;
-  const subtrahend = new Uint256(deficit);
-  subtrahend.mulAssign(totalInsurance);
-  subtrahend.set(divUp(subtrahend, new Uint256(totalBond)));
-  _collateralOut.subAssign(subtrahend);
-  _collateralOut.set(mulDiv(_collateralOut, liquidityIn, totalLiquidity));
-  collateralOut.set(_collateralOut);
-  return collateralOut;
+  return { assetOut, collateralOut };
 }
 
 export default {
   burn,
-  getAsset,
-  getCollateral,
 };

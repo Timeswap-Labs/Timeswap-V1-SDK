@@ -5,7 +5,7 @@ import invariant from 'tiny-invariant';
 import {
   ERC20Token,
   NativeToken,
-  Due as DueCalculated,
+  Due as DueCore,
   Pair as PairCore,
   Uint112,
   Uint128,
@@ -15,6 +15,9 @@ import {
   Uint40,
   CP,
   Uint120,
+  LiquidityReturn,
+  LendReturn,
+  BorrowReturn,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
 import { Conv, ConvSigner } from './conv';
 import pairAbi from '../abi/pair';
@@ -139,6 +142,20 @@ export class Pair {
     const protocolFee = await this.pair!.protocolFee();
 
     return new Uint16(protocolFee);
+  }
+
+  async getFeeStored(maturity: Uint256): Promise<Uint256> {
+    await this.initPair();
+    const feeStored = await this.pair!.feeStored(maturity.toBigInt());
+
+    return new Uint256(feeStored);
+  }
+
+  async getProtocolFeeStored(): Promise<Uint256> {
+    await this.initPair();
+    const protocolFeeStored = await this.pair!.protocolFeeStored();
+
+    return new Uint256(protocolFeeStored);
   }
 
   async getConstantProduct(maturity: Uint256): Promise<CP> {
@@ -280,14 +297,14 @@ export class Pair {
 
   calculateNewLiquidity(
     state: CP,
-    protocolFee: Uint16,
+    feeStored: Uint256,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     debtIn: Uint112,
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn1 {
+  ): LiquidityReturn {
     return PairCore.calculateNewLiquidity(
       state,
       maturity,
@@ -296,67 +313,68 @@ export class Pair {
       debtIn,
       collateralIn,
       now,
-      protocolFee
+      feeStored
     );
   }
 
   calculateLiquidityGivenAsset(
     state: CP,
-    protocolFee: Uint16,
+    feeStored: Uint256,
     totalLiquidity: Uint256,
     assetIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn1 {
+  ): LiquidityReturn {
     return PairCore.calculateLiquidityGivenAsset(
       state,
       maturity,
       totalLiquidity,
       assetIn,
       now,
-      protocolFee
+      feeStored
     );
   }
 
   calculateLiquidityGivenDebt(
     state: CP,
-    protocolFee: Uint16,
+    feeStored: Uint256,
     totalLiquidity: Uint256,
     debtIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn2 {
+  ): LiquidityReturn {
     return PairCore.calculateLiquidityGivenDebt(
       state,
       maturity,
       totalLiquidity,
       debtIn,
       now,
-      protocolFee
+      feeStored
     );
   }
 
   calculateLiquidityGivenCollateral(
     state: CP,
-    protocolFee: Uint16,
+    feeStored: Uint256,
     totalLiquidity: Uint256,
     collateralIn: Uint112,
     maturity: Uint256,
     now: Uint256
-  ): LiquidityReturn2 {
+  ): LiquidityReturn {
     return PairCore.calculateLiquidityGivenCollateral(
       state,
       maturity,
       totalLiquidity,
       collateralIn,
       now,
-      protocolFee
+      feeStored
     );
   }
 
   calculateLendGivenBond(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetIn: Uint112,
     bondOut: Uint128,
     maturity: Uint256,
@@ -368,13 +386,15 @@ export class Pair {
       assetIn,
       bondOut,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
   calculateLendGivenInsurance(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetIn: Uint112,
     insuranceOut: Uint128,
     maturity: Uint256,
@@ -386,13 +406,15 @@ export class Pair {
       assetIn,
       insuranceOut,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
   calculateLendGivenPercent(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetIn: Uint112,
     percent: Uint40,
     maturity: Uint256,
@@ -404,13 +426,15 @@ export class Pair {
       assetIn,
       percent,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
   calculateBorrowGivenDebt(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetOut: Uint112,
     debtIn: Uint112,
     maturity: Uint256,
@@ -422,13 +446,15 @@ export class Pair {
       assetOut,
       debtIn,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
   calculateBorrowGivenCollateral(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetOut: Uint112,
     collateralIn: Uint112,
     maturity: Uint256,
@@ -440,13 +466,15 @@ export class Pair {
       assetOut,
       collateralIn,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
   calculateBorrowGivenPercent(
     state: CP,
     fee: Uint16,
+    protocolFee: Uint16,
     assetOut: Uint112,
     percent: Uint40,
     maturity: Uint256,
@@ -458,7 +486,8 @@ export class Pair {
       assetOut,
       percent,
       now,
-      fee
+      fee,
+      protocolFee
     );
   }
 
@@ -474,13 +503,15 @@ export class Pair {
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
-    liquidityIn: Uint256
-  ): Tokens {
+    liquidityIn: Uint256,
+    feeStored: Uint256
+  ): { assetOut: Uint256; collateralOut: Uint128 } {
     return PairCore.calculateBurn(
       reserves,
       totalClaims,
       totalLiquidity,
-      liquidityIn
+      liquidityIn,
+      feeStored
     );
   }
 }
@@ -890,37 +921,12 @@ export class PairSigner extends Pair {
   }
 }
 
-interface LiquidityReturn1 {
-  liquidityOut: Uint256;
-  dueOut: DueCalculated;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
-interface LiquidityReturn2 extends LiquidityReturn1 {
-  xIncrease: Uint112;
-}
-
-interface LendReturn {
-  claims: Claims;
-  yDecrease: Uint112;
-  zDecrease: Uint112;
-}
-
-interface BorrowReturn {
-  due: DueCalculated;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
 interface Tokens {
   asset: Uint128;
   collateral: Uint128;
 }
 
-interface Due {
-  debt: Uint112;
-  collateral: Uint112;
+interface Due extends DueCore {
   startBlock: Uint32;
 }
 

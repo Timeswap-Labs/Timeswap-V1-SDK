@@ -1,14 +1,15 @@
 import invariant from 'tiny-invariant';
 
+type Uintable = string | number | bigint | boolean | Uint;
+
 export abstract class Uint {
   protected abstract valid(): boolean;
   protected abstract clone(): this;
 
   protected value: bigint;
 
-  constructor(value: string | number | bigint | boolean | Uint) {
-    if (value instanceof Uint) this.value = value.value;
-    else this.value = BigInt(value);
+  constructor(value: Uintable) {
+    this.value = toBigInt(value);
     invariant(this.valid(), 'Invalid value');
   }
 
@@ -20,130 +21,128 @@ export abstract class Uint {
     return this.value.toString();
   }
 
-  set(value: string | number | bigint | boolean | Uint) {
-    if (value instanceof Uint) this.value = value.value;
-    else this.value = BigInt(value);
+  set(value: Uintable) {
+    this.value = toBigInt(value);
     invariant(this.valid(), 'Invalid value');
   }
 
-  addAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value += other.value;
-    else this.value += BigInt(other);
-
+  addAssign(other: Uintable) {
+    this.value += toBigInt(other);
     invariant(this.valid(), 'Addition out of bounds');
   }
 
-  subAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value -= other.value;
-    else this.value -= BigInt(other);
-
+  subAssign(other: Uintable) {
+    this.value -= toBigInt(other);
     invariant(this.valid(), 'Subtraction out of bounds');
   }
 
-  mulAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value *= other.value;
-    else this.value *= BigInt(other);
-
+  mulAssign(other: Uintable) {
+    this.value *= toBigInt(other);
     invariant(this.valid(), 'Multiplication out of bounds');
   }
 
-  divAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value /= other.value;
-    else this.value /= BigInt(other);
-
+  divAssign(other: Uintable) {
+    this.value /= toBigInt(other);
     invariant(this.valid(), 'Division out of bounds');
   }
 
-  modAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value %= other.value;
-    else this.value %= BigInt(other);
-
+  modAssign(other: Uintable) {
+    this.value %= toBigInt(other);
     invariant(this.valid(), 'Modulus out of bounds');
   }
 
-  shiftLeftAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value <<= other.value;
-    else this.value <<= BigInt(other);
+  powAssign(other: Uintable) {
+    const value = toBigInt(other);
+    let result = 1n;
+    for (let i = 0n; i < value; i++, result *= this.value);
+    this.value = result;
+    invariant(this.valid(), 'Power out of bounds');
+  }
 
+  shlAssign(other: Uintable) {
+    this.value <<= toBigInt(other);
     invariant(this.valid(), 'Shift left out of bounds');
   }
 
-  shiftRightAssign(other: string | number | bigint | boolean | Uint) {
-    if (other instanceof Uint) this.value >>= other.value;
-    else this.value >>= BigInt(other);
-
+  shrAssign(other: Uintable) {
+    this.value >>= toBigInt(other);
     invariant(this.valid(), 'Shift right out of bounds');
   }
 
-  add(other: string | number | bigint | boolean | Uint): this {
+  add(other: Uintable): this {
     const result = this.clone();
     result.addAssign(other);
     return result;
   }
 
-  sub(other: string | number | bigint | boolean | Uint): this {
+  sub(other: Uintable): this {
     const result = this.clone();
     result.subAssign(other);
     return result;
   }
 
-  mul(other: string | number | bigint | boolean | Uint): this {
+  mul(other: Uintable): this {
     const result = this.clone();
     result.mulAssign(other);
     return result;
   }
 
-  div(other: string | number | bigint | boolean | Uint): this {
+  div(other: Uintable): this {
     const result = this.clone();
     result.divAssign(other);
     return result;
   }
 
-  mod(other: string | number | bigint | boolean | Uint): this {
+  mod(other: Uintable): this {
     const result = this.clone();
     result.modAssign(other);
     return result;
   }
 
-  shiftLeft(other: string | number | bigint | boolean | Uint): this {
+  pow(other: Uintable): this {
     const result = this.clone();
-    result.shiftLeftAssign(other);
+    result.powAssign(other);
     return result;
   }
 
-  shiftRight(other: string | number | bigint | boolean | Uint): this {
+  shl(other: Uintable): this {
     const result = this.clone();
-    result.shiftRightAssign(other);
+    result.shlAssign(other);
     return result;
   }
 
-  eq(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value === other.value;
-    else return this.value === BigInt(other);
+  shr(other: Uintable): this {
+    const result = this.clone();
+    result.shrAssign(other);
+    return result;
   }
 
-  ne(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value !== other.value;
-    else return this.value !== BigInt(other);
+  eq(other: Uintable): boolean {
+    return this.value === toBigInt(other);
   }
 
-  gt(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value > other.value;
-    else return this.value > BigInt(other);
+  ne(other: Uintable): boolean {
+    return this.value !== toBigInt(other);
   }
 
-  gte(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value >= other.value;
-    else return this.value >= BigInt(other);
+  gt(other: Uintable): boolean {
+    return this.value > toBigInt(other);
   }
 
-  lt(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value < other.value;
-    else return this.value < BigInt(other);
+  gte(other: Uintable): boolean {
+    return this.value >= toBigInt(other);
   }
 
-  lte(other: string | number | bigint | boolean | Uint): boolean {
-    if (other instanceof Uint) return this.value <= other.value;
-    else return this.value <= BigInt(other);
+  lt(other: Uintable): boolean {
+    return this.value < toBigInt(other);
   }
+
+  lte(other: Uintable): boolean {
+    return this.value <= toBigInt(other);
+  }
+}
+
+function toBigInt(value: Uintable): bigint {
+  if (value instanceof Uint) return value.toBigInt();
+  else return BigInt(value);
 }

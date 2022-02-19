@@ -1,4 +1,11 @@
-import { CP, Due, Claims, Tokens } from './interface';
+import {
+  CP,
+  Claims,
+  Tokens,
+  LiquidityReturn,
+  LendReturn,
+  BorrowReturn,
+} from './interface';
 import { Uint16, Uint256, Uint112, Uint128, Uint40 } from '../uint';
 import {
   givenBond,
@@ -45,9 +52,9 @@ export class Pair {
     debtIn: Uint112,
     collateralIn: Uint112,
     now: Uint256,
-    protocolFee: Uint16
-  ): LiquidityReturn1 {
-    const { yIncrease, zIncrease } = givenNew(
+    feeStored: Uint256
+  ): LiquidityReturn {
+    const givenNewReturn = givenNew(
       maturity,
       assetIn,
       debtIn,
@@ -55,18 +62,18 @@ export class Pair {
       now
     );
 
-    const { liquidityOut, dueOut } = mint(
-      protocolFee,
+    const liquidityReturn = mint(
+      feeStored,
       state,
       totalLiquidity,
       maturity,
       assetIn,
-      yIncrease,
-      zIncrease,
+      givenNewReturn.yIncrease,
+      givenNewReturn.zIncrease,
       now
     );
 
-    return { liquidityOut, dueOut, yIncrease, zIncrease };
+    return { ...liquidityReturn, ...givenNewReturn };
   }
 
   static calculateLiquidityGivenAsset(
@@ -75,22 +82,22 @@ export class Pair {
     totalLiquidity: Uint256,
     assetIn: Uint112,
     now: Uint256,
-    protocolFee: Uint16
-  ): LiquidityReturn1 {
-    const { yIncrease, zIncrease } = givenAsset(state, assetIn);
+    feeStored: Uint256
+  ): LiquidityReturn {
+    const givenAssetReturn = givenAsset(state, assetIn, feeStored);
 
-    const { liquidityOut, dueOut } = mint(
-      protocolFee,
+    const liquidityReturn = mint(
+      feeStored,
       state,
       totalLiquidity,
       maturity,
       assetIn,
-      yIncrease,
-      zIncrease,
+      givenAssetReturn.yIncrease,
+      givenAssetReturn.zIncrease,
       now
     );
 
-    return { liquidityOut, dueOut, yIncrease, zIncrease };
+    return { ...liquidityReturn, ...givenAssetReturn };
   }
 
   static calculateLiquidityGivenDebt(
@@ -99,27 +106,22 @@ export class Pair {
     totalLiquidity: Uint256,
     debtIn: Uint112,
     now: Uint256,
-    protocolFee: Uint16
-  ): LiquidityReturn2 {
-    const { xIncrease, yIncrease, zIncrease } = givenDebt(
-      state,
-      maturity,
-      debtIn,
-      now
-    );
+    feeStored: Uint256
+  ): LiquidityReturn {
+    const givenDebtReturn = givenDebt(state, maturity, debtIn, now);
 
-    const { liquidityOut, dueOut } = mint(
-      protocolFee,
+    const liquidityReturn = mint(
+      feeStored,
       state,
       totalLiquidity,
       maturity,
-      xIncrease,
-      yIncrease,
-      zIncrease,
+      givenDebtReturn.xIncrease,
+      givenDebtReturn.yIncrease,
+      givenDebtReturn.zIncrease,
       now
     );
 
-    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
+    return { ...liquidityReturn, ...givenDebtReturn };
   }
 
   static calculateLiquidityGivenCollateral(
@@ -128,27 +130,27 @@ export class Pair {
     totalLiquidity: Uint256,
     collateralIn: Uint112,
     now: Uint256,
-    protocolFee: Uint16
-  ): LiquidityReturn2 {
-    const { xIncrease, yIncrease, zIncrease } = givenCollateral(
+    feeStored: Uint256
+  ): LiquidityReturn {
+    const givenCollateralReturn = givenCollateral(
       state,
       maturity,
       collateralIn,
       now
     );
 
-    const { liquidityOut, dueOut } = mint(
-      protocolFee,
+    const liquidityReturn = mint(
+      feeStored,
       state,
       totalLiquidity,
       maturity,
-      xIncrease,
-      yIncrease,
-      zIncrease,
+      givenCollateralReturn.xIncrease,
+      givenCollateralReturn.yIncrease,
+      givenCollateralReturn.zIncrease,
       now
     );
 
-    return { liquidityOut, dueOut, xIncrease, yIncrease, zIncrease };
+    return { ...liquidityReturn, ...givenCollateralReturn };
   }
 
   static calculateLendGivenBond(
@@ -157,10 +159,12 @@ export class Pair {
     assetIn: Uint112,
     bondOut: Uint128,
     now: Uint256,
-    fee: Uint16
+    fee: Uint16,
+    protocolFee: Uint16
   ): LendReturn {
-    const { yDecrease, zDecrease } = givenBond(
+    const givenBondReturn = givenBond(
       fee,
+      protocolFee,
       state,
       maturity,
       assetIn,
@@ -168,17 +172,18 @@ export class Pair {
       now
     );
 
-    const claims = lend(
+    const lendReturn = lend(
       fee,
+      protocolFee,
       state,
       maturity,
       assetIn,
-      yDecrease,
-      zDecrease,
+      givenBondReturn.yDecrease,
+      givenBondReturn.zDecrease,
       now
     );
 
-    return { claims, yDecrease, zDecrease };
+    return { ...lendReturn, ...givenBondReturn };
   }
 
   static calculateLendGivenInsurance(
@@ -187,10 +192,12 @@ export class Pair {
     assetIn: Uint112,
     insuranceOut: Uint128,
     now: Uint256,
-    fee: Uint16
+    fee: Uint16,
+    protocolFee: Uint16
   ): LendReturn {
-    const { yDecrease, zDecrease } = givenInsurance(
+    const givenInsuranceReturn = givenInsurance(
       fee,
+      protocolFee,
       state,
       maturity,
       assetIn,
@@ -198,17 +205,18 @@ export class Pair {
       now
     );
 
-    const claims = lend(
+    const lendReturn = lend(
       fee,
+      protocolFee,
       state,
       maturity,
       assetIn,
-      yDecrease,
-      zDecrease,
+      givenInsuranceReturn.yDecrease,
+      givenInsuranceReturn.zDecrease,
       now
     );
 
-    return { claims, yDecrease, zDecrease };
+    return { ...lendReturn, ...givenInsuranceReturn };
   }
 
   static calculateLendGivenPercent(
@@ -217,114 +225,31 @@ export class Pair {
     assetIn: Uint112,
     percent: Uint40,
     now: Uint256,
-    fee: Uint16
+    fee: Uint16,
+    protocolFee: Uint16
   ): LendReturn {
-    const { yDecrease, zDecrease } = givenPercentLend(
+    const givenPercentLendReturn = givenPercentLend(
       fee,
-      state,
-      assetIn,
-      percent
-    );
-
-    const claims = lend(
-      fee,
+      protocolFee,
       state,
       maturity,
       assetIn,
-      yDecrease,
-      zDecrease,
+      percent,
       now
     );
 
-    return { claims, yDecrease, zDecrease };
-  }
-
-  static calculateBorrowGivenDebt(
-    state: CP,
-    maturity: Uint256,
-    assetOut: Uint112,
-    debtIn: Uint112,
-    now: Uint256,
-    fee: Uint16
-  ): BorrowReturn {
-    const { yIncrease, zIncrease } = givenDebtBorrow(
+    const lendReturn = lend(
       fee,
+      protocolFee,
       state,
       maturity,
-      assetOut,
-      debtIn,
+      assetIn,
+      givenPercentLendReturn.yDecrease,
+      givenPercentLendReturn.zDecrease,
       now
     );
 
-    const due = borrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      yIncrease,
-      zIncrease,
-      now
-    );
-
-    return { due, yIncrease, zIncrease };
-  }
-
-  static calculateBorrowGivenCollateral(
-    state: CP,
-    maturity: Uint256,
-    assetOut: Uint112,
-    collateralIn: Uint112,
-    now: Uint256,
-    fee: Uint16
-  ): BorrowReturn {
-    const { yIncrease, zIncrease } = givenCollateralBorrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      collateralIn,
-      now
-    );
-
-    const due = borrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      yIncrease,
-      zIncrease,
-      now
-    );
-
-    return { due, yIncrease, zIncrease };
-  }
-
-  static calculateBorrowGivenPercent(
-    state: CP,
-    maturity: Uint256,
-    assetOut: Uint112,
-    percent: Uint40,
-    now: Uint256,
-    fee: Uint16
-  ): BorrowReturn {
-    const { yIncrease, zIncrease } = givenPercentBorrow(
-      fee,
-      state,
-      assetOut,
-      percent
-    );
-
-    const due = borrow(
-      fee,
-      state,
-      maturity,
-      assetOut,
-      yIncrease,
-      zIncrease,
-      now
-    );
-
-    return { due, yIncrease, zIncrease };
+    return { ...lendReturn, ...givenPercentLendReturn };
   }
 
   static calculateWithdraw(
@@ -335,35 +260,112 @@ export class Pair {
     return withdraw(reserves, totalClaims, claimsIn);
   }
 
+  static calculateBorrowGivenDebt(
+    state: CP,
+    maturity: Uint256,
+    assetOut: Uint112,
+    debtIn: Uint112,
+    now: Uint256,
+    fee: Uint16,
+    protocolFee: Uint16
+  ): BorrowReturn {
+    const givenDebtBorrowReturn = givenDebtBorrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      debtIn,
+      now
+    );
+
+    const borrowReturn = borrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      givenDebtBorrowReturn.yIncrease,
+      givenDebtBorrowReturn.zIncrease,
+      now
+    );
+
+    return { ...borrowReturn, ...givenDebtBorrowReturn };
+  }
+
+  static calculateBorrowGivenCollateral(
+    state: CP,
+    maturity: Uint256,
+    assetOut: Uint112,
+    collateralIn: Uint112,
+    now: Uint256,
+    fee: Uint16,
+    protocolFee: Uint16
+  ): BorrowReturn {
+    const givenCollateralBorrowReturn = givenCollateralBorrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      collateralIn,
+      now
+    );
+
+    const borrowReturn = borrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      givenCollateralBorrowReturn.yIncrease,
+      givenCollateralBorrowReturn.zIncrease,
+      now
+    );
+
+    return { ...borrowReturn, ...givenCollateralBorrowReturn };
+  }
+
+  static calculateBorrowGivenPercent(
+    state: CP,
+    maturity: Uint256,
+    assetOut: Uint112,
+    percent: Uint40,
+    now: Uint256,
+    fee: Uint16,
+    protocolFee: Uint16
+  ): BorrowReturn {
+    const givenPercentBorrowReturn = givenPercentBorrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      percent,
+      now
+    );
+
+    const borrowReturn = borrow(
+      fee,
+      protocolFee,
+      state,
+      maturity,
+      assetOut,
+      givenPercentBorrowReturn.yIncrease,
+      givenPercentBorrowReturn.zIncrease,
+      now
+    );
+
+    return { ...borrowReturn, ...givenPercentBorrowReturn };
+  }
+
   static calculateBurn(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
-    liquidityIn: Uint256
-  ): Tokens {
-    return burn(reserves, totalClaims, totalLiquidity, liquidityIn);
+    liquidityIn: Uint256,
+    feeStored: Uint256
+  ): { assetOut: Uint256; collateralOut: Uint128 } {
+    return burn(feeStored, reserves, totalClaims, totalLiquidity, liquidityIn);
   }
-}
-
-interface LiquidityReturn1 {
-  liquidityOut: Uint256;
-  dueOut: Due;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
-interface LiquidityReturn2 extends LiquidityReturn1 {
-  xIncrease: Uint112;
-}
-
-interface LendReturn {
-  claims: Claims;
-  yDecrease: Uint112;
-  zDecrease: Uint112;
-}
-
-interface BorrowReturn {
-  due: Due;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
 }

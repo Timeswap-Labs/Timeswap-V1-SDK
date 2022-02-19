@@ -4,7 +4,7 @@ import { Provider } from '@ethersproject/abstract-provider';
 import {
   ERC20Token,
   NativeToken,
-  Due as DueCalculated,
+  Due as DueCore,
   Uint112,
   Uint128,
   Uint16,
@@ -13,6 +13,9 @@ import {
   Uint40,
   CP,
   Uint120,
+  LiquidityReturn,
+  LendReturn,
+  BorrowReturn,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
 import { Pair, PairSigner } from './pair';
 
@@ -131,6 +134,10 @@ export class Pool {
         cache?.protocolFee ??
         this.cache?.protocolFee ??
         (await this.getProtocolFee()),
+      feeStored:
+        cache?.feeStored ??
+        this.cache?.feeStored ??
+        (await this.getFeeStored()),
     };
   }
 
@@ -148,6 +155,14 @@ export class Pool {
 
   async getProtocolFee(): Promise<Uint16> {
     return this.pair.getProtocolFee();
+  }
+
+  async getFeeStored(): Promise<Uint256> {
+    return this.pair.getFeeStored(this.maturity);
+  }
+
+  async getProtocolFeeStored(): Promise<Uint256> {
+    return this.pair.getProtocolFeeStored();
   }
 
   async getConstantProduct(): Promise<CP> {
@@ -207,12 +222,12 @@ export class Pool {
     debtIn: Uint112,
     collateralIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn1> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateNewLiquidity(
       this.cache!.state,
-      this.cache!.protocolFee,
+      this.cache!.feeStored,
       this.cache!.totalLiquidity,
       assetIn,
       debtIn,
@@ -225,12 +240,12 @@ export class Pool {
   async calculateLiquidityGivenAsset(
     assetIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn1> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLiquidityGivenAsset(
       this.cache!.state,
-      this.cache!.protocolFee,
+      this.cache!.feeStored,
       this.cache!.totalLiquidity,
       assetIn,
       this.maturity,
@@ -241,12 +256,12 @@ export class Pool {
   async calculateLiquidityGivenDebt(
     debtIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn2> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLiquidityGivenDebt(
       this.cache!.state,
-      this.cache!.protocolFee,
+      this.cache!.feeStored,
       this.cache!.totalLiquidity,
       debtIn,
       this.maturity,
@@ -257,12 +272,12 @@ export class Pool {
   async calculateLiquidityGivenCollateral(
     collateralIn: Uint112,
     now: Uint256
-  ): Promise<LiquidityReturn2> {
+  ): Promise<LiquidityReturn> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateLiquidityGivenCollateral(
       this.cache!.state,
-      this.cache!.protocolFee,
+      this.cache!.feeStored,
       this.cache!.totalLiquidity,
       collateralIn,
       this.maturity,
@@ -280,6 +295,7 @@ export class Pool {
     return this.pair.calculateLendGivenBond(
       this.cache!.state,
       this.cache!.fee,
+      this.cache!.protocolFee,
       assetIn,
       bondOut,
       this.maturity,
@@ -297,6 +313,7 @@ export class Pool {
     return this.pair.calculateLendGivenInsurance(
       this.cache!.state,
       this.cache!.fee,
+      this.cache!.protocolFee,
       assetIn,
       insuranceOut,
       this.maturity,
@@ -314,6 +331,7 @@ export class Pool {
     return this.pair.calculateLendGivenPercent(
       this.cache!.state,
       this.cache!.fee,
+      this.cache!.protocolFee,
       assetIn,
       percent,
       this.maturity,
@@ -331,6 +349,7 @@ export class Pool {
     return this.pair.calculateBorrowGivenDebt(
       this.cache!.state,
       this.cache!.fee,
+      this.cache!.protocolFee,
       assetOut,
       debtIn,
       this.maturity,
@@ -348,6 +367,7 @@ export class Pool {
     return this.pair.calculateBorrowGivenCollateral(
       this.cache!.state,
       this.cache!.fee,
+      this.cache!.protocolFee,
       assetOut,
       collateralIn,
       this.maturity,
@@ -364,6 +384,7 @@ export class Pool {
 
     return this.pair.calculateBorrowGivenPercent(
       this.cache!.state,
+      this.cache!.protocolFee,
       this.cache!.fee,
       assetOut,
       percent,
@@ -382,14 +403,17 @@ export class Pool {
     );
   }
 
-  async calculateBurn(liquidityIn: Uint256): Promise<Tokens> {
+  async calculateBurn(
+    liquidityIn: Uint256
+  ): Promise<{ assetOut: Uint256; collateralOut: Uint128 }> {
     if (!this.cache) await this.updateCache();
 
     return this.pair.calculateBurn(
       this.cache!.reserves,
       this.cache!.totalClaims,
       this.cache!.totalLiquidity,
-      liquidityIn
+      liquidityIn,
+      this.cache!.feeStored
     );
   }
 }
@@ -526,29 +550,6 @@ export class PoolSigner extends Pool {
   }
 }
 
-interface LiquidityReturn1 {
-  liquidityOut: Uint256;
-  dueOut: DueCalculated;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
-interface LiquidityReturn2 extends LiquidityReturn1 {
-  xIncrease: Uint112;
-}
-
-interface LendReturn {
-  claims: Claims;
-  yDecrease: Uint112;
-  zDecrease: Uint112;
-}
-
-interface BorrowReturn {
-  due: DueCalculated;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
 interface Cache {
   state: CP;
   reserves: Tokens;
@@ -556,6 +557,7 @@ interface Cache {
   totalLiquidity: Uint256;
   fee: Uint16;
   protocolFee: Uint16;
+  feeStored: Uint256;
 }
 
 interface CacheModifier {
@@ -565,6 +567,7 @@ interface CacheModifier {
   totalLiquidity?: Uint256;
   fee?: Uint16;
   protocolFee?: Uint16;
+  feeStored?: Uint256;
 }
 
 interface Tokens {
@@ -572,9 +575,7 @@ interface Tokens {
   collateral: Uint128;
 }
 
-interface Due {
-  debt: Uint112;
-  collateral: Uint112;
+interface Due extends DueCore {
   startBlock: Uint32;
 }
 

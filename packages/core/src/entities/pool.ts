@@ -1,7 +1,14 @@
 import { ERC20Token } from './erc20Token';
 import { NativeToken } from './nativeToken';
 import { Pair } from './pair';
-import { CP, Claims, Due, Tokens } from './interface';
+import {
+  CP,
+  Claims,
+  Tokens,
+  LiquidityReturn,
+  LendReturn,
+  BorrowReturn,
+} from './interface';
 import { Uint256, Uint112, Uint128, Uint40, Uint16, Uint } from '../uint';
 
 export class Pool {
@@ -41,8 +48,9 @@ export class Pool {
     assetIn: Uint112,
     debtIn: Uint112,
     collateralIn: Uint112,
-    now: Uint256
-  ): LiquidityReturn1 {
+    now: Uint256,
+    feeStored: Uint256
+  ): LiquidityReturn {
     return Pair.calculateNewLiquidity(
       state,
       this.maturity,
@@ -51,7 +59,7 @@ export class Pool {
       debtIn,
       collateralIn,
       now,
-      this.protocolFee
+      feeStored
     );
   }
 
@@ -59,15 +67,16 @@ export class Pool {
     state: CP,
     totalLiquidity: Uint256,
     assetIn: Uint112,
-    now: Uint256
-  ): LiquidityReturn1 {
+    now: Uint256,
+    feeStored: Uint256
+  ): LiquidityReturn {
     return Pair.calculateLiquidityGivenAsset(
       state,
       this.maturity,
       totalLiquidity,
       assetIn,
       now,
-      this.protocolFee
+      feeStored
     );
   }
 
@@ -75,15 +84,16 @@ export class Pool {
     state: CP,
     totalLiquidity: Uint256,
     debtIn: Uint112,
-    now: Uint256
-  ): LiquidityReturn2 {
+    now: Uint256,
+    feeStored: Uint256
+  ): LiquidityReturn {
     return Pair.calculateLiquidityGivenDebt(
       state,
       this.maturity,
       totalLiquidity,
       debtIn,
       now,
-      this.protocolFee
+      feeStored
     );
   }
 
@@ -91,15 +101,16 @@ export class Pool {
     state: CP,
     totalLiquidity: Uint256,
     collateralIn: Uint112,
-    now: Uint256
-  ): LiquidityReturn2 {
+    now: Uint256,
+    feeStored: Uint256
+  ): LiquidityReturn {
     return Pair.calculateLiquidityGivenCollateral(
       state,
       this.maturity,
       totalLiquidity,
       collateralIn,
       now,
-      this.protocolFee
+      feeStored
     );
   }
 
@@ -115,7 +126,8 @@ export class Pool {
       assetIn,
       bondOut,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
   }
 
@@ -131,7 +143,8 @@ export class Pool {
       assetIn,
       insuranceOut,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
   }
 
@@ -147,8 +160,13 @@ export class Pool {
       assetIn,
       percent,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
+  }
+
+  withdraw(reserves: Tokens, totalClaims: Claims, claimsIn: Claims): Tokens {
+    return Pair.calculateWithdraw(reserves, totalClaims, claimsIn);
   }
 
   borrowGivenDebt(
@@ -163,7 +181,8 @@ export class Pool {
       assetOut,
       debtIn,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
   }
 
@@ -179,7 +198,8 @@ export class Pool {
       assetOut,
       collateralIn,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
   }
 
@@ -195,48 +215,24 @@ export class Pool {
       assetOut,
       percent,
       now,
-      this.fee
+      this.fee,
+      this.protocolFee
     );
-  }
-
-  withdraw(reserves: Tokens, totalClaims: Claims, claimsIn: Claims): Tokens {
-    return Pair.calculateWithdraw(reserves, totalClaims, claimsIn);
   }
 
   burn(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
-    liquidityIn: Uint256
-  ): Tokens {
+    liquidityIn: Uint256,
+    feeStored: Uint256
+  ): { assetOut: Uint256; collateralOut: Uint128 } {
     return Pair.calculateBurn(
       reserves,
       totalClaims,
       totalLiquidity,
-      liquidityIn
+      liquidityIn,
+      feeStored
     );
   }
-}
-
-interface LiquidityReturn1 {
-  liquidityOut: Uint256;
-  dueOut: Due;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
-}
-
-interface LiquidityReturn2 extends LiquidityReturn1 {
-  xIncrease: Uint112;
-}
-
-interface LendReturn {
-  claims: Claims;
-  yDecrease: Uint112;
-  zDecrease: Uint112;
-}
-
-interface BorrowReturn {
-  due: Due;
-  yIncrease: Uint112;
-  zIncrease: Uint112;
 }
