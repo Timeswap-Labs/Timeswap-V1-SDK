@@ -136,7 +136,7 @@ export function givenPercent(
     const zMid = new Uint256(cp.z);
     const subtrahend = new Uint256(cp.z);
     subtrahend.mulAssign(cp.z);
-    subtrahend.set(mulDivUp(subtrahend, new Uint256(cp.z), xReserve));
+    subtrahend.set(mulDivUp(subtrahend, new Uint256(cp.x), xReserve));
     subtrahend.set(sqrtUp(subtrahend));
     zMid.subAssign(subtrahend);
 
