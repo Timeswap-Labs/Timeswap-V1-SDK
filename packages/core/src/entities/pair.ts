@@ -243,7 +243,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetIn,
+      givenPercentLendReturn.xIncrease,
       givenPercentLendReturn.yDecrease,
       givenPercentLendReturn.zDecrease,
       now
