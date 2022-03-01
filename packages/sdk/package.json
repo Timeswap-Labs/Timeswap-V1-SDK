@@ -1,5 +1,5 @@
 {
-  "version": "0.1.72",
+  "version": "0.1.73",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
