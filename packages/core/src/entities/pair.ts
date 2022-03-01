@@ -67,7 +67,7 @@ export class Pair {
       state,
       totalLiquidity,
       maturity,
-      assetIn,
+      givenNewReturn.xIncrease,
       givenNewReturn.yIncrease,
       givenNewReturn.zIncrease,
       now
@@ -91,7 +91,7 @@ export class Pair {
       state,
       totalLiquidity,
       maturity,
-      assetIn,
+      givenAssetReturn.xIncrease,
       givenAssetReturn.yIncrease,
       givenAssetReturn.zIncrease,
       now
@@ -177,7 +177,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetIn,
+      givenBondReturn.xIncrease,
       givenBondReturn.yDecrease,
       givenBondReturn.zDecrease,
       now
@@ -210,7 +210,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetIn,
+      givenInsuranceReturn.xIncrease,
       givenInsuranceReturn.yDecrease,
       givenInsuranceReturn.zDecrease,
       now
@@ -284,7 +284,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetOut,
+      givenDebtBorrowReturn.xDecrease,
       givenDebtBorrowReturn.yIncrease,
       givenDebtBorrowReturn.zIncrease,
       now
@@ -317,7 +317,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetOut,
+      givenCollateralBorrowReturn.xDecrease,
       givenCollateralBorrowReturn.yIncrease,
       givenCollateralBorrowReturn.zIncrease,
       now
@@ -350,7 +350,7 @@ export class Pair {
       protocolFee,
       state,
       maturity,
-      assetOut,
+      givenPercentBorrowReturn.xDecrease,
       givenPercentBorrowReturn.yIncrease,
       givenPercentBorrowReturn.zIncrease,
       now
