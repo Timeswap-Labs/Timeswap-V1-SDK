@@ -3,11 +3,13 @@ import { ChainId } from './chainId';
 export const CONVENIENCE: AddressMap = {
   [ChainId.RINKEBY]: '0xefE81D4Aed8E58706b1B592d372DA21c46e64bBc',
   [ChainId.MATIC_TESTNET]: '0x5d33c9c1b4b14a727dd8dcd14b99d87edcc7777f',
+  [ChainId.MATIC]: '0xE857E9983Ba65d92Fd068110b11E0c7c4E115B16',
 };
 
 export const FACTORY: AddressMap = {
   [ChainId.RINKEBY]: '0x87838724523EB63fb3Af8418b3f14f00d4AcED08',
   [ChainId.MATIC_TESTNET]: '0x0a2934eA5891661c2E9052Ab57f78e6C931b2339',
+  [ChainId.MATIC]: '0xb71Af4865098fF8A998Efaf74254bC71fC45Ec6b',
 };
 
 export const WETH9_ADDRESS: AddressMap = {
