@@ -61,6 +61,7 @@ export function givenCollateral(
   xReserve.subAssign(xDecrease);
 
   const _zIncrease = new Uint256(collateralIn);
+  _zIncrease.subAssign(1);
   _zIncrease.mulAssign(xReserve); // bug
   const subtrahend = new Uint256(cp.z);
   subtrahend.mulAssign(xDecrease);

@@ -61,6 +61,7 @@ export function givenInsurance(
   xReserve.addAssign(xIncrease);
 
   const _zDecrease = new Uint256(insuranceOut);
+  _zDecrease.addAssign(1);
   _zDecrease.mulAssign(xReserve);
   const subtrahend = new Uint256(cp.z);
   subtrahend.mulAssign(xIncrease);
