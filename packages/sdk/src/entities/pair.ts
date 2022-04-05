@@ -531,23 +531,29 @@ export class PairSigner extends Pair {
     this.convSigner = this.conv.upgrade(signer);
   }
 
-  async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
+  async newLiquidity(
+    params: NewLiquidity,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.newLiquidity({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.newLiquidity(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.newLiquidityETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.assetIn }
+        { value: params.assetIn, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.newLiquidityETHCollateral(
@@ -555,7 +561,7 @@ export class PairSigner extends Pair {
           ...params,
           asset: this.asset,
         },
-        { value: params.collateralIn }
+        { value: params.collateralIn, gasLimit }
       );
     } else {
       throw 'Unreachable';
@@ -563,24 +569,28 @@ export class PairSigner extends Pair {
   }
 
   async liquidityGivenAsset(
-    params: LiquidityGivenAsset
+    params: LiquidityGivenAsset,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.liquidityGivenAsset({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.liquidityGivenAsset(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.liquidityGivenAssetETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.assetIn }
+        { value: params.assetIn, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.liquidityGivenAssetETHCollateral(
@@ -588,7 +598,7 @@ export class PairSigner extends Pair {
           ...params,
           asset: this.asset,
         },
-        { value: params.maxCollateral }
+        { value: params.maxCollateral, gasLimit }
       );
     } else {
       throw 'Unreachable';
@@ -596,24 +606,28 @@ export class PairSigner extends Pair {
   }
 
   async liquidityGivenDebt(
-    params: LiquidityGivenDebt
+    params: LiquidityGivenDebt,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.liquidityGivenDebt({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.liquidityGivenDebt(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.liquidityGivenDebtETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.maxAsset }
+        { value: params.maxAsset, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.liquidityGivenDebtETHCollateral(
@@ -621,7 +635,7 @@ export class PairSigner extends Pair {
           ...params,
           asset: this.asset,
         },
-        { value: params.maxCollateral }
+        { value: params.maxCollateral, gasLimit }
       );
     } else {
       throw 'Unreachable';
@@ -629,24 +643,28 @@ export class PairSigner extends Pair {
   }
 
   async liquidityGivenCollateral(
-    params: LiquidityGivenCollateral
+    params: LiquidityGivenCollateral,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.liquidityGivenCollateral({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.liquidityGivenCollateral(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.liquidityGivenCollateralETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.maxAsset }
+        { value: params.maxAsset, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.liquidityGivenCollateralETHCollateral(
@@ -654,173 +672,229 @@ export class PairSigner extends Pair {
           ...params,
           asset: this.asset,
         },
-        { value: params.collateralIn }
+        { value: params.collateralIn, gasLimit }
       );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
+  async removeLiquidity(
+    params: RemoveLiquidity,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.removeLiquidity({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.removeLiquidity(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.removeLiquidityETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.removeLiquidityETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.removeLiquidityETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.removeLiquidityETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async lendGivenBond(params: LendGivenBond): Promise<ContractTransaction> {
+  async lendGivenBond(
+    params: LendGivenBond,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.lendGivenBond({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenBond(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenBondETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.assetIn }
+        { value: params.assetIn, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.lendGivenBondETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.lendGivenBondETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
   async lendGivenInsurance(
-    params: LendGivenInsurance
+    params: LendGivenInsurance,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.lendGivenInsurance({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenInsurance(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenInsuranceETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.assetIn }
+        { value: params.assetIn, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.lendGivenInsuranceETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.lendGivenInsuranceETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
   async lendGivenPercent(
-    params: LendGivenPercent
+    params: LendGivenPercent,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.lendGivenPercent({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.lendGivenPercent(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.lendGivenPercentETHAsset(
         {
           ...params,
           collateral: this.collateral,
         },
-        { value: params.assetIn }
+        { value: params.assetIn, gasLimit }
       );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.lendGivenPercentETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.lendGivenPercentETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async collect(params: Collect): Promise<ContractTransaction> {
+  async collect(
+    params: Collect,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.collect({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.collect(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.collectETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.collectETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.collectETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.collectETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async borrowGivenDebt(params: BorrowGivenDebt): Promise<ContractTransaction> {
+  async borrowGivenDebt(
+    params: BorrowGivenDebt,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.borrowGivenDebt({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenDebt(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.borrowGivenDebtETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenDebtETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenDebtETHCollateral(
         {
           ...params,
           asset: this.asset,
         },
-        { value: params.maxCollateral }
+        { value: params.maxCollateral, gasLimit }
       );
     } else {
       throw 'Unreachable';
@@ -828,29 +902,36 @@ export class PairSigner extends Pair {
   }
 
   async borrowGivenCollateral(
-    params: BorrowGivenCollateral
+    params: BorrowGivenCollateral,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.borrowGivenCollateral({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenCollateral(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.borrowGivenCollateralETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenCollateralETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenCollateralETHCollateral(
         {
           ...params,
           asset: this.asset,
         },
-        { value: params.collateralIn }
+        { value: params.collateralIn, gasLimit }
       );
     } else {
       throw 'Unreachable';
@@ -858,45 +939,55 @@ export class PairSigner extends Pair {
   }
 
   async borrowGivenPercent(
-    params: BorrowGivenPercent
+    params: BorrowGivenPercent,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.borrowGivenPercent({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenPercent(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
-      return this.convSigner.borrowGivenPercentETHAsset({
-        ...params,
-        collateral: this.collateral,
-      });
+      return this.convSigner.borrowGivenPercentETHAsset(
+        {
+          ...params,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.asset instanceof ERC20Token) {
       return this.convSigner.borrowGivenPercentETHCollateral(
         {
           ...params,
           asset: this.asset,
         },
-        { value: params.maxCollateral }
+        { value: params.maxCollateral, gasLimit }
       );
     } else {
       throw 'Unreachable';
     }
   }
 
-  async repay(params: Repay): Promise<ContractTransaction> {
+  async repay(params: Repay, gasLimit?: Uint256): Promise<ContractTransaction> {
     if (
       this.asset instanceof ERC20Token &&
       this.collateral instanceof ERC20Token
     ) {
-      return this.convSigner.repay({
-        ...params,
-        asset: this.asset,
-        collateral: this.collateral,
-      });
+      return this.convSigner.repay(
+        {
+          ...params,
+          asset: this.asset,
+          collateral: this.collateral,
+        },
+        { gasLimit }
+      );
     } else if (this.collateral instanceof ERC20Token) {
       return this.convSigner.repayETHAsset(
         {
@@ -908,13 +999,17 @@ export class PairSigner extends Pair {
             (sum, x) => sum.add(x),
             new Uint112(0)
           ),
+          gasLimit,
         }
       );
     } else if (this.asset instanceof ERC20Token) {
-      return this.convSigner.repayETHCollateral({
-        ...params,
-        asset: this.asset,
-      });
+      return this.convSigner.repayETHCollateral(
+        {
+          ...params,
+          asset: this.asset,
+        },
+        { gasLimit }
+      );
     } else {
       throw 'Unreachable';
     }

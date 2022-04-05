@@ -93,25 +93,35 @@ export class Conv {
 }
 
 export class ConvSigner extends Conv {
-  async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
-    return this.convContract.newLiquidity([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.liquidityTo,
-      params.dueTo,
-      params.assetIn.toBigInt(),
-      params.debtIn.toBigInt(),
-      params.collateralIn.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+  async newLiquidity(
+    params: NewLiquidity,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'newLiquidity',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.assetIn.toBigInt(),
+        params.debtIn.toBigInt(),
+        params.collateralIn.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async newLiquidityETHAsset(
     params: NewLiquidityETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.newLiquidityETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'newLiquidityETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -121,7 +131,10 @@ export class ConvSigner extends Conv {
         params.collateralIn.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
@@ -129,7 +142,9 @@ export class ConvSigner extends Conv {
     params: NewLiquidityETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.newLiquidityETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'newLiquidityETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -139,32 +154,43 @@ export class ConvSigner extends Conv {
         params.debtIn.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async liquidityGivenAsset(
-    params: LiquidityGivenAsset
+    params: LiquidityGivenAsset,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenAsset([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.liquidityTo,
-      params.dueTo,
-      params.assetIn.toBigInt(),
-      params.minLiquidity.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenAsset',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.assetIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async liquidityGivenAssetETHAsset(
     params: LiquidityGivenAssetETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenAssetETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenAssetETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -175,7 +201,10 @@ export class ConvSigner extends Conv {
         params.maxCollateral.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
@@ -183,7 +212,9 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenAssetETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenAssetETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenAssetETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -194,32 +225,43 @@ export class ConvSigner extends Conv {
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async liquidityGivenDebt(
-    params: LiquidityGivenDebt
+    params: LiquidityGivenDebt,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenDebt([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.liquidityTo,
-      params.dueTo,
-      params.debtIn.toBigInt(),
-      params.minLiquidity.toBigInt(),
-      params.maxAsset.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenDebt',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.debtIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxAsset.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async liquidityGivenDebtETHAsset(
     params: LiquidityGivenDebtETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenDebtETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenDebtETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -230,7 +272,10 @@ export class ConvSigner extends Conv {
         params.maxCollateral.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
@@ -238,7 +283,9 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenDebtETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenDebtETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenDebtETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -249,32 +296,43 @@ export class ConvSigner extends Conv {
         params.maxAsset.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async liquidityGivenCollateral(
-    params: LiquidityGivenCollateral
+    params: LiquidityGivenCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenCollateral([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.liquidityTo,
-      params.dueTo,
-      params.collateralIn.toBigInt(),
-      params.minLiquidity.toBigInt(),
-      params.maxAsset.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenCollateral',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.liquidityTo,
+        params.dueTo,
+        params.collateralIn.toBigInt(),
+        params.minLiquidity.toBigInt(),
+        params.maxAsset.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async liquidityGivenCollateralETHAsset(
     params: LiquidityGivenCollateralETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenCollateralETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenCollateralETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -285,7 +343,10 @@ export class ConvSigner extends Conv {
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
@@ -293,7 +354,9 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenCollateralETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.liquidityGivenCollateralETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'liquidityGivenCollateralETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -304,64 +367,97 @@ export class ConvSigner extends Conv {
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
-  async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
-    return this.convContract.removeLiquidity([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
-      params.liquidityIn.toBigInt(),
-    ]);
+  async removeLiquidity(
+    params: RemoveLiquidity,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'removeLiquidity',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        params.liquidityIn.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async removeLiquidityETHAsset(
-    params: RemoveLiquidityETHAsset
+    params: RemoveLiquidityETHAsset,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.removeLiquidityETHAsset([
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
-      params.liquidityIn.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'removeLiquidityETHAsset',
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        params.liquidityIn.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async removeLiquidityETHCollateral(
-    params: RemoveLiquidityETHCollateral
+    params: RemoveLiquidityETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.removeLiquidityETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
-      params.liquidityIn.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'removeLiquidityETHCollateral',
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        params.liquidityIn.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
-  async lendGivenBond(params: LendGivenBond): Promise<ContractTransaction> {
-    return this.convContract.lendGivenBond([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.bondOut.toBigInt(),
-      params.minInsurance.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+  async lendGivenBond(
+    params: LendGivenBond,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'lendGivenBond',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.bondOut.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async lendGivenBondETHAsset(
     params: LendGivenBondETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenBondETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'lendGivenBondETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -371,46 +467,63 @@ export class ConvSigner extends Conv {
         params.minInsurance.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async lendGivenBondETHCollateral(
-    params: LendGivenBondETHCollateral
+    params: LendGivenBondETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenBondETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.bondOut.toBigInt(),
-      params.minInsurance.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'lendGivenBondETHCollateral',
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.bondOut.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async lendGivenInsurance(
-    params: LendGivenInsurance
+    params: LendGivenInsurance,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenInsurance([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.insuranceOut.toBigInt(),
-      params.minBond.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'lendGivenInsurance',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.insuranceOut.toBigInt(),
+        params.minBond.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async lendGivenInsuranceETHAsset(
     params: LendGivenInsuranceETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenInsuranceETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'lendGivenInsuranceETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -420,47 +533,64 @@ export class ConvSigner extends Conv {
         params.minBond.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async lendGivenInsuranceETHCollateral(
-    params: LendGivenInsuranceETHCollateral
+    params: LendGivenInsuranceETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenInsuranceETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.insuranceOut.toBigInt(),
-      params.minBond.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'lendGivenInsuranceETHCollateral',
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.insuranceOut.toBigInt(),
+        params.minBond.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async lendGivenPercent(
-    params: LendGivenPercent
+    params: LendGivenPercent,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenPercent([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.percent.toBigInt(),
-      params.minBond.toBigInt(),
-      params.minInsurance.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'lendGivenPercent',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.percent.toBigInt(),
+        params.minBond.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async lendGivenPercentETHAsset(
     params: LendGivenPercentETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenPercentETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'lendGivenPercentETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -471,108 +601,155 @@ export class ConvSigner extends Conv {
         params.minInsurance.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async lendGivenPercentETHCollateral(
-    params: LendGivenPercentETHCollateral
+    params: LendGivenPercentETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.lendGivenPercentETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.bondTo,
-      params.insuranceTo,
-      params.assetIn.toBigInt(),
-      params.percent.toBigInt(),
-      params.minBond.toBigInt(),
-      params.minInsurance.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'lendGivenPercentETHCollateral',
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.bondTo,
+        params.insuranceTo,
+        params.assetIn.toBigInt(),
+        params.percent.toBigInt(),
+        params.minBond.toBigInt(),
+        params.minInsurance.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
-  async collect(params: Collect): Promise<ContractTransaction> {
-    return this.convContract.collect([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
+  async collect(
+    params: Collect,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'collect',
       [
-        params.claimsIn.bondPrincipal.toBigInt(),
-        params.claimsIn.bondInterest.toBigInt(),
-        params.claimsIn.insurancePrincipal.toBigInt(),
-        params.claimsIn.insuranceInterest.toBigInt(),
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        [
+          params.claimsIn.bondPrincipal.toBigInt(),
+          params.claimsIn.bondInterest.toBigInt(),
+          params.claimsIn.insurancePrincipal.toBigInt(),
+          params.claimsIn.insuranceInterest.toBigInt(),
+        ],
       ],
-    ]);
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
-  async collectETHAsset(params: CollectETHAsset): Promise<ContractTransaction> {
-    return this.convContract.collectETHAsset([
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
+  async collectETHAsset(
+    params: CollectETHAsset,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'collectETHAsset',
       [
-        params.claimsIn.bondPrincipal.toBigInt(),
-        params.claimsIn.bondInterest.toBigInt(),
-        params.claimsIn.insurancePrincipal.toBigInt(),
-        params.claimsIn.insuranceInterest.toBigInt(),
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        [
+          params.claimsIn.bondPrincipal.toBigInt(),
+          params.claimsIn.bondInterest.toBigInt(),
+          params.claimsIn.insurancePrincipal.toBigInt(),
+          params.claimsIn.insuranceInterest.toBigInt(),
+        ],
       ],
-    ]);
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async collectETHCollateral(
-    params: CollectETHCollateral
+    params: CollectETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.collectETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.collateralTo,
+    return contractInteraction(
+      this.convContract,
+      'collectETHCollateral',
       [
-        params.claimsIn.bondPrincipal.toBigInt(),
-        params.claimsIn.bondInterest.toBigInt(),
-        params.claimsIn.insurancePrincipal.toBigInt(),
-        params.claimsIn.insuranceInterest.toBigInt(),
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.collateralTo,
+        [
+          params.claimsIn.bondPrincipal.toBigInt(),
+          params.claimsIn.bondInterest.toBigInt(),
+          params.claimsIn.insurancePrincipal.toBigInt(),
+          params.claimsIn.insuranceInterest.toBigInt(),
+        ],
       ],
-    ]);
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
-  async borrowGivenDebt(params: BorrowGivenDebt): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenDebt([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.debtIn.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+  async borrowGivenDebt(
+    params: BorrowGivenDebt,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenDebt',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.debtIn.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenDebtETHAsset(
-    params: BorrowGivenDebtETHAsset
+    params: BorrowGivenDebtETHAsset,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenDebtETHAsset([
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.debtIn.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenDebtETHAsset',
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.debtIn.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenDebtETHCollateral(
     params: BorrowGivenDebtETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenDebtETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenDebtETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -582,46 +759,63 @@ export class ConvSigner extends Conv {
         params.debtIn.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async borrowGivenCollateral(
-    params: BorrowGivenCollateral
+    params: BorrowGivenCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenCollateral([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.collateralIn.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenCollateral',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.collateralIn.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenCollateralETHAsset(
-    params: BorrowGivenCollateralETHAsset
+    params: BorrowGivenCollateralETHAsset,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenCollateralETHAsset([
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.collateralIn.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenCollateralETHAsset',
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.collateralIn.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenCollateralETHCollateral(
     params: BorrowGivenCollateralETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenCollateralETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenCollateralETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -631,48 +825,65 @@ export class ConvSigner extends Conv {
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async borrowGivenPercent(
-    params: BorrowGivenPercent
+    params: BorrowGivenPercent,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenPercent([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.percent.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenPercent',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.percent.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenPercentETHAsset(
-    params: BorrowGivenPercentETHAsset
+    params: BorrowGivenPercentETHAsset,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenPercentETHAsset([
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.assetTo,
-      params.dueTo,
-      params.assetOut.toBigInt(),
-      params.percent.toBigInt(),
-      params.maxDebt.toBigInt(),
-      params.maxCollateral.toBigInt(),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenPercentETHAsset',
+      [
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.assetTo,
+        params.dueTo,
+        params.assetOut.toBigInt(),
+        params.percent.toBigInt(),
+        params.maxDebt.toBigInt(),
+        params.maxCollateral.toBigInt(),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async borrowGivenPercentETHCollateral(
     params: BorrowGivenPercentETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.borrowGivenPercentETHCollateral(
+    return contractInteraction(
+      this.convContract,
+      'borrowGivenPercentETHCollateral',
       [
         params.asset.address,
         params.maturity.toBigInt(),
@@ -683,27 +894,40 @@ export class ConvSigner extends Conv {
         params.maxDebt.toBigInt(),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
-  async repay(params: Repay): Promise<ContractTransaction> {
-    return this.convContract.repay([
-      params.asset.address,
-      params.collateral.address,
-      params.maturity.toBigInt(),
-      params.collateralTo,
-      params.ids.map(value => value.toBigInt()),
-      params.maxAssetsIn.map(value => value.toBigInt()),
-      params.deadline.toBigInt(),
-    ]);
+  async repay(
+    params: Repay,
+    txnParams?: GasLimitTransactionParams
+  ): Promise<ContractTransaction> {
+    return contractInteraction(
+      this.convContract,
+      'repay',
+      [
+        params.asset.address,
+        params.collateral.address,
+        params.maturity.toBigInt(),
+        params.collateralTo,
+        params.ids.map(value => value.toBigInt()),
+        params.maxAssetsIn.map(value => value.toBigInt()),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
 
   async repayETHAsset(
     params: RepayETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.repayETHAsset(
+    return contractInteraction(
+      this.convContract,
+      'repayETHAsset',
       [
         params.collateral.address,
         params.maturity.toBigInt(),
@@ -712,28 +936,65 @@ export class ConvSigner extends Conv {
         params.maxAssetsIn.map(value => value.toBigInt()),
         params.deadline.toBigInt(),
       ],
-      { value: txnParams.value.toBigInt() }
+      {
+        value: txnParams.value.toBigInt(),
+        gasLimit: txnParams.gasLimit?.toBigInt(),
+      }
     );
   }
 
   async repayETHCollateral(
-    params: RepayETHCollateral
+    params: RepayETHCollateral,
+    txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
-    return this.convContract.repayETHCollateral([
-      params.asset.address,
-      params.maturity.toBigInt(),
-      params.collateralTo,
-      params.ids.map(value => value.toBigInt()),
-      params.maxAssetsIn.map(value => value.toBigInt()),
-      params.deadline.toBigInt(),
-    ]);
+    return contractInteraction(
+      this.convContract,
+      'repayETHCollateral',
+      [
+        params.asset.address,
+        params.maturity.toBigInt(),
+        params.collateralTo,
+        params.ids.map(value => value.toBigInt()),
+        params.maxAssetsIn.map(value => value.toBigInt()),
+        params.deadline.toBigInt(),
+      ],
+      { gasLimit: txnParams?.gasLimit?.toBigInt() }
+    );
   }
+}
+
+async function contractInteraction(
+  contract: Contract,
+  functionName: string,
+  arg: any,
+  options: TransactionParamsBigInt
+): Promise<ContractTransaction> {
+  const gasUnits = (
+    await contract.estimateGas[functionName](arg, options)
+  ).toBigInt();
+  const maxGasUnits =
+    options.gasLimit && options.gasLimit >= gasUnits
+      ? options.gasLimit
+      : gasUnits;
+
+  const gasLimit = (maxGasUnits * 120n) / 100n;
+
+  return contract[functionName](arg, { ...options, gasLimit });
 }
 
 // Interface
 
-interface TransactionParams {
+interface TransactionParamsBigInt {
+  value?: bigint;
+  gasLimit?: bigint;
+}
+
+interface TransactionParams extends GasLimitTransactionParams {
   value: Uint112;
+}
+
+interface GasLimitTransactionParams {
+  gasLimit?: Uint256;
 }
 
 interface Native {

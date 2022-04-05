@@ -444,109 +444,170 @@ export class PoolSigner extends Pool {
     this.pairSigner = this.pair.upgrade(signer);
   }
 
-  async newLiquidity(params: NewLiquidity): Promise<ContractTransaction> {
-    return this.pairSigner.newLiquidity({
-      ...params,
-      maturity: this.maturity,
-    });
+  async newLiquidity(
+    params: NewLiquidity,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.newLiquidity(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async liquidityGivenAsset(
-    params: LiquidityGivenAsset
+    params: LiquidityGivenAsset,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.liquidityGivenAsset({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.liquidityGivenAsset(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async liquidityGivenDebt(
-    params: LiquidityGivenDebt
+    params: LiquidityGivenDebt,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.liquidityGivenDebt({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.liquidityGivenDebt(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async liquidityGivenCollateral(
-    params: LiquidityGivenCollateral
+    params: LiquidityGivenCollateral,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.liquidityGivenCollateral({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.liquidityGivenCollateral(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
-  async removeLiquidity(params: RemoveLiquidity): Promise<ContractTransaction> {
-    return this.pairSigner.removeLiquidity({
-      ...params,
-      maturity: this.maturity,
-    });
+  async removeLiquidity(
+    params: RemoveLiquidity,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.removeLiquidity(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
-  async lendGivenBond(params: LendGivenBond): Promise<ContractTransaction> {
-    return this.pairSigner.lendGivenBond({
-      ...params,
-      maturity: this.maturity,
-    });
+  async lendGivenBond(
+    params: LendGivenBond,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.lendGivenBond(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async lendGivenInsurance(
-    params: LendGivenInsurance
+    params: LendGivenInsurance,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.lendGivenInsurance({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.lendGivenInsurance(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async lendGivenPercent(
-    params: LendGivenPercent
+    params: LendGivenPercent,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.lendGivenPercent({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.lendGivenPercent(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
-  async collect(params: Collect): Promise<ContractTransaction> {
-    return this.pairSigner.collect({
-      ...params,
-      maturity: this.maturity,
-    });
+  async collect(
+    params: Collect,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.collect(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
-  async borrowGivenDebt(params: BorrowGivenDebt): Promise<ContractTransaction> {
-    return this.pairSigner.borrowGivenDebt({
-      ...params,
-      maturity: this.maturity,
-    });
+  async borrowGivenDebt(
+    params: BorrowGivenDebt,
+    gasLimit?: Uint256
+  ): Promise<ContractTransaction> {
+    return this.pairSigner.borrowGivenDebt(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async borrowGivenCollateral(
-    params: BorrowGivenCollateral
+    params: BorrowGivenCollateral,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.borrowGivenCollateral({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.borrowGivenCollateral(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
   async borrowGivenPercent(
-    params: BorrowGivenPercent
+    params: BorrowGivenPercent,
+    gasLimit?: Uint256
   ): Promise<ContractTransaction> {
-    return this.pairSigner.borrowGivenPercent({
-      ...params,
-      maturity: this.maturity,
-    });
+    return this.pairSigner.borrowGivenPercent(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 
-  async repay(params: Repay): Promise<ContractTransaction> {
-    return this.pairSigner.repay({
-      ...params,
-      maturity: this.maturity,
-    });
+  async repay(params: Repay, gasLimit?: Uint256): Promise<ContractTransaction> {
+    return this.pairSigner.repay(
+      {
+        ...params,
+        maturity: this.maturity,
+      },
+      gasLimit
+    );
   }
 }
 
