@@ -16,8 +16,12 @@ export class Uint128 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint128.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint128.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint128.maxValue;
   }
 
   protected clone(): this {

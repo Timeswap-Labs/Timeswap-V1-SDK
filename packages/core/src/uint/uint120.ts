@@ -16,8 +16,12 @@ export class Uint120 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint120.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint120.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint120.maxValue;
   }
 
   protected clone(): this {

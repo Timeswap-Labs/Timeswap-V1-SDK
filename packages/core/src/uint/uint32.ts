@@ -16,8 +16,12 @@ export class Uint32 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint32.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint32.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint32.maxValue;
   }
 
   protected clone(): this {

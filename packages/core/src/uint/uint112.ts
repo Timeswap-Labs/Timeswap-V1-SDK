@@ -16,8 +16,12 @@ export class Uint112 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint112.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint112.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint112.maxValue;
   }
 
   protected clone(): this {

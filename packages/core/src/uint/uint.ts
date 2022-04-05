@@ -1,8 +1,9 @@
 import invariant from 'tiny-invariant';
 
-type Uintable = string | number | bigint | boolean | Uint;
+export type Uintable = string | number | bigint | boolean | Uint;
 
 export abstract class Uint {
+  protected abstract bits(): bigint;
   protected abstract valid(): boolean;
   protected abstract clone(): this;
 
@@ -10,7 +11,10 @@ export abstract class Uint {
 
   constructor(value: Uintable) {
     this.value = toBigInt(value);
-    invariant(this.valid(), 'Invalid value');
+    invariant(
+      this.valid(),
+      `Invalid value: ${this.value} is an invalid Uint${this.bits()} value`
+    );
   }
 
   toBigInt(): bigint {
@@ -23,7 +27,10 @@ export abstract class Uint {
 
   set(value: Uintable) {
     this.value = toBigInt(value);
-    invariant(this.valid(), 'Invalid value');
+    invariant(
+      this.valid(),
+      `Invalid value: ${this.value} is an invalid Uint${this.bits()} value`
+    );
   }
 
   addAssign(other: Uintable) {

@@ -16,8 +16,12 @@ export class Uint16 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint16.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint16.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint16.maxValue;
   }
 
   protected clone(): this {

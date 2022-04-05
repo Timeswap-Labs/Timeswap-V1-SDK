@@ -16,8 +16,12 @@ export class Uint256 extends Uint {
     }
   }
 
+  protected bits(): bigint {
+    return Uint256.bits;
+  }
+
   protected valid(): boolean {
-    return 0n <= this.value && this.value <= Uint256.maxValue ? true : false;
+    return 0n <= this.value && this.value <= Uint256.maxValue;
   }
 
   protected clone(): this {
