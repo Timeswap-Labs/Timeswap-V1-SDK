@@ -1,6 +1,7 @@
 import invariant from 'tiny-invariant';
 import { CP, Due } from '../entities';
 import { Uint256, Uint112 } from '../uint';
+import { divUp } from './math';
 import timeswapMath from './timeswapMath';
 
 export function givenNew(
@@ -44,12 +45,12 @@ export function givenAsset(
   const xIncrease = new Uint112(_xIncrease);
 
   const _yIncrease = new Uint256(cp.y);
-  _yIncrease.mulAssign(assetIn);
+  _yIncrease.mulAssign(xIncrease);
   _yIncrease.divAssign(cp.x);
   const yIncrease = new Uint112(_yIncrease);
 
   const _zIncrease = new Uint256(cp.z);
-  _zIncrease.mulAssign(assetIn);
+  _zIncrease.mulAssign(xIncrease);
   _zIncrease.divAssign(cp.x);
   const zIncrease = new Uint112(_zIncrease);
 
@@ -76,7 +77,7 @@ export function givenDebt(
 
   const _xIncrease = new Uint256(cp.x);
   _xIncrease.mulAssign(_yIncrease);
-  _xIncrease.divAssign(cp.y);
+  _xIncrease.set(divUp(_xIncrease, new Uint256(cp.y)));
   const xIncrease = new Uint112(_xIncrease);
 
   const _zIncrease = new Uint256(cp.z);
@@ -103,7 +104,7 @@ export function givenCollateral(
 
   const _xIncrease = new Uint256(cp.x);
   _xIncrease.mulAssign(_zIncrease);
-  _xIncrease.divAssign(cp.z);
+  _xIncrease.set(divUp(_xIncrease, new Uint256(cp.z)));
   const xIncrease = new Uint112(_xIncrease);
 
   const _yIncrease = new Uint256(cp.y);

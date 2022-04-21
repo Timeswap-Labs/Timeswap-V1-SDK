@@ -4,6 +4,7 @@ import {
   Uint128,
   Uint256,
   Uint40,
+  Uintable,
 } from '@timeswap-labs/timeswap-v1-sdk-core';
 
 import { Provider } from '@ethersproject/abstract-provider';
@@ -97,19 +98,25 @@ export class ConvSigner extends Conv {
     params: NewLiquidity,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'newLiquidity',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.toBigInt(),
-        params.debtIn.toBigInt(),
-        params.collateralIn.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        debtIn,
+        collateralIn,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -119,17 +126,22 @@ export class ConvSigner extends Conv {
     params: NewLiquidityETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'newLiquidityETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.debtIn.toBigInt(),
-        params.collateralIn.toBigInt(),
-        params.deadline.toBigInt(),
+        debtIn,
+        collateralIn,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -142,17 +154,22 @@ export class ConvSigner extends Conv {
     params: NewLiquidityETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'newLiquidityETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.toBigInt(),
-        params.debtIn.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        debtIn,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -165,20 +182,27 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenAsset',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        minLiquidity,
+        maxDebt,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -188,18 +212,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenAssetETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenAssetETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.minLiquidity.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        minLiquidity,
+        maxDebt,
+        maxCollateral,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -212,18 +242,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenAssetETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenAssetETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.assetIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        minLiquidity,
+        maxDebt,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -236,20 +272,27 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenDebt,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxAsset = new Uint112(params.maxAsset).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenDebt',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.debtIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxAsset.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        debtIn,
+        minLiquidity,
+        maxAsset,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -259,18 +302,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenDebtETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenDebtETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.debtIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        debtIn,
+        minLiquidity,
+        maxCollateral,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -283,18 +332,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenDebtETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxAsset = new Uint112(params.maxAsset).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenDebtETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.debtIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxAsset.toBigInt(),
-        params.deadline.toBigInt(),
+        debtIn,
+        minLiquidity,
+        maxAsset,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -307,20 +362,27 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxAsset = new Uint112(params.maxAsset).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenCollateral',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.collateralIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxAsset.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        collateralIn,
+        minLiquidity,
+        maxAsset,
+        maxDebt,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -330,18 +392,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenCollateralETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenCollateralETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.collateralIn.toBigInt(),
-        params.minLiquidity.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        collateralIn,
+        minLiquidity,
+        maxDebt,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -354,18 +422,24 @@ export class ConvSigner extends Conv {
     params: LiquidityGivenCollateralETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const minLiquidity = new Uint256(params.minLiquidity).toBigInt();
+    const maxAsset = new Uint112(params.maxAsset).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'liquidityGivenCollateralETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.liquidityTo,
         params.dueTo,
-        params.minLiquidity.toBigInt(),
-        params.maxAsset.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        minLiquidity,
+        maxAsset,
+        maxDebt,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -378,16 +452,19 @@ export class ConvSigner extends Conv {
     params: RemoveLiquidity,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'removeLiquidity',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        params.liquidityIn.toBigInt(),
+        liquidityIn,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -397,15 +474,18 @@ export class ConvSigner extends Conv {
     params: RemoveLiquidityETHAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'removeLiquidityETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        params.liquidityIn.toBigInt(),
+        liquidityIn,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -415,15 +495,18 @@ export class ConvSigner extends Conv {
     params: RemoveLiquidityETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'removeLiquidityETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        params.liquidityIn.toBigInt(),
+        liquidityIn,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -433,19 +516,25 @@ export class ConvSigner extends Conv {
     params: LendGivenBond,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const bondOut = new Uint128(params.bondOut).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenBond',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.bondOut.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        bondOut,
+        minInsurance,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -455,17 +544,22 @@ export class ConvSigner extends Conv {
     params: LendGivenBondETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const bondOut = new Uint128(params.bondOut).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenBondETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.bondOut.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        bondOut,
+        minInsurance,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -478,18 +572,24 @@ export class ConvSigner extends Conv {
     params: LendGivenBondETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const bondOut = new Uint128(params.bondOut).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenBondETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.bondOut.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        bondOut,
+        minInsurance,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -499,19 +599,25 @@ export class ConvSigner extends Conv {
     params: LendGivenInsurance,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const insuranceOut = new Uint128(params.insuranceOut).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenInsurance',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.insuranceOut.toBigInt(),
-        params.minBond.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        insuranceOut,
+        minBond,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -521,17 +627,22 @@ export class ConvSigner extends Conv {
     params: LendGivenInsuranceETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const insuranceOut = new Uint128(params.insuranceOut).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenInsuranceETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.insuranceOut.toBigInt(),
-        params.minBond.toBigInt(),
-        params.deadline.toBigInt(),
+        insuranceOut,
+        minBond,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -544,18 +655,24 @@ export class ConvSigner extends Conv {
     params: LendGivenInsuranceETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const insuranceOut = new Uint128(params.insuranceOut).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenInsuranceETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.insuranceOut.toBigInt(),
-        params.minBond.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        insuranceOut,
+        minBond,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -565,20 +682,27 @@ export class ConvSigner extends Conv {
     params: LendGivenPercent,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenPercent',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.percent.toBigInt(),
-        params.minBond.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        percent,
+        minBond,
+        minInsurance,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -588,18 +712,24 @@ export class ConvSigner extends Conv {
     params: LendGivenPercentETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenPercentETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.percent.toBigInt(),
-        params.minBond.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        percent,
+        minBond,
+        minInsurance,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -612,19 +742,26 @@ export class ConvSigner extends Conv {
     params: LendGivenPercentETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetIn = new Uint112(params.assetIn).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const minBond = new Uint128(params.minBond).toBigInt();
+    const minInsurance = new Uint128(params.minInsurance).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'lendGivenPercentETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.bondTo,
         params.insuranceTo,
-        params.assetIn.toBigInt(),
-        params.percent.toBigInt(),
-        params.minBond.toBigInt(),
-        params.minInsurance.toBigInt(),
-        params.deadline.toBigInt(),
+        assetIn,
+        percent,
+        minBond,
+        minInsurance,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -634,21 +771,26 @@ export class ConvSigner extends Conv {
     params: Collect,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const bondPrincipal = new Uint112(params.claimsIn.bondPrincipal).toBigInt();
+    const bondInterest = new Uint112(params.claimsIn.bondInterest).toBigInt();
+    const insurancePrincipal = new Uint112(
+      params.claimsIn.insurancePrincipal
+    ).toBigInt();
+    const insuranceInterest = new Uint112(
+      params.claimsIn.insuranceInterest
+    ).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'collect',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        [
-          params.claimsIn.bondPrincipal.toBigInt(),
-          params.claimsIn.bondInterest.toBigInt(),
-          params.claimsIn.insurancePrincipal.toBigInt(),
-          params.claimsIn.insuranceInterest.toBigInt(),
-        ],
+        [bondPrincipal, bondInterest, insurancePrincipal, insuranceInterest],
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -658,20 +800,25 @@ export class ConvSigner extends Conv {
     params: CollectETHAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const bondPrincipal = new Uint112(params.claimsIn.bondPrincipal).toBigInt();
+    const bondInterest = new Uint112(params.claimsIn.bondInterest).toBigInt();
+    const insurancePrincipal = new Uint112(
+      params.claimsIn.insurancePrincipal
+    ).toBigInt();
+    const insuranceInterest = new Uint112(
+      params.claimsIn.insuranceInterest
+    ).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'collectETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        [
-          params.claimsIn.bondPrincipal.toBigInt(),
-          params.claimsIn.bondInterest.toBigInt(),
-          params.claimsIn.insurancePrincipal.toBigInt(),
-          params.claimsIn.insuranceInterest.toBigInt(),
-        ],
+        [bondPrincipal, bondInterest, insurancePrincipal, insuranceInterest],
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -681,20 +828,25 @@ export class ConvSigner extends Conv {
     params: CollectETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const bondPrincipal = new Uint112(params.claimsIn.bondPrincipal).toBigInt();
+    const bondInterest = new Uint112(params.claimsIn.bondInterest).toBigInt();
+    const insurancePrincipal = new Uint112(
+      params.claimsIn.insurancePrincipal
+    ).toBigInt();
+    const insuranceInterest = new Uint112(
+      params.claimsIn.insuranceInterest
+    ).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'collectETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.collateralTo,
-        [
-          params.claimsIn.bondPrincipal.toBigInt(),
-          params.claimsIn.bondInterest.toBigInt(),
-          params.claimsIn.insurancePrincipal.toBigInt(),
-          params.claimsIn.insuranceInterest.toBigInt(),
-        ],
+        [bondPrincipal, bondInterest, insurancePrincipal, insuranceInterest],
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -704,19 +856,25 @@ export class ConvSigner extends Conv {
     params: BorrowGivenDebt,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenDebt',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.debtIn.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        debtIn,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -726,18 +884,24 @@ export class ConvSigner extends Conv {
     params: BorrowGivenDebtETHAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenDebtETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.debtIn.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        debtIn,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -747,17 +911,22 @@ export class ConvSigner extends Conv {
     params: BorrowGivenDebtETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const debtIn = new Uint112(params.debtIn).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenDebtETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.debtIn.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        debtIn,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -770,19 +939,25 @@ export class ConvSigner extends Conv {
     params: BorrowGivenCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenCollateral',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.collateralIn.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        collateralIn,
+        maxDebt,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -792,18 +967,24 @@ export class ConvSigner extends Conv {
     params: BorrowGivenCollateralETHAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const collateralIn = new Uint112(params.collateralIn).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenCollateralETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.collateralIn.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        collateralIn,
+        maxDebt,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -813,17 +994,22 @@ export class ConvSigner extends Conv {
     params: BorrowGivenCollateralETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenCollateralETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        maxDebt,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -836,20 +1022,27 @@ export class ConvSigner extends Conv {
     params: BorrowGivenPercent,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenPercent',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.percent.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        percent,
+        maxDebt,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -859,19 +1052,26 @@ export class ConvSigner extends Conv {
     params: BorrowGivenPercentETHAsset,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenPercentETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.percent.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.maxCollateral.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        percent,
+        maxDebt,
+        maxCollateral,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -881,18 +1081,24 @@ export class ConvSigner extends Conv {
     params: BorrowGivenPercentETHCollateral,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const assetOut = new Uint112(params.assetOut).toBigInt();
+    const percent = new Uint40(params.percent).toBigInt();
+    const maxDebt = new Uint112(params.maxDebt).toBigInt();
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'borrowGivenPercentETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.assetTo,
         params.dueTo,
-        params.assetOut.toBigInt(),
-        params.percent.toBigInt(),
-        params.maxDebt.toBigInt(),
-        params.deadline.toBigInt(),
+        assetOut,
+        percent,
+        maxDebt,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -905,17 +1111,24 @@ export class ConvSigner extends Conv {
     params: Repay,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const ids = params.ids.map(value => new Uint256(value).toBigInt());
+    const maxAssetsIn = params.maxAssetsIn.map(value =>
+      new Uint112(value).toBigInt()
+    );
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'repay',
       [
         params.asset.address,
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.collateralTo,
-        params.ids.map(value => value.toBigInt()),
-        params.maxAssetsIn.map(value => value.toBigInt()),
-        params.deadline.toBigInt(),
+        ids,
+        maxAssetsIn,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -925,16 +1138,23 @@ export class ConvSigner extends Conv {
     params: RepayETHAsset,
     txnParams: TransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const ids = params.ids.map(value => new Uint256(value).toBigInt());
+    const maxAssetsIn = params.maxAssetsIn.map(value =>
+      new Uint112(value).toBigInt()
+    );
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'repayETHAsset',
       [
         params.collateral.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.collateralTo,
-        params.ids.map(value => value.toBigInt()),
-        params.maxAssetsIn.map(value => value.toBigInt()),
-        params.deadline.toBigInt(),
+        ids,
+        maxAssetsIn,
+        deadline,
       ],
       {
         value: txnParams.value.toBigInt(),
@@ -947,16 +1167,23 @@ export class ConvSigner extends Conv {
     params: RepayETHCollateral,
     txnParams?: GasLimitTransactionParams
   ): Promise<ContractTransaction> {
+    const maturity = new Uint256(params.maturity).toBigInt();
+    const ids = params.ids.map(value => new Uint256(value).toBigInt());
+    const maxAssetsIn = params.maxAssetsIn.map(value =>
+      new Uint112(value).toBigInt()
+    );
+    const deadline = new Uint256(params.deadline).toBigInt();
+
     return contractInteraction(
       this.convContract,
       'repayETHCollateral',
       [
         params.asset.address,
-        params.maturity.toBigInt(),
+        maturity,
         params.collateralTo,
-        params.ids.map(value => value.toBigInt()),
-        params.maxAssetsIn.map(value => value.toBigInt()),
-        params.deadline.toBigInt(),
+        ids,
+        maxAssetsIn,
+        deadline,
       ],
       { gasLimit: txnParams?.gasLimit?.toBigInt() }
     );
@@ -1009,270 +1236,270 @@ interface Native {
 interface NewLiquidity {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  assetIn: Uint112;
-  debtIn: Uint112;
-  collateralIn: Uint112;
-  deadline: Uint256;
+  assetIn: Uintable;
+  debtIn: Uintable;
+  collateralIn: Uintable;
+  deadline: Uintable;
 }
 
 interface NewLiquidityETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  debtIn: Uint112;
-  collateralIn: Uint112;
-  deadline: Uint256;
+  debtIn: Uintable;
+  collateralIn: Uintable;
+  deadline: Uintable;
 }
 
 interface NewLiquidityETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  assetIn: Uint112;
-  debtIn: Uint112;
-  deadline: Uint256;
+  assetIn: Uintable;
+  debtIn: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenAsset {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  assetIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  assetIn: Uintable;
+  minLiquidity: Uintable;
+  maxDebt: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenAssetETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  minLiquidity: Uintable;
+  maxDebt: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenAssetETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  assetIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  assetIn: Uintable;
+  minLiquidity: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenDebt {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  debtIn: Uint112;
-  minLiquidity: Uint256;
-  maxAsset: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  debtIn: Uintable;
+  minLiquidity: Uintable;
+  maxAsset: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenDebtETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  debtIn: Uint112;
-  minLiquidity: Uint256;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  debtIn: Uintable;
+  minLiquidity: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenDebtETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  debtIn: Uint112;
-  minLiquidity: Uint256;
-  maxAsset: Uint112;
-  deadline: Uint256;
+  debtIn: Uintable;
+  minLiquidity: Uintable;
+  maxAsset: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenCollateral {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  collateralIn: Uint112;
-  minLiquidity: Uint256;
-  maxAsset: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  collateralIn: Uintable;
+  minLiquidity: Uintable;
+  maxAsset: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenCollateralETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  collateralIn: Uint112;
-  minLiquidity: Uint256;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  collateralIn: Uintable;
+  minLiquidity: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface LiquidityGivenCollateralETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   liquidityTo: string;
   dueTo: string;
-  minLiquidity: Uint256;
-  maxAsset: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  minLiquidity: Uintable;
+  maxAsset: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface RemoveLiquidity {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
-  liquidityIn: Uint256;
+  liquidityIn: Uintable;
 }
 
 interface RemoveLiquidityETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
-  liquidityIn: Uint256;
+  liquidityIn: Uintable;
 }
 
 interface RemoveLiquidityETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
-  liquidityIn: Uint256;
+  liquidityIn: Uintable;
 }
 interface LendGivenBond {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  bondOut: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenBondETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  bondOut: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenBondETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  bondOut: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  bondOut: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenInsurance {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  insuranceOut: Uintable;
+  minBond: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenInsuranceETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
+  insuranceOut: Uintable;
+  minBond: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenInsuranceETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  insuranceOut: Uint128;
-  minBond: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  insuranceOut: Uintable;
+  minBond: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenPercent {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  percent: Uintable;
+  minBond: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenPercentETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  percent: Uintable;
+  minBond: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface LendGivenPercentETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   bondTo: string;
   insuranceTo: string;
-  assetIn: Uint112;
-  percent: Uint40;
-  minBond: Uint128;
-  minInsurance: Uint128;
-  deadline: Uint256;
+  assetIn: Uintable;
+  percent: Uintable;
+  minBond: Uintable;
+  minInsurance: Uintable;
+  deadline: Uintable;
 }
 
 interface Collect {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
   claimsIn: Claims;
@@ -1280,7 +1507,7 @@ interface Collect {
 
 interface CollectETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
   claimsIn: Claims;
@@ -1288,145 +1515,145 @@ interface CollectETHAsset {
 
 interface CollectETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   collateralTo: string;
   claimsIn: Claims;
 }
 
 interface Claims {
-  bondPrincipal: Uint112;
-  bondInterest: Uint112;
-  insurancePrincipal: Uint112;
-  insuranceInterest: Uint112;
+  bondPrincipal: Uintable;
+  bondInterest: Uintable;
+  insurancePrincipal: Uintable;
+  insuranceInterest: Uintable;
 }
 
 interface BorrowGivenDebt {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  debtIn: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenDebtETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  debtIn: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenDebtETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  debtIn: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  debtIn: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenCollateral {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  collateralIn: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenCollateralETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  collateralIn: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  collateralIn: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenCollateralETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenPercent {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  percent: Uintable;
+  maxDebt: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenPercentETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  maxCollateral: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  percent: Uintable;
+  maxDebt: Uintable;
+  maxCollateral: Uintable;
+  deadline: Uintable;
 }
 
 interface BorrowGivenPercentETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   assetTo: string;
   dueTo: string;
-  assetOut: Uint112;
-  percent: Uint40;
-  maxDebt: Uint112;
-  deadline: Uint256;
+  assetOut: Uintable;
+  percent: Uintable;
+  maxDebt: Uintable;
+  deadline: Uintable;
 }
 
 interface Repay {
   asset: ERC20Token;
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
+  ids: Uintable[];
+  maxAssetsIn: Uintable[];
+  deadline: Uintable;
 }
 
 interface RepayETHAsset {
   collateral: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
+  ids: Uintable[];
+  maxAssetsIn: Uintable[];
+  deadline: Uintable;
 }
 
 interface RepayETHCollateral {
   asset: ERC20Token;
-  maturity: Uint256;
+  maturity: Uintable;
   collateralTo: string;
-  ids: Uint256[];
-  maxAssetsIn: Uint112[];
-  deadline: Uint256;
+  ids: Uintable[];
+  maxAssetsIn: Uintable[];
+  deadline: Uintable;
 }
