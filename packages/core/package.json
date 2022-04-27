@@ -1,5 +1,5 @@
 {
-  "version": "1.2.2-Beta",
+  "version": "1.2.3-Beta",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -21,7 +21,7 @@
   "module": "./dist/timeswap-v1-sdk-core.esm.js",
   "repository": "git://github.com/Timeswap-Labs/Timeswap-V1-SDK.git",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "size-limit": [
     {
