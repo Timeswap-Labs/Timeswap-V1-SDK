@@ -1,5 +1,5 @@
 {
-  "version": "1.2.3-Beta",
+  "version": "1.2.4-Beta",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -21,7 +21,7 @@
   "module": "./dist/timeswap-v1-sdk.esm.js",
   "repository": "git://github.com/Timeswap-Labs/Timeswap-V1-SDK.git",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "size-limit": [
     {
@@ -46,7 +46,7 @@
     "@ethersproject/abstract-provider": "^5.5.1",
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/contracts": "^5.5.0",
-    "@timeswap-labs/timeswap-v1-sdk-core": "1.2.2-Beta",
+    "@timeswap-labs/timeswap-v1-sdk-core": "1.2.3-Beta",
     "tiny-invariant": "^1.1.0"
   }
 }
