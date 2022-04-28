@@ -3,7 +3,7 @@ import { ChainId } from './chainId';
 export const CONVENIENCE: AddressMap = {
   [ChainId.RINKEBY]: '0xefE81D4Aed8E58706b1B592d372DA21c46e64bBc',
   [ChainId.MATIC_TESTNET]: '0xb3d8b8f29baA63575224c5f7C6d82ae3E8586204',
-  [ChainId.MATIC]: '0xb3d8b8f29baA63575224c5f7C6d82ae3E8586204',
+  [ChainId.MATIC]: '0xf4077Bd057Dddc2576b17889e175c839d9cEF2d3',
 };
 
 export const FACTORY: AddressMap = {
