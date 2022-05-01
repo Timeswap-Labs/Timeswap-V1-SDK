@@ -180,7 +180,7 @@ function lendCheck(
   let yMin = xIncrease;
   yMin.mulAssign(state.y);
   yMin.divAssign(xReserve);
-  yMin.shr(4);
+  yMin.shrAssign(4);
   invariant(yDecrease.lt(yMin), 'E217');
 }
 
@@ -397,7 +397,7 @@ function borrowCheck(
   invariant(zIncrease.lte(zMax), 'E215');
 
   let yMin = yMax;
-  yMin.shr(4);
+  yMin.shrAssign(4);
   invariant(yIncrease.lt(yMin), 'E217');
 }
 
