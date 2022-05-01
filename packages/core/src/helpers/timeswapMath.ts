@@ -176,6 +176,12 @@ function lendCheck(
     new Uint128(yReserve),
     new Uint128(zReserve)
   );
+
+  let yMin = xIncrease;
+  yMin.mulAssign(state.y);
+  yMin.divAssign(xReserve);
+  yMin.shr(4);
+  invariant(yDecrease.lt(yMin), 'E217');
 }
 
 function getBondInterest(
@@ -389,6 +395,10 @@ function borrowCheck(
   zMax.mulAssign(state.z);
   zMax.set(divUp(zMax, new Uint256(xReserve)));
   invariant(zIncrease.lte(zMax), 'E215');
+
+  let yMin = yMax;
+  yMin.shr(4);
+  invariant(yIncrease.lt(yMin), 'E217');
 }
 
 function getDebt(
