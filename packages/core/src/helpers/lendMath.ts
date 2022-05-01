@@ -22,7 +22,7 @@ export function givenBond(
   const xReserve = new Uint256(cp.x);
   xReserve.addAssign(xIncrease);
 
-  const _yDecrease = new Uint256(bondOut);
+  const _yDecrease = new Uint256(bondOut);  //@dipesh: _yDecrease
   _yDecrease.subAssign(xIncrease);
   _yDecrease.shlAssign(32);
   const denominator = new Uint256(maturity);
@@ -76,7 +76,7 @@ export function givenInsurance(
   const zReserve = new Uint256(cp.z);
   zReserve.subAssign(_zDecrease);
 
-  const yReserve = new Uint256(cp.x);
+  const yReserve = new Uint256(cp.x); // @dipesh: _yDecrease
   yReserve.mulAssign(cp.z);
   denominator.set(xReserve);
   denominator.mulAssign(zReserve);
@@ -107,6 +107,11 @@ export function givenPercent(
   xReserve.addAssign(xIncrease);
 
   if (percent.lte(0x80000000)) {
+    let yMin = assetIn;
+    yMin.mulAssign(cp.y);
+    yMin.divAssign(xReserve);
+    yMin.shr(4);
+
     const yMid = new Uint256(cp.y);
     const subtrahend = new Uint256(cp.y);
     subtrahend.mulAssign(cp.y);
@@ -115,8 +120,10 @@ export function givenPercent(
     yMid.subAssign(subtrahend);
 
     const _yDecrease = new Uint256(yMid);
+    _yDecrease.subAssign(yMin);
     _yDecrease.mulAssign(percent);
-    _yDecrease.shrAssign(31);
+    _yDecrease.shr(31);
+    _yDecrease.addAssign(yMin);
     yDecrease.set(_yDecrease);
 
     const yReserve = new Uint256(cp.y);
@@ -149,13 +156,13 @@ export function givenPercent(
     const zReserve = new Uint256(cp.z);
     zReserve.subAssign(_zDecrease);
 
-    const yReserve = new Uint256(cp.x);
+    const yReserve = new Uint256(cp.x); // @dipesh: _yDecrease
     yReserve.mulAssign(cp.z);
     const denominator = new Uint256(xReserve);
     denominator.mulAssign(zReserve);
     yReserve.set(mulDivUp(yReserve, new Uint256(cp.y), denominator));
 
-    const _yDecrease = new Uint256(cp.y);
+    const _yDecrease = new Uint256(cp.y);  // @dipesh: _yDecrease
     _yDecrease.subAssign(yReserve);
     yDecrease.set(_yDecrease);
   }
@@ -173,7 +180,7 @@ export function lend(
   zDecrease: Uint112,
   now: Uint256
 ): { assetIn: Uint256; claimsOut: Claims } {
-  invariant(now.lt(maturity), 'Expired');
+  invariant(now.lt(maturity), 'E202');
   invariant(xIncrease.ne(0), 'E205');
 
   const {
@@ -223,7 +230,7 @@ function getX(
 
 export interface LendResult {
   xIncrease: Uint112;
-  yDecrease: Uint112;
+  yDecrease: Uint112; //@dipesh cannot be lower than what the Core expects
   zDecrease: Uint112;
 }
 
