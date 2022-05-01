@@ -110,7 +110,7 @@ export function givenPercent(
     let yMin = assetIn;
     yMin.mulAssign(cp.y);
     yMin.divAssign(xReserve);
-    yMin.shr(4);
+    yMin.shrAssign(4);
 
     const yMid = new Uint256(cp.y);
     const subtrahend = new Uint256(cp.y);
@@ -230,7 +230,7 @@ function getX(
 
 export interface LendResult {
   xIncrease: Uint112;
-  yDecrease: Uint112; //@dipesh cannot be lower than what the Core expects
+  yDecrease: Uint112;
   zDecrease: Uint112;
 }
 
