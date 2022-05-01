@@ -22,7 +22,7 @@ export function givenBond(
   const xReserve = new Uint256(cp.x);
   xReserve.addAssign(xIncrease);
 
-  const _yDecrease = new Uint256(bondOut);  //@dipesh: _yDecrease
+  const _yDecrease = new Uint256(bondOut); 
   _yDecrease.subAssign(xIncrease);
   _yDecrease.shlAssign(32);
   const denominator = new Uint256(maturity);
@@ -76,7 +76,7 @@ export function givenInsurance(
   const zReserve = new Uint256(cp.z);
   zReserve.subAssign(_zDecrease);
 
-  const yReserve = new Uint256(cp.x); // @dipesh: _yDecrease
+  const yReserve = new Uint256(cp.x);
   yReserve.mulAssign(cp.z);
   denominator.set(xReserve);
   denominator.mulAssign(zReserve);
@@ -156,13 +156,13 @@ export function givenPercent(
     const zReserve = new Uint256(cp.z);
     zReserve.subAssign(_zDecrease);
 
-    const yReserve = new Uint256(cp.x); // @dipesh: _yDecrease
+    const yReserve = new Uint256(cp.x);
     yReserve.mulAssign(cp.z);
     const denominator = new Uint256(xReserve);
     denominator.mulAssign(zReserve);
     yReserve.set(mulDivUp(yReserve, new Uint256(cp.y), denominator));
 
-    const _yDecrease = new Uint256(cp.y);  // @dipesh: _yDecrease
+    const _yDecrease = new Uint256(cp.y); 
     _yDecrease.subAssign(yReserve);
     yDecrease.set(_yDecrease);
   }
