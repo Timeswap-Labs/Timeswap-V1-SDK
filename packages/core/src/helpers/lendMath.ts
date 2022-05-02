@@ -22,7 +22,7 @@ export function givenBond(
   const xReserve = new Uint256(cp.x);
   xReserve.addAssign(xIncrease);
 
-  const _yDecrease = new Uint256(bondOut); 
+  const _yDecrease = new Uint256(xIncrease); 
   _yDecrease.subAssign(xIncrease);
   _yDecrease.shlAssign(32);
   const denominator = new Uint256(maturity);
