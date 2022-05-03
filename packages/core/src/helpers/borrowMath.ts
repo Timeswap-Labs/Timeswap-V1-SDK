@@ -105,11 +105,12 @@ export function givenPercent(
 
   const xReserve = new Uint256(cp.x);
   xReserve.subAssign(xDecrease);
+
   if (percent.lte(0x80000000)) {
-    let yMin = new Uint256(xDecrease);
+    const yMin = new Uint256(xDecrease);
     yMin.mulAssign(cp.y);
-    yMin.set(divUp(yMin, xReserve));  
-    yMin.shrAssign(4);
+    yMin.set(divUp(yMin, xReserve));
+    yMin.set(shiftRightUp(yMin, new Uint256(4)));
 
     const yMid = new Uint256(cp.y);
     yMid.mulAssign(cp.y);

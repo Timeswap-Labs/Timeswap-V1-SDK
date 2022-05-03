@@ -22,7 +22,7 @@ export function givenBond(
   const xReserve = new Uint256(cp.x);
   xReserve.addAssign(xIncrease);
 
-  const _yDecrease = new Uint256(xIncrease); 
+  const _yDecrease = new Uint256(bondOut);
   _yDecrease.subAssign(xIncrease);
   _yDecrease.shlAssign(32);
   const denominator = new Uint256(maturity);
@@ -107,7 +107,7 @@ export function givenPercent(
   xReserve.addAssign(xIncrease);
 
   if (percent.lte(0x80000000)) {
-    let yMin = assetIn;
+    const yMin = new Uint256(xIncrease);
     yMin.mulAssign(cp.y);
     yMin.divAssign(xReserve);
     yMin.shrAssign(4);
@@ -122,7 +122,7 @@ export function givenPercent(
     const _yDecrease = new Uint256(yMid);
     _yDecrease.subAssign(yMin);
     _yDecrease.mulAssign(percent);
-    _yDecrease.shr(31);
+    _yDecrease.shrAssign(31);
     _yDecrease.addAssign(yMin);
     yDecrease.set(_yDecrease);
 
@@ -162,7 +162,7 @@ export function givenPercent(
     denominator.mulAssign(zReserve);
     yReserve.set(mulDivUp(yReserve, new Uint256(cp.y), denominator));
 
-    const _yDecrease = new Uint256(cp.y); 
+    const _yDecrease = new Uint256(cp.y);
     _yDecrease.subAssign(yReserve);
     yDecrease.set(_yDecrease);
   }
