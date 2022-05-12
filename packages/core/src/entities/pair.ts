@@ -45,14 +45,11 @@ export class Pair {
   }
 
   static calculateNewLiquidity(
-    state: CP,
     maturity: Uint256,
-    totalLiquidity: Uint256,
     assetIn: Uint112,
     debtIn: Uint112,
     collateralIn: Uint112,
-    now: Uint256,
-    feeStored: Uint256
+    now: Uint256
   ): LiquidityReturn {
     const givenNewReturn = givenNew(
       maturity,
@@ -63,9 +60,13 @@ export class Pair {
     );
 
     const liquidityReturn = mint(
-      feeStored,
-      state,
-      totalLiquidity,
+      new Uint256(0),
+      {
+        x: new Uint112(0),
+        y: new Uint112(0),
+        z: new Uint112(0),
+      },
+      new Uint256(0),
       maturity,
       givenNewReturn.xIncrease,
       givenNewReturn.yIncrease,
@@ -359,7 +360,7 @@ export class Pair {
     return { ...borrowReturn, ...givenPercentBorrowReturn };
   }
 
-  static calculateBurn(
+  static calculateRemoveLiquidity(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,

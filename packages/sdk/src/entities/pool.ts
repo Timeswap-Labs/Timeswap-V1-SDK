@@ -223,12 +223,7 @@ export class Pool {
     collateralIn: Uint112,
     now: Uint256
   ): Promise<LiquidityReturn> {
-    if (!this.cache) await this.updateCache();
-
     return this.pair.calculateNewLiquidity(
-      this.cache!.state,
-      this.cache!.feeStored,
-      this.cache!.totalLiquidity,
       assetIn,
       debtIn,
       collateralIn,
@@ -403,12 +398,12 @@ export class Pool {
     );
   }
 
-  async calculateBurn(
+  async calculateRemoveLiquidity(
     liquidityIn: Uint256
   ): Promise<{ assetOut: Uint256; collateralOut: Uint128 }> {
     if (!this.cache) await this.updateCache();
 
-    return this.pair.calculateBurn(
+    return this.pair.calculateRemoveLiquidity(
       this.cache!.reserves,
       this.cache!.totalClaims,
       this.cache!.totalLiquidity,

@@ -296,9 +296,6 @@ export class Pair {
   }
 
   calculateNewLiquidity(
-    state: CP,
-    feeStored: Uint256,
-    totalLiquidity: Uint256,
     assetIn: Uint112,
     debtIn: Uint112,
     collateralIn: Uint112,
@@ -306,14 +303,11 @@ export class Pair {
     now: Uint256
   ): LiquidityReturn {
     return PairCore.calculateNewLiquidity(
-      state,
       maturity,
-      totalLiquidity,
       assetIn,
       debtIn,
       collateralIn,
-      now,
-      feeStored
+      now
     );
   }
 
@@ -499,14 +493,14 @@ export class Pair {
     return PairCore.calculateWithdraw(reserves, totalClaims, claimsIn);
   }
 
-  calculateBurn(
+  calculateRemoveLiquidity(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
     liquidityIn: Uint256,
     feeStored: Uint256
   ): { assetOut: Uint256; collateralOut: Uint128 } {
-    return PairCore.calculateBurn(
+    return PairCore.calculateRemoveLiquidity(
       reserves,
       totalClaims,
       totalLiquidity,

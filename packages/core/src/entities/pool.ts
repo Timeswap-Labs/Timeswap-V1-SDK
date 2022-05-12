@@ -43,23 +43,17 @@ export class Pool {
   }
 
   newLiquidity(
-    state: CP,
-    totalLiquidity: Uint256,
     assetIn: Uint112,
     debtIn: Uint112,
     collateralIn: Uint112,
-    now: Uint256,
-    feeStored: Uint256
+    now: Uint256
   ): LiquidityReturn {
     return Pair.calculateNewLiquidity(
-      state,
       this.maturity,
-      totalLiquidity,
       assetIn,
       debtIn,
       collateralIn,
-      now,
-      feeStored
+      now
     );
   }
 
@@ -220,14 +214,14 @@ export class Pool {
     );
   }
 
-  burn(
+  removeLiquidity(
     reserves: Tokens,
     totalClaims: Claims,
     totalLiquidity: Uint256,
     liquidityIn: Uint256,
     feeStored: Uint256
   ): { assetOut: Uint256; collateralOut: Uint128 } {
-    return Pair.calculateBurn(
+    return Pair.calculateRemoveLiquidity(
       reserves,
       totalClaims,
       totalLiquidity,
