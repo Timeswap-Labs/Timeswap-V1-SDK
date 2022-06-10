@@ -104,7 +104,7 @@ export class ConvSigner extends Conv {
     const collateralIn = new Uint112(params.collateralIn).toBigInt();
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'newLiquidity',
       [
@@ -189,7 +189,7 @@ export class ConvSigner extends Conv {
     const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'liquidityGivenAsset',
       [
@@ -279,7 +279,7 @@ export class ConvSigner extends Conv {
     const maxCollateral = new Uint112(params.maxCollateral).toBigInt();
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'liquidityGivenDebt',
       [
@@ -369,7 +369,7 @@ export class ConvSigner extends Conv {
     const maxDebt = new Uint112(params.maxDebt).toBigInt();
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'liquidityGivenCollateral',
       [
@@ -455,7 +455,7 @@ export class ConvSigner extends Conv {
     const maturity = new Uint256(params.maturity).toBigInt();
     const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'removeLiquidity',
       [
@@ -477,7 +477,7 @@ export class ConvSigner extends Conv {
     const maturity = new Uint256(params.maturity).toBigInt();
     const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'removeLiquidityETHAsset',
       [
@@ -498,7 +498,7 @@ export class ConvSigner extends Conv {
     const maturity = new Uint256(params.maturity).toBigInt();
     const liquidityIn = new Uint256(params.liquidityIn).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'removeLiquidityETHCollateral',
       [
@@ -781,7 +781,7 @@ export class ConvSigner extends Conv {
       params.claimsIn.insuranceInterest
     ).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'collect',
       [
@@ -810,7 +810,7 @@ export class ConvSigner extends Conv {
       params.claimsIn.insuranceInterest
     ).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'collectETHAsset',
       [
@@ -838,7 +838,7 @@ export class ConvSigner extends Conv {
       params.claimsIn.insuranceInterest
     ).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'collectETHCollateral',
       [
@@ -1118,7 +1118,7 @@ export class ConvSigner extends Conv {
     );
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'repay',
       [
@@ -1174,7 +1174,7 @@ export class ConvSigner extends Conv {
     );
     const deadline = new Uint256(params.deadline).toBigInt();
 
-    return contractInteractionPayable(
+    return contractInteraction(
       this.convContract,
       'repayETHCollateral',
       [
