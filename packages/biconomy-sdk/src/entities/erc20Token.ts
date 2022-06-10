@@ -1,4 +1,4 @@
-import { Provider } from '@ethersproject/abstract-provider';
+import { Provider, JsonRpcProvider } from '@ethersproject/providers';
 import { Signer } from '@ethersproject/abstract-signer';
 import {
   Uint256,
@@ -89,14 +89,44 @@ export class ERC20TokenSigner extends ERC20Token {
     spender: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.approve(spender, amount.toBigInt());
+    const { data } = await this.erc20Contract.populateTransaction.approve(
+      spender,
+      amount.toBigInt()
+    );
+
+    const provider = this.erc20Contract.provider as JsonRpcProvider;
+    const txnParams = {
+      data,
+      to: this.erc20Contract.address,
+      from: await this.erc20Contract.signer.getAddress(),
+      signatureType: 'EIP712_SIGN',
+    };
+
+    const txnHash = provider.send('eth_sendTransaction', [txnParams]);
+
+    return provider.getTransaction(txnHash);
   }
 
   async transfer(
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transfer(recipient, amount.toBigInt());
+    const { data } = await this.erc20Contract.populateTransaction.transfer(
+      recipient,
+      amount.toBigInt()
+    );
+
+    const provider = this.erc20Contract.provider as JsonRpcProvider;
+    const txnParams = {
+      data,
+      to: this.erc20Contract.address,
+      from: await this.erc20Contract.signer.getAddress(),
+      signatureType: 'EIP712_SIGN',
+    };
+
+    const txnHash = provider.send('eth_sendTransaction', [txnParams]);
+
+    return provider.getTransaction(txnHash);
   }
 
   async transferFrom(
@@ -104,10 +134,22 @@ export class ERC20TokenSigner extends ERC20Token {
     recipient: string,
     amount: Uint256
   ): Promise<ContractTransaction> {
-    return this.erc20Contract.transferFrom(
+    const { data } = await this.erc20Contract.populateTransaction.transferFrom(
       sender,
       recipient,
       amount.toBigInt()
     );
+
+    const provider = this.erc20Contract.provider as JsonRpcProvider;
+    const txnParams = {
+      data,
+      to: this.erc20Contract.address,
+      from: await this.erc20Contract.signer.getAddress(),
+      signatureType: 'EIP712_SIGN',
+    };
+
+    const txnHash = provider.send('eth_sendTransaction', [txnParams]);
+
+    return provider.getTransaction(txnHash);
   }
 }
