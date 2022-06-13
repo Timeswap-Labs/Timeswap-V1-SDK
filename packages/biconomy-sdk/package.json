@@ -1,5 +1,5 @@
 {
-  "version": "1.2.5-Beta",
+  "version": "1.0.1",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -16,13 +16,9 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "@timeswap-labs/timeswap-v1-sdk",
+  "name": "@timeswap-labs/timeswap-v1-biconomy-sdk",
   "author": "Emmanuel Antony",
-  "module": "./dist/timeswap-v1-sdk.esm.js",
   "repository": "git://github.com/Timeswap-Labs/Timeswap-V1-SDK.git",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "size-limit": [
     {
       "path": "./dist/timeswap-v1-sdk.cjs.production.min.js",
@@ -47,7 +43,7 @@
     "@ethersproject/abstract-signer": "^5.5.0",
     "@ethersproject/contracts": "^5.5.0",
     "@ethersproject/providers": "^5.5.1",
-    "@timeswap-labs/timeswap-v1-sdk-core": "1.2.3-Beta",
+    "@timeswap-labs/timeswap-v1-sdk-core": "1.2.5-Beta",
     "tiny-invariant": "^1.1.0"
   }
 }
