@@ -1,5 +1,5 @@
 {
-  "version": "1.2.3-Beta",
+  "version": "1.2.5-Beta",
   "main": "./dist/index.js",
   "scripts": {
     "start": "tsdx watch",
@@ -20,9 +20,6 @@
   "author": "Emmanuel Antony",
   "module": "./dist/timeswap-v1-sdk-core.esm.js",
   "repository": "git://github.com/Timeswap-Labs/Timeswap-V1-SDK.git",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "size-limit": [
     {
       "path": "./dist/timeswap-v1-sdk-core.cjs.production.min.js",
