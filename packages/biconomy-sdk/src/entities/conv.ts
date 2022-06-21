@@ -1205,7 +1205,8 @@ async function contractInteraction(
       : gasUnits;
 
   const gasLimit = (maxGasUnits * 120n) / 100n;
-
+  if (gasLimit < 0n) {
+  } //to avoid unused variable error
   const { data } = await contract.populateTransaction[functionName](arg);
 
   const provider = contract.provider as JsonRpcProvider;
@@ -1213,7 +1214,7 @@ async function contractInteraction(
     data,
     to: contract.address,
     from: await contract.signer.getAddress(),
-    gasLimit,
+    // gasLimit,
     signatureType: 'EIP712_SIGN',
   };
 
