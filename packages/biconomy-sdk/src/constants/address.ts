@@ -2,7 +2,7 @@ import { ChainId } from './chainId';
 
 export const CONVENIENCE: AddressMap = {
          [ChainId.RINKEBY]: '0xefE81D4Aed8E58706b1B592d372DA21c46e64bBc',
-         [ChainId.MATIC_TESTNET]: '0x85E56049A9aF0c865Ab87c753DE43527d0A926bb',
+         [ChainId.MATIC_TESTNET]: '0xE80D3402d7787F9F7dE4C31089369A82FaC0293B',
          [ChainId.MATIC]: '0x6c4D0cb3F41394d4Ab9059f7Ee3D09a31F23c33d',
        };
 
