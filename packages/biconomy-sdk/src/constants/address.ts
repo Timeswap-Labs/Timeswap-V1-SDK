@@ -1,10 +1,10 @@
 import { ChainId } from './chainId';
 
 export const CONVENIENCE: AddressMap = {
-  [ChainId.RINKEBY]: '0xefE81D4Aed8E58706b1B592d372DA21c46e64bBc',
-  [ChainId.MATIC_TESTNET]: '0xC1490b50eDF71bA2ceD77E756d2FDFB82B3A5Cf6',
-  [ChainId.MATIC]: '0x6c4D0cb3F41394d4Ab9059f7Ee3D09a31F23c33d',
-};
+         [ChainId.RINKEBY]: '0xefE81D4Aed8E58706b1B592d372DA21c46e64bBc',
+         [ChainId.MATIC_TESTNET]: '0x85E56049A9aF0c865Ab87c753DE43527d0A926bb',
+         [ChainId.MATIC]: '0x6c4D0cb3F41394d4Ab9059f7Ee3D09a31F23c33d',
+       };
 
 export const FACTORY: AddressMap = {
   [ChainId.RINKEBY]: '0x87838724523EB63fb3Af8418b3f14f00d4AcED08',
