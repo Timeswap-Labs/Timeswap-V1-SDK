@@ -1465,10 +1465,10 @@
     webpack "^4.44.1"
     webpack-bundle-analyzer "^4.4.2"
 
-"@timeswap-labs/timeswap-v1-sdk-core@1.2.3-Beta":
-  version "1.2.3-Beta"
-  resolved "https://registry.yarnpkg.com/@timeswap-labs/timeswap-v1-sdk-core/-/timeswap-v1-sdk-core-1.2.3-Beta.tgz#02df86f0330593efa5bc94bc1ac2dc8545679478"
-  integrity sha512-qtRRfoNkSCuzytl8S8enU1GGCqmy6oPghNMAJS4iKFLK1ryaiBFXT2rOp/k9UgSki6RopwavknpIog9L+SqA5g==
+"@timeswap-labs/timeswap-v1-sdk-core@1.2.5-Beta":
+  version "1.2.5-Beta"
+  resolved "https://registry.yarnpkg.com/@timeswap-labs/timeswap-v1-sdk-core/-/timeswap-v1-sdk-core-1.2.5-Beta.tgz#335bbdffb71abda2de6c7e5c9381066c21e97177"
+  integrity sha512-TlK3EINDMv5ifVoeLLM+kPPpx+iI2Z9p1Xo1X2omtnkTHzWFmPxRuxJpbrcqiYRVE25LnDPwEoqiewD9F5YvBg==
   dependencies:
     "@ethersproject/address" "^5.5.0"
     tiny-invariant "^1.1.0"
